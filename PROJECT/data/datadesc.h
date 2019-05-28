@@ -8,6 +8,9 @@
 
 #define MAX_PRICE 9999
 
+// 6 постов мойки - 6 купюроприемников и 6 монетоприемников
+#define COUNT_POST 6
+
 #define DEFAULT_PASSWORD 1111
 #define MASTER_PASSWORD 11300045//1234567890L
 
@@ -59,14 +62,14 @@ typedef struct{
 
 // структура конфигурации аппаратуры
 typedef struct{
-  CPU_INT32U  EnableValidator;
-  CPU_INT32U  EnableCoinAcceptor;
+  CPU_INT32U  EnableValidator[COUNT_POST];
+  CPU_INT32U  EnableCoinAcceptor[COUNT_POST];
   CPU_INT32U  EnableModem;
   CPU_INT32U  EnableFiscal;
   CPU_INT32U  EnableFiscalDayClear;
   CPU_INT32U  ServiceName;
 
-  CPU_INT32U  CoinPerPulse; // цена импульса монетоприемника
+  CPU_INT32U  CoinPerPulse[COUNT_POST]; // цена импульса монетоприемника
   CPU_INT32U  BillFormat;
   
   CPU_INT32U  DisableFiscalErrors; // отключение реакции на ошибки ФР
@@ -77,8 +80,8 @@ typedef struct{
   CPU_INT32U  ClearJournalAfterSend;
   CPU_INT32U  StatSendHourMin;
 
-  CPU_INT32U  CashMode;
-  CPU_INT32U  CashPerPulse; // цена импульса купюрника
+  CPU_INT32U  CashMode[COUNT_POST];
+  CPU_INT32U  CashPerPulse[COUNT_POST]; // цена импульса купюрника
   CPU_INT32U  PrintTimeout;
   CPU_INT32U  PrintTimeoutAfter;
 
@@ -227,4 +230,7 @@ extern TDataDescStruct const SubjSellDesc;
 extern TDataDescStruct const CommandV2Desc;
 extern TDataDescStruct const TaxSystemDesc;
 
+extern TDataDescStruct const CoinIndexDesc;
+extern TDataDescStruct const CashIndexDesc;
+extern CPU_INT32U CoinIndex;
 #endif //#ifndef _DATADESC_H_

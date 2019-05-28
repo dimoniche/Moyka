@@ -844,9 +844,9 @@ const TMenuPanel PriceWeekendMenuPanel[] = {arr_PriceMenuArrayWend, OnEnterPanel
 
 const CPU_INT08U str_DeviceMenu_0[] = "   ОБОРУДОВАНИЕ";
 const CPU_INT08U str_DeviceMenu_1[] = "ФР";
-const CPU_INT08U str_DeviceMenu_2[] = "Монетоприемник";
-const CPU_INT08U str_DeviceMenu_3[] = "Модем";
-const CPU_INT08U str_DeviceMenu_4[] = "Купюроприемник";
+const CPU_INT08U str_DeviceMenu_2[] = "Монетоприемники";
+//const CPU_INT08U str_DeviceMenu_3[] = "Модем";
+const CPU_INT08U str_DeviceMenu_4[] = "Купюроприемники";
 
 const TMenuLine line_DeviceMenu_0 = {
   MENU_LINE_STRING,               // тип пункта меню
@@ -876,15 +876,15 @@ const TMenuLine line_DeviceMenu_3 = {
   (void*)&CoinSetupPanel                            // панель для перехода
 };
 
-const TMenuLine line_DeviceMenu_4 = {
+/*const TMenuLine line_DeviceMenu_4 = {
   MENU_LINE_GOTO_MENU,               // тип пункта меню
   0,                              // доп. флаги  
   (void*)str_DeviceMenu_3,       // указатель на текстовую строку или дескриптор
   (void*)&ModemSetupPanel                            // панель для перехода
-};
+};*/
 
-const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_3, &line_DeviceMenu_4, NULL};
-const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 5, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_3, /*&line_DeviceMenu_4,*/ NULL};
+const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 4, MENU_PANEL_STANDARD};
 
 
 /***********************************
@@ -988,14 +988,12 @@ const TMenuLineArray arr_FrMenuArray[] = {&line_FrMenu_0, &line_FrMenu_1, &line_
 const TMenuPanel FrMenuPanel[] = {arr_FrMenuArray, NULL, 13, MENU_PANEL_STANDARD};
 
 /***********************************
-  МЕНЮ НАСТРОЙКА МОНЕТОПРИЕМНИКА
+  МЕНЮ НАСТРОЙКА МОНЕТОПРИЕМНИКОВ
 ***********************************/
-const CPU_INT08U str_CoinMenu_0[] = "НАСТРОйКИ МОНЕТОПР.";
-
 const TMenuLine line_CoinMenu_0 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_CoinMenu_0,        // указатель на текстовую строку или дескриптор
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
+  (void*)&CoinIndexDesc,          // указатель на текстовую строку или дескриптор
   NULL                            // панель для перехода
 };
 
@@ -1013,18 +1011,22 @@ const TMenuLine line_CoinMenu_2 = {
   NULL                            // панель для перехода
 };
 
+void OnEnterCoinMenu(void)
+{
+    CoinIndex = 0;
+}
+
 const TMenuLineArray arr_CoinMenuArray[] = {&line_CoinMenu_0, &line_CoinMenu_1, &line_CoinMenu_2, NULL};
-const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, NULL, 3, MENU_PANEL_STANDARD};
+const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, OnEnterCoinMenu, 3, MENU_PANEL_STANDARD};
 
 /***********************************
-  МЕНЮ НАСТРОЙКА КУПЮРОПРИЕМНИКА
+  МЕНЮ НАСТРОЙКА КУПЮРОПРИЕМНИКОВ
 ***********************************/
-const CPU_INT08U str_CashMenu_0[] = "НАСТРОйКИ КУПЮРОПР.";
 
 const TMenuLine line_CashMenu_0 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_CashMenu_0,        // указатель на текстовую строку или дескриптор
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
+  (void*)&CashIndexDesc,        // указатель на текстовую строку или дескриптор
   NULL                            // панель для перехода
 };
 
@@ -1064,7 +1066,7 @@ const TMenuLine line_CashMenu_5 = {
 };
 
 const TMenuLineArray arr_ValidatorMenuArray[] = {&line_CashMenu_0, &line_CashMenu_1, &line_CashMenu_2, &line_CashMenu_3, &line_CashMenu_4, &line_CashMenu_5, NULL};
-const TMenuPanel ValidatorSetupPanel[] = {arr_ValidatorMenuArray, NULL, 6, MENU_PANEL_STANDARD};
+const TMenuPanel ValidatorSetupPanel[] = {arr_ValidatorMenuArray, OnEnterCoinMenu, 6, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ НАСТРОЙКА МОДЕМА

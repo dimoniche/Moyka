@@ -5,7 +5,6 @@
 
 #define CONSOLE_TCP_DEFAULT_PORT    10000
 
-
 extern CPU_INT32U incas_bill_nom_counter[24];
 extern CPU_INT32U incas_common_bill_counter;
 

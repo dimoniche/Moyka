@@ -8,13 +8,9 @@
 #include "modem.h"
 #include <stdlib.h>
 
-
 OS_STK  CoinTaskStk[COIN_TASK_STK_SIZE];
 
 void  InitImpInput(void);
-
-// 6 постов мойки - 6 купюроприемников и 6 монетоприемников
-#define COUNT_POST 6
 
 CPU_INT32U  CoinImpCounter[COUNT_POST];
 CPU_INT32U  CashImpCounter[COUNT_POST];

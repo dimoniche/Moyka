@@ -161,9 +161,9 @@ TDataDescStruct const CashPulseLenDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  NULL,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, cash_pulse_len),            // указатель на переменную или адрес FRAM
   (void*)&CashPulseLenRange,     // указатель на границы параметра
   OnChangeCashPulseLen,                     // функция по изменению
@@ -185,9 +185,9 @@ TDataDescStruct const CashPauseLenDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  NULL,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, cash_pause_len),            // указатель на переменную или адрес FRAM
   (void*)&CashPauseLenRange,     // указатель на границы параметра
   OnChangeCashPulseLen,                     // функция по изменению
@@ -394,9 +394,9 @@ TDataDescStruct const EnableValidatorDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.EnableValidator),            // указатель на переменную или адрес FRAM
   (void*)&EnableValidatorRange,     // указатель на границы параметра
   NULL,                     // функция по изменению
@@ -572,6 +572,43 @@ TDataDescStruct const StatSendHourMinDesc = {
 };
 
 /*************************************
+  Индекс при настройке монетоприемников
+*************************************/
+TRangeValueULONG const CoinIndexRange = {0, 5};
+CPU_INT08U const CoinIndexName[] = "НАСТР.МОНЕТОПР.";
+CPU_INT08U const CoinIndex_str0[] = "1";
+CPU_INT08U const CoinIndex_str1[] = "2";
+CPU_INT08U const CoinIndex_str2[] = "3";
+CPU_INT08U const CoinIndex_str3[] = "4";
+CPU_INT08U const CoinIndex_str4[] = "5";
+CPU_INT08U const CoinIndex_str5[] = "6";
+CPU_INT08U const *CoinIndexList[] = {CoinIndex_str0, CoinIndex_str1,CoinIndex_str2,CoinIndex_str3,CoinIndex_str4,CoinIndex_str5};
+
+CPU_INT32U CoinIndex = 0;
+
+void OnChangeCoinIndex(void)
+{
+}
+
+TDataDescStruct const CoinIndexDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_RAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,             // размер массива
+  NULL,        // указатель на десриптор индекса массива
+  (void*)&CoinIndex,            // указатель на переменную или адрес FRAM
+  (void*)&CoinIndexRange,     // указатель на границы параметра
+  OnChangeCoinIndex,                     // функция по изменению
+  0,       // смещение между элементами в массиве
+  CoinIndexName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  CoinIndexList,                     // указатель на список строк для индексного параметра
+  DATA_INIT_ENABLE,
+  0                           
+};
+
+/*************************************
   Включение монетоприемника
 *************************************/
 TRangeValueULONG const EnableCoinRange = {0, 1};
@@ -586,9 +623,9 @@ TDataDescStruct const EnableCoinDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.EnableCoinAcceptor),            // указатель на переменную или адрес FRAM
   (void*)&EnableCoinRange,     // указатель на границы параметра
   OnchangeEnableCoin,                     // функция по изменению
@@ -610,9 +647,9 @@ TDataDescStruct const CoinPerPulseDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.CoinPerPulse),            // указатель на переменную или адрес FRAM
   (void*)&CoinPerPulseRange,     // указатель на границы параметра
   NULL,                     // функция по изменению
@@ -624,9 +661,37 @@ TDataDescStruct const CoinPerPulseDesc = {
   1                           // значение по умолчанию
 };
 
+/*************************************
+  Индекс при настройке купюроприемников
+*************************************/
+TRangeValueULONG const CashIndexRange = {0, 5};
+CPU_INT08U const CashIndexName[] = "НАСТР.КУПЮРОПР.";
+
+void OnChangeCashIndex(void)
+{
+}
+
+TDataDescStruct const CashIndexDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_RAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,             // размер массива
+  NULL,        // указатель на десриптор индекса массива
+  (void*)&CoinIndex,            // указатель на переменную или адрес FRAM
+  (void*)&CashIndexRange,     // указатель на границы параметра
+  OnChangeCashIndex,                     // функция по изменению
+  0,       // смещение между элементами в массиве
+  CashIndexName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  CoinIndexList,                     // указатель на список строк для индексного параметра
+  DATA_INIT_ENABLE,
+  0                           
+};
+
 
 /*************************************
-  Режим купуюрника
+  Режим купюрника
 *************************************/
 TRangeValueULONG const CashModeRange = {0, 1};
 CPU_INT08U const CashModeName[] = "Режим";
@@ -638,9 +703,9 @@ TDataDescStruct const CashModeDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.CashMode),            // указатель на переменную или адрес FRAM
   (void*)&CashModeRange,     // указатель на границы параметра
   NULL,                     // функция по изменению
@@ -737,9 +802,9 @@ TDataDescStruct const CashPerPulseDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.CashPerPulse),            // указатель на переменную или адрес FRAM
   (void*)&CashPerPulseRange,     // указатель на границы параметра
   NULL,                     // функция по изменению

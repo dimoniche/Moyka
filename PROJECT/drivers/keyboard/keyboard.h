@@ -19,8 +19,8 @@
 
 #define KEY_COUNT           11
 
-#define LED_OK_ON()  {FIO1SET_bit.P1_21 = 1;}
-#define LED_OK_OFF() {FIO1CLR_bit.P1_21 = 1;}
+#define LED_OK_ON()  {/*FIO1SET_bit.P1_21 = 1;*/}
+#define LED_OK_OFF() {/*FIO1CLR_bit.P1_21 = 1;*/}
             
 extern void InitKbrd();
 extern int GetKbrdEvent(int* event);
