@@ -10,6 +10,6 @@
 @REM 
 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\common\bin\cspybat" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armproc.dll" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armsim2.dll"  %1 --plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armbat.dll" --backend -B "--endian=little" "--cpu=ARM7TDMI-S" "--fpu=None" "-p" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\CONFIG\debugger\NXP\iolpc2368.ddf" "--semihosting" "--device=LPC2368" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\common\bin\cspybat" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armproc.dll" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armjlink.dll"  %1 --plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\bin\armbat.dll" --backend -B "--endian=little" "--cpu=ARM7TDMI-S" "--fpu=None" "-p" "C:\Program Files (x86)\IAR Systems\Embedded Workbench 6.0\arm\CONFIG\debugger\NXP\iolpc2368.ddf" "--semihosting" "--device=LPC2368" "--drv_communication=USB0" "--jlink_speed=auto" "--jlink_initial_speed=32" 
 
 

@@ -13,13 +13,16 @@ OS_STK  CoinTaskStk[COIN_TASK_STK_SIZE];
 
 void  InitImpInput(void);
 
-CPU_INT32U  CoinImpCounter;
-CPU_INT32U  CashImpCounter;
+// 6 постов мойки - 6 купюроприемников и 6 монетоприемников
+#define COUNT_POST 6
+
+CPU_INT32U  CoinImpCounter[COUNT_POST];
+CPU_INT32U  CashImpCounter[COUNT_POST];
 
 static CPU_INT32U cash_pulse = 5000;
 static CPU_INT32U cash_pause = 2000;
-static char pend_cash_counter = 0;
-static CPU_INT32U pend_cash_timestamp;
+static char pend_cash_counter[COUNT_POST] = 0;
+static CPU_INT32U pend_cash_timestamp[COUNT_POST];
 
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause)
 {
@@ -37,85 +40,83 @@ void CoinTask(void *p_arg)
   CPU_INT32U enable_coin;
   CPU_INT32U cash_mode;
   CPU_INT32U cash_enable;
-  CPU_INT32U last_cash_count = GetCashCount();
-  CPU_INT32U last_cash_time = OSTimeGet();
-  CPU_INT32U last_settings_time = OSTimeGet();
-
-  GetData(&EnableCoinDesc, &enable_coin, 0, DATA_FLAG_SYSTEM_INDEX);  
-  GetData(&CashModeDesc, &cash_mode, 0, DATA_FLAG_SYSTEM_INDEX);  
-  GetData(&EnableValidatorDesc, &cash_enable, 0, DATA_FLAG_SYSTEM_INDEX);
+  CPU_INT32U last_cash_count[COUNT_POST];
+  CPU_INT32U last_cash_time[COUNT_POST];
+  CPU_INT32U last_settings_time = 0;
 
   while(1)
     {
-      if (OSTimeGet() - last_settings_time > 1000)
-      {
-          last_settings_time = OSTimeGet();
-          GetData(&EnableCoinDesc, &enable_coin, 0, DATA_FLAG_SYSTEM_INDEX);  
-          GetData(&CashModeDesc, &cash_mode, 0, DATA_FLAG_SYSTEM_INDEX);  
-          GetData(&EnableValidatorDesc, &cash_enable, 0, DATA_FLAG_SYSTEM_INDEX);
-      }
-            
-      OSTimeDly(1);
-      
-      if (enable_coin)
-        {
-          if (GetCoinCount())
-          {
-            PostUserEvent(EVENT_COIN_INSERTED);
-          }
-        }
-      else
-       {
-          CoinDisable();
-          GetResetCoinCount();
-        }
+		for(int i = 0; i < COUNT_POST; i++)
+		{
+			if (OSTimeGet() - last_settings_time > 1000)
+			{
+				last_settings_time = OSTimeGet();
+				GetData(&EnableCoinDesc, &enable_coin, i, DATA_FLAG_DIRECT_INDEX);  
+				GetData(&CashModeDesc, &cash_mode, i, DATA_FLAG_DIRECT_INDEX);  
+				GetData(&EnableValidatorDesc, &cash_enable, i, DATA_FLAG_DIRECT_INDEX);
+			}
+				
+			OSTimeDly(1);
 
-      if (!cash_enable) {GetResetCashCount(); continue;}
+			if (enable_coin)
+			{
+				if (GetCoinCount(i))
+				{
+					PostUserEvent(EVENT_COIN_INSERTED);
+				}
+			}
+			else
+			{
+				CoinDisable();
+				GetResetCoinCount(i);
+			}
 
-      #if OS_CRITICAL_METHOD == 3
-      OS_CPU_SR  cpu_sr = 0;
-      #endif
-      OS_ENTER_CRITICAL();
-      if (pend_cash_counter)
-      {
-          // импульсы инкрементируем только после выдержки паузы
-          if (OSTimeGet() - pend_cash_timestamp > cash_pause)
-          {
-            pend_cash_counter = 0;
-            CashImpCounter++;
-          }
-      }
-      OS_EXIT_CRITICAL();
-            
-      if (cash_mode == 1)
-        {
-          if (GetCashCount())
-          {
-            if (last_cash_count == GetCashCount())
-            {
-                if (labs(OSTimeGet() - last_cash_time) > 500)
-                {
-                  PostUserEvent(EVENT_CASH_INSERTED);
-                }
-            }
-            else
-            {
-                last_cash_count = GetCashCount();
-                last_cash_time = OSTimeGet();
-            }
-          }
-          else
-          {
-            last_cash_time = OSTimeGet();
-          }
-        }
-      else
-       {
-          GetResetCashCount();
-       }
+			if (!cash_enable) {GetResetCashCount(i); continue;}
 
+			#if OS_CRITICAL_METHOD == 3
+			OS_CPU_SR  cpu_sr = 0;
+			#endif
+			OS_ENTER_CRITICAL();
+			
+			if (pend_cash_counter[i])
+			{
+			  // импульсы инкрементируем только после выдержки паузы
+			  if (OSTimeGet() - pend_cash_timestamp[i] > cash_pause)
+			  {
+				pend_cash_counter[i] = 0;
+				CashImpCounter[i]++;
+			  }
+			}
+			OS_EXIT_CRITICAL();
+				
+			if (cash_mode == 1)
+			{
+			  if (GetCashCount(i))
+			  {
+				if (last_cash_count[i] == GetCashCount(i))
+				{
+					if (labs(OSTimeGet() - last_cash_time[i]) > 500)
+					{
+					  PostUserEvent(EVENT_CASH_INSERTED);
+					}
+				}
+				else
+				{
+					last_cash_count[i] = GetCashCount(i);
+					last_cash_time[i] = OSTimeGet();
+				}
+			  }
+			  else
+			  {
+				last_cash_time[i] = OSTimeGet();
+			  }
+			}
+			else
+			{
+			  GetResetCashCount(i);
+			}
+		}
     }
-
 }
 
 void CoinDisable(void)
@@ -129,51 +130,51 @@ void CoinEnable(void)
 }
 
 // получить число монет
-CPU_INT32U GetCoinCount(void)
+CPU_INT32U GetCoinCount(int index)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  CPU_INT32U ctr = CoinImpCounter;
+  CPU_INT32U ctr = CoinImpCounter[index];
   OS_EXIT_CRITICAL();
   return ctr;
 }
 
 // получить число монет и сбросить счетчик
-CPU_INT32U GetResetCoinCount(void)
+CPU_INT32U GetResetCoinCount(int index)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  CPU_INT32U ctr = CoinImpCounter;
-  CoinImpCounter = 0;
+  CPU_INT32U ctr = CoinImpCounter[index];
+  CoinImpCounter[index] = 0;
   OS_EXIT_CRITICAL();
   return ctr;
 }
 
 // получить число импульсов от купюрника
-CPU_INT32U GetCashCount(void)
+CPU_INT32U GetCashCount(int index)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  CPU_INT32U ctr = CashImpCounter;
+  CPU_INT32U ctr = CashImpCounter[index];
   OS_EXIT_CRITICAL();
   return ctr;
 }
 
 // получить число импульсов от купюрника и сбросить счетчик
-CPU_INT32U GetResetCashCount(void)
+CPU_INT32U GetResetCashCount(int index)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  CPU_INT32U ctr = CashImpCounter;
-  CashImpCounter = 0;
+  CPU_INT32U ctr = CashImpCounter[index];
+  CashImpCounter[index] = 0;
   OS_EXIT_CRITICAL();
   return ctr;
 }
@@ -181,56 +182,51 @@ CPU_INT32U GetResetCashCount(void)
 // инициализация монетоприемника
 void InitCoin(void)
 {
-  CoinImpCounter = 0;
-  CashImpCounter = 0;
+  //CoinImpCounter = 0;
+  //CashImpCounter = 0;
   InitImpInput();
   OSTaskCreate(CoinTask, (void *)0, (OS_STK *)&CoinTaskStk[COIN_TASK_STK_SIZE-1], COIN_TASK_PRIO);
 }
 
-
 void InputCapture_ISR(void)
 {
-  CPU_INT08U ir = T3IR;
   static CPU_INT32U period = 0;
   static CPU_INT32U period_cash = 0;
-  T3IR = 0xFF;
+  static CPU_INT32U T3CR = 0;
 
-  if (ir & 0x10)
-    {// CR0 interrupt
+  // наращиваем тики
+  T3CR++;
   
-      if (FIO0PIN_bit.P0_23)
-        {// пришел задний фронт
-          CPU_INT32U cr=T3CR0;
-          if (((cr-period) > COIN_IMP_MIN_LEN)
-               &&  ((cr-period) < COIN_IMP_MAX_LEN))
-            CoinImpCounter++;
-        }
-      else
-        {// пришел передний фронт
-          period = T3CR0;
-        }
-    }
+  if (FIO0PIN_bit.P0_23)
+	{ // пришел задний фронт
+	  if (((T3CR-period) > COIN_IMP_MIN_LEN)
+	  &&  ((T3CR-period) < COIN_IMP_MAX_LEN))
+		{
+			//CoinImpCounter++;
+		}
+	}
+  else
+	{ // пришел передний фронт
+	  period = T3CR;
+	}
 
-  if (ir & 0x20)
-    {// CR1 interrupt
-  
-      if (FIO0PIN_bit.P0_24)
-        {// пришел задний фронт
-          CPU_INT32U cr=T3CR1;
-          cr -= period_cash;
-          if ((cr > (cash_pulse - COIN_IMP_SPAN))
-               &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
-          {
-              pend_cash_counter = 1;
-              pend_cash_timestamp = OSTimeGet();
-          }
-        }
-      else
-        {// пришел передний фронт
-          period_cash = T3CR1;
-          pend_cash_counter = 0;
-        }
-    }
+  if (FIO0PIN_bit.P0_24)
+	{ // пришел задний фронт
+	  CPU_INT32U cr=T3CR;
+	  cr -= period_cash;
+	  
+	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  {
+		  //pend_cash_counter = 1;
+		  //pend_cash_timestamp = OSTimeGet();
+	  }
+	}
+  else
+	{ // пришел передний фронт
+	  period_cash = T3CR;
+	  //pend_cash_counter = 0;
+	}
 }
 
 
@@ -240,8 +236,7 @@ extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
 P0.23	MK_P9	IMPULSE OUTPUT (импульсный выход монетоприемника)
 P0.24	MK_P8	INHIBIT (блокировка)
 */
-// инициализация импульсного входа
-// используется CAP3.0
+// инициализация импульсных входов
 void  InitImpInput (void)
 {
     #define INPUT_CAPTURE_FREQ  100000  // частота тактирования частотных входов
@@ -277,7 +272,7 @@ void  InitImpInput (void)
     T3CTCR_bit.CIS    =   0;          // select CAP3.0 input
     T3PR              =   rld_cnts-1;
     T3MCR             =   0;
-    T3CCR             =   0x3F;
+    T3CCR             =   0x00;
     T3EMR             =   0;
     T3TCR             =   0x03;
     T3TCR             =   0x01;

@@ -331,7 +331,7 @@ void UserAppTask(void *p_arg)
                 CPU_INT32U cpp = 1;
                 CPU_INT32U money, accmoney;
                 GetData(&CoinPerPulseDesc, &cpp, 0, DATA_FLAG_SYSTEM_INDEX);
-                money = cpp*GetResetCoinCount();
+                //money = cpp*GetResetCoinCount();
                 accmoney = GetAcceptedMoney();
                 accmoney += money;
                 SetAcceptedMoney(accmoney);
@@ -349,7 +349,7 @@ void UserAppTask(void *p_arg)
                 CPU_INT32U cpp = 1;
                 CPU_INT32U money, accmoney;
                 GetData(&CashPerPulseDesc, &cpp, 0, DATA_FLAG_SYSTEM_INDEX);
-                money = cpp * GetResetCashCount();
+                //money = cpp * GetResetCashCount();
                 accmoney = GetAcceptedMoney();
                 accmoney += money;
                 SetAcceptedMoney(accmoney);

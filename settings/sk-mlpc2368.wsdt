@@ -3,7 +3,7 @@
 <Workspace>
   <ConfigDictionary>
     
-  <CurrentConfigs><Project>sk-mlpc2368/Flash Post</Project></CurrentConfigs></ConfigDictionary>
+  <CurrentConfigs><Project>sk-mlpc2368/Flash Central</Project></CurrentConfigs></ConfigDictionary>
   <Desktop>
     <Static>
       <Build>
@@ -18,9 +18,9 @@
           
           
           
-        <Column0>192</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+        <Column0>175</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
-    </Static>
+    <Find-in-Files><ColumnWidth0>440</ColumnWidth0><ColumnWidth1>62</ColumnWidth1><ColumnWidth2>754</ColumnWidth2></Find-in-Files><TerminalIO/></Static>
     <Windows>
       
       
@@ -32,7 +32,7 @@
             <Factory>Build</Factory>
             <Session/>
           </Tab>
-        </Tabs>
+        <Tab><Identity>TabID-28963-15244</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab></Tabs>
         
       <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
         <Tabs>
@@ -42,7 +42,7 @@
             <Factory>Workspace</Factory>
             <Session>
               
-            <NodeDict><ExpandedNode>sk-mlpc2368</ExpandedNode></NodeDict></Session>
+            <NodeDict><ExpandedNode>sk-mlpc2368</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT/drivers</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT/drivers/keyboard</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT/libs</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT/menu</ExpandedNode><ExpandedNode>sk-mlpc2368/PROJECT/services</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
         
@@ -52,14 +52,14 @@
       
       
       
-    <Pane/><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\fr.c</Filename><XPos>0</XPos><YPos>66</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\coin.c</Filename><XPos>0</XPos><YPos>157</YPos><SelStart>4537</SelStart><SelEnd>4537</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\datadesc.c</Filename><XPos>0</XPos><YPos>133</YPos><SelStart>6348</SelStart><SelEnd>6348</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\data.h</Filename><XPos>0</XPos><YPos>72</YPos><SelStart>2419</SelStart><SelEnd>2441</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\app_serv.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>1007</SelStart><SelEnd>1007</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\8\positive_6_24\OS\app\app.c</Filename><XPos>0</XPos><YPos>29</YPos><SelStart>1131</SelStart><SelEnd>1131</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\app_serv.c</Filename><XPos>0</XPos><YPos>319</YPos><SelStart>10711</SelStart><SelEnd>10711</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\menu\menudesc.c</Filename><XPos>0</XPos><YPos>135</YPos><SelStart>6324</SelStart><SelEnd>6324</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\keyboard\keyboard.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\keyboard\keyboard.c</Filename><XPos>0</XPos><YPos>99</YPos><SelStart>2767</SelStart><SelEnd>2767</SelEnd></Tab><ActiveTab>9</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\bsp\iolpc2368.h</Filename><XPos>0</XPos><YPos>421</YPos><SelStart>9913</SelStart><SelEnd>9913</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-033839e8><key>iaridepm.enu1</key></Toolbar-033839e8></Sizes></Row0></Top><Left><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>531</Bottom><Right>266</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>156250</sizeHorzCX><sizeHorzCY>210305</sizeHorzCY><sizeVertCX>209375</sizeVertCX><sizeVertCY>560463</sizeVertCY></Rect></Wnd3></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>375</Bottom><Right>1282</Right><x>-2</x><y>-2</y><xscreen>1284</xscreen><yscreen>377</yscreen><sizeHorzCX>1003125</sizeHorzCX><sizeHorzCY>396425</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>210305</sizeVertCY></Rect></Wnd2></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-04462d18><key>iaridepm.enu1</key></Toolbar-04462d18></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>719</Bottom><Right>266</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>156250</sizeHorzCX><sizeHorzCY>210305</sizeHorzCY><sizeVertCX>209375</sizeVertCX><sizeVertCY>758149</sizeVertCY></Rect></Wnd3></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>187</Bottom><Right>1282</Right><x>-2</x><y>-2</y><xscreen>1284</xscreen><yscreen>189</yscreen><sizeHorzCX>1003125</sizeHorzCX><sizeHorzCY>198738</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>210305</sizeVertCY></Rect></Wnd2></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 

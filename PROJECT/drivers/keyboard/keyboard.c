@@ -17,61 +17,61 @@ unsigned long kbrd_state;
 void InitKbrd()
 {
  // проинициализируем порты
-/*      
-P0.28	MK_P24	«1»
-P0.27	MK_P25	«2»
-P3.26	MK_P26	«3»
-P3.25	MK_P27	«a»
-P1.18	MK_P32	«b»
-P1.19	MK_P33	«c»
+/*
+P2.3	MK_P24	«1»
+P2.5	MK_P25	«2»
+P2.11	MK_P26	«3»
+P1.29	MK_P27	«a»
+P2.13	MK_P32	«b»
+P2.12	MK_P33	«c»
 */
     
   // подсветка кнопки OK
-  PINSEL3_bit.P1_21 = 0x0;
-  PINMODE3_bit.P1_21 = 0;
-  FIO1DIR_bit.P1_21 = 1;
-  FIO1MASK_bit.P1_21 = 0;
-  FIO1CLR_bit.P1_21 = 1;
+  //PINSEL3_bit.P1_21 = 0x0;
+  //PINMODE3_bit.P1_21 = 0;
+  //FIO1DIR_bit.P1_21 = 1;
+  //FIO1MASK_bit.P1_21 = 0;
+  //FIO1CLR_bit.P1_21 = 1;
   
   // сканирующие линии
-  PINSEL1_bit.P0_28 = 0x0;
-  PINSEL1_bit.P0_27 = 0x0;
-  PINSEL7_bit.P3_26 = 0x0;
+  PINSEL4_bit.P2_3 = 0x0;
+  PINSEL4_bit.P2_5 = 0x0;
+  PINSEL4_bit.P2_11 = 0x0;
 
-  PINMODE1_bit.P0_28 = 0;
-  PINMODE1_bit.P0_27 = 0;
-  PINMODE7_bit.P3_26 = 0;
+  PINMODE4_bit.P2_3 = 0;
+  PINMODE4_bit.P2_5 = 0;
+  PINMODE4_bit.P2_11 = 0;
     
-  FIO0DIR_bit.P0_28 = 1;
-  FIO0DIR_bit.P0_27 = 1;
-  FIO3DIR_bit.P3_26 = 1;
+  FIO2DIR_bit.P2_3 = 1;
+  FIO2DIR_bit.P2_5 = 1;
+  FIO2DIR_bit.P2_11 = 1;
 
-  FIO0MASK_bit.P0_28 = 0;
-  FIO0MASK_bit.P0_27 = 0;
-  FIO3MASK_bit.P3_26 = 0;
+  FIO2MASK_bit.P2_3 = 0;
+  FIO2MASK_bit.P2_5 = 0;
+  FIO2MASK_bit.P2_11 = 0;
   
   // входные линии
-  PINSEL3_bit.P1_18 = 0x0;
-  PINSEL3_bit.P1_19 = 0x0;
-  PINSEL7_bit.P3_25 = 0x0;
+  PINSEL3_bit.P1_29 = 0x0;
+  PINSEL4_bit.P2_13 = 0x0;
+  PINSEL4_bit.P2_12 = 0x0;
 
-  PINMODE3_bit.P1_18 = 0;
-  PINMODE3_bit.P1_19 = 0;
-  PINMODE7_bit.P3_25 = 0;
+  PINMODE3_bit.P1_29 = 0;
+  PINMODE4_bit.P2_13 = 0;
+  PINMODE4_bit.P2_12 = 0;
     
-  FIO1DIR_bit.P1_18 = 0;
-  FIO1DIR_bit.P1_19 = 0;
-  FIO3DIR_bit.P3_25 = 0;
+  FIO1DIR_bit.P1_29 = 0;
+  FIO2DIR_bit.P2_13 = 0;
+  FIO2DIR_bit.P2_12 = 0;
 
-  FIO1MASK_bit.P1_18 = 0;
-  FIO1MASK_bit.P1_19 = 0;
-  FIO3MASK_bit.P3_25 = 0;
+  FIO1MASK_bit.P1_29 = 0;
+  FIO2MASK_bit.P2_13 = 0;
+  FIO2MASK_bit.P2_12 = 0;
 
   // кнопка пользователя  
-  PINSEL3_bit.P1_20 = 0x0;
-  PINMODE3_bit.P1_20 = 0;
-  FIO1DIR_bit.P1_20= 0;
-  FIO1MASK_bit.P1_20 = 0;
+  //PINSEL3_bit.P1_20 = 0x0;
+  //PINMODE3_bit.P1_20 = 0;
+  //FIO1DIR_bit.P1_20= 0;
+  //FIO1MASK_bit.P1_20 = 0;
   
   kbrd_state = 0;
   
@@ -83,9 +83,9 @@ P1.19	MK_P33	«c»
     }
 }
 
-#define KBRD_SCAN_LINE1()  {FIO0CLR_bit.P0_28 = 1; FIO0SET_bit.P0_27 = 1; FIO3SET_bit.P3_26 = 1;}
-#define KBRD_SCAN_LINE2()  {FIO0SET_bit.P0_28 = 1; FIO0CLR_bit.P0_27 = 1; FIO3SET_bit.P3_26 = 1;}
-#define KBRD_SCAN_LINE3()  {FIO0SET_bit.P0_28 = 1; FIO0SET_bit.P0_27 = 1; FIO3CLR_bit.P3_26 = 1;}
+#define KBRD_SCAN_LINE1()  {FIO2CLR_bit.P2_3 = 1; FIO2SET_bit.P2_5 = 1; FIO2SET_bit.P2_11 = 1;}
+#define KBRD_SCAN_LINE2()  {FIO2SET_bit.P2_3 = 1; FIO2CLR_bit.P2_5 = 1; FIO2SET_bit.P2_11 = 1;}
+#define KBRD_SCAN_LINE3()  {FIO2SET_bit.P2_3 = 1; FIO2SET_bit.P2_5 = 1; FIO2CLR_bit.P2_11 = 1;}
 
 void  KbrdTask(void *p_arg)
 {
@@ -100,21 +100,21 @@ void  KbrdTask(void *p_arg)
       state = 0;      
       KBRD_SCAN_LINE1();
       OSTimeDly(1);
-      if (!FIO3PIN_bit.P3_25) state |= (1UL << KEY_F1);
-      if (!FIO1PIN_bit.P1_18) state |= (1UL << KEY_F2);
-      if (!FIO1PIN_bit.P1_19) state |= (1UL << KEY_F3);
+      if (!FIO1PIN_bit.P1_29) state |= (1UL << KEY_F1);
+      if (!FIO2PIN_bit.P2_13) state |= (1UL << KEY_F2);
+      if (!FIO2PIN_bit.P2_12) state |= (1UL << KEY_F3);
       KBRD_SCAN_LINE2();
       OSTimeDly(1);
-      if (!FIO3PIN_bit.P3_25) state |= (1UL << KEY_LEFT);
-      if (!FIO1PIN_bit.P1_18) state |= (1UL << KEY_UP);
-      if (!FIO1PIN_bit.P1_19) state |= (1UL << KEY_RIGHT);
+      if (!FIO1PIN_bit.P1_29) state |= (1UL << KEY_LEFT);
+      if (!FIO2PIN_bit.P2_13) state |= (1UL << KEY_UP);
+      if (!FIO2PIN_bit.P2_12) state |= (1UL << KEY_RIGHT);
       KBRD_SCAN_LINE3();
       OSTimeDly(1);
-      if (!FIO3PIN_bit.P3_25) state |= (1UL << KEY_STOP);
-      if (!FIO1PIN_bit.P1_18) state |= (1UL << KEY_DOWN);
-      if (!FIO1PIN_bit.P1_19) state |= (1UL << KEY_START);
+      if (!FIO1PIN_bit.P1_29) state |= (1UL << KEY_STOP);
+      if (!FIO2PIN_bit.P2_13) state |= (1UL << KEY_DOWN);
+      if (!FIO2PIN_bit.P2_12) state |= (1UL << KEY_START);
 
-      if (!FIO1PIN_bit.P1_20) state |=  (1UL << KEY_USER_START);
+      //if (!FIO1PIN_bit.P1_20) state |=  (1UL << KEY_USER_START);
 
       if (prew_state == state)
         { // устранили дребезг
