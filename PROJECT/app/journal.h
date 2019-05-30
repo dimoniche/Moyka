@@ -15,80 +15,39 @@ typedef struct{
   // тип события
   CPU_INT08U event;
     #define JOURNAL_EVENT_NO_EVENT         0  // нет события
-    #define JOURNAL_EVENT_MONEY_NOTE       1  // событие получения купюры
-    #define JOURNAL_EVENT_MONEY_COIN       2  // событие получения монеты (кол-во рублей)
-    #define JOURNAL_EVENT_START_SESSION    3  // событие начала сеанса
-    #define JOURNAL_EVENT_END_SESSION      4  // событие конца сеанса
-    #define JOURNAL_EVENT_DEVICE_ON        6  // включение устройства
-    #define JOURNAL_EVENT_PRINT_BILL       7  // печать чека
-    #define JOURNAL_EVENT_PRINT_Z          8  // печать z-отчета
-    #define JOURNAL_EVENT_PRINT_X          9  // печать x-отчета
-    #define JOURNAL_EVENT_PRINT_BUF        10  // печать x-отчета
-    #define JOURNAL_EVENT_CHANGE_MODE      11  // смена режима
-    #define JOURNAL_EVENT_INCASSATION      12  // инкассация 
-    #define JOURNAL_EVENT_PASS_FAIL        13  // неверный ввод пароля
-    #define JOURNAL_EVENT_EMAIL_OK         14  // правильно отправлен email
-    #define JOURNAL_EVENT_EMAIL_FAIL       15  // ошибка при отправке email
-
-    // ошибка связи с купюрником
-    #define ERROR_VALIDATOR_CONN           16
-    // критическая ошибка работы купюрника
-    #define ERROR_VALIDATOR_FAILURE        17
-
-    // некритические ошибки купюроприемника
-    // Выброс купюры при замине
-    #define ERROR_VALIDATOR_INSERTION       18
-    // Выброс купюры по маг.датчику
-    #define ERROR_VALIDATOR_MAGNETIC        19
-    // Выброс купюры при транспортировке
-    #define ERROR_VALIDATOR_CONVEYING       20
-    // Выброс купюры по идентификации
-    #define ERROR_VALIDATOR_IDENT           21
-    // Выброс купюры по верификации 
-    #define ERROR_VALIDATOR_VRFY            22
-    // Выброс купюры по оптич.датчику 
-    #define ERROR_VALIDATOR_OPT             23
-    // Выброс купюры по запрету
-    #define ERROR_VALIDATOR_INHIBIT         24
-    // Выброс купюры по емкостному датчику
-    #define ERROR_VALIDATOR_CAP             25
-    // Выброс купюры по длине
-    #define ERROR_VALIDATOR_LNG             26
-    // Кассета заполнена
-    #define ERROR_STACKER_FULL              27
-    // Кассета отсутствует
-    #define ERROR_STACKER_REMOVED           28
-    // Замин в купюроприемнике
-    #define ERROR_BV_JAMMED                 29
-    // Замин в кассете
-    #define ERROR_ST_JAMMED                 30
-    // Попытка обмана
-    #define ERROR_CHEATED                   31
-    // Ошибка стекерного мотора
-    #define ERROR_FLR_STACKER               32
-    // Ошибка скорости транспорт.мотора
-    #define ERROR_TR_SPEED                  33
-    // Ошибка транспорт.мотора
-    #define ERROR_FLR_TRANSPORT             34
-    // Ошибка механизма выравнивания
-    #define ERROR_FLR_ALIGNIN               35
-    // Кассета отсутствует
-    #define ERROR_FLR_INIT_CAS              36
-    // Ошибка оптики
-    #define ERROR_FLR_OPT                   37
-    // Ошибка маг.датчика
-    #define ERROR_FLR_MAG                   38
-    // Ошибка емкостного датчика
-    #define ERROR_FLR_CAP                   39
-
-    // ошибка связи с модемом
-    #define ERROR_MODEM_CONN                40
   
+    #define JOURNAL_EVENT_MONEY_NOTE_POST1 1  // событие получения купюры пост 1
+    #define JOURNAL_EVENT_MONEY_NOTE_POST2 2  // событие получения купюры пост 2
+    #define JOURNAL_EVENT_MONEY_NOTE_POST3 3  // событие получения купюры пост 3
+    #define JOURNAL_EVENT_MONEY_NOTE_POST4 4  // событие получения купюры пост 4
+    #define JOURNAL_EVENT_MONEY_NOTE_POST5 5  // событие получения купюры пост 5
+    #define JOURNAL_EVENT_MONEY_NOTE_POST6 6  // событие получения купюры пост 6
+  
+    #define JOURNAL_EVENT_MONEY_COIN_POST1 7  // событие получения монеты (кол-во рублей) пост 1
+    #define JOURNAL_EVENT_MONEY_COIN_POST2 8  // событие получения монеты (кол-во рублей) пост 2
+    #define JOURNAL_EVENT_MONEY_COIN_POST3 9  // событие получения монеты (кол-во рублей) пост 3
+    #define JOURNAL_EVENT_MONEY_COIN_POST4 10  // событие получения монеты (кол-во рублей) пост 4
+    #define JOURNAL_EVENT_MONEY_COIN_POST5 11  // событие получения монеты (кол-во рублей) пост 5
+    #define JOURNAL_EVENT_MONEY_COIN_POST6 12  // событие получения монеты (кол-во рублей) пост 6
+
+    #define JOURNAL_EVENT_START_SESSION    13  // событие начала сеанса
+    #define JOURNAL_EVENT_END_SESSION      14  // событие конца сеанса
+    #define JOURNAL_EVENT_DEVICE_ON        16  // включение устройства
+    #define JOURNAL_EVENT_PRINT_BILL       17  // печать чека
+    #define JOURNAL_EVENT_PRINT_Z          18  // печать z-отчета
+    #define JOURNAL_EVENT_PRINT_X          19  // печать x-отчета
+    #define JOURNAL_EVENT_PRINT_BUF        20  // печать x-отчета
+    #define JOURNAL_EVENT_CHANGE_MODE      21  // смена режима
+    #define JOURNAL_EVENT_INCASSATION      22  // инкассация 
+    #define JOURNAL_EVENT_PASS_FAIL        23  // неверный ввод пароля
+    #define JOURNAL_EVENT_EMAIL_OK         24  // правильно отправлен email
+    #define JOURNAL_EVENT_EMAIL_FAIL       25  // ошибка при отправке email
+
     // ошибка связи с фискальником
-    #define ERROR_FR_CONN                   41
+    #define ERROR_FR_CONN                  26
 
     // ВСЕ ОШИБКИ ФР ФАТАЛЬНЫЕ
-    #define ERROR_FR                        42
+    #define ERROR_FR                       27
   
     #define JOURNAL_EVENTS_COUNT             (ERROR_FR+FR_ERROR_NUMBER)  // число событий
 

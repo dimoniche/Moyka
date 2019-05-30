@@ -5,7 +5,6 @@
 #include "coin.h"
 #include "data.h"
 #include "datadesc.h"
-#include "modem.h"
 #include <stdlib.h>
 
 OS_STK  CoinTaskStk[COIN_TASK_STK_SIZE];
@@ -17,7 +16,8 @@ CPU_INT32U  CashImpCounter[COUNT_POST];
 
 static CPU_INT32U cash_pulse = 5000;
 static CPU_INT32U cash_pause = 2000;
-static char pend_cash_counter[COUNT_POST] = 0;
+
+static char pend_cash_counter[COUNT_POST];
 static CPU_INT32U pend_cash_timestamp[COUNT_POST];
 
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause)
@@ -51,14 +51,14 @@ void CoinTask(void *p_arg)
 				GetData(&CashModeDesc, &cash_mode, i, DATA_FLAG_DIRECT_INDEX);  
 				GetData(&EnableValidatorDesc, &cash_enable, i, DATA_FLAG_DIRECT_INDEX);
 			}
-				
+
 			OSTimeDly(1);
 
 			if (enable_coin)
 			{
 				if (GetCoinCount(i))
 				{
-					PostUserEvent(EVENT_COIN_INSERTED);
+					PostUserEvent(EVENT_COIN_INSERTED_POST1 + i);
 				}
 			}
 			else
@@ -93,7 +93,7 @@ void CoinTask(void *p_arg)
 				{
 					if (labs(OSTimeGet() - last_cash_time[i]) > 500)
 					{
-					  PostUserEvent(EVENT_CASH_INSERTED);
+					  PostUserEvent(EVENT_CASH_INSERTED_POST1 + i);
 					}
 				}
 				else
@@ -178,8 +178,14 @@ CPU_INT32U GetResetCashCount(int index)
 // инициализация монетоприемника
 void InitCoin(void)
 {
-  //CoinImpCounter = 0;
-  //CashImpCounter = 0;
+  for(int i = 0; i < COUNT_POST; i++)
+  {
+    CoinImpCounter[i] = 0;
+    CashImpCounter[i] = 0;
+
+    pend_cash_counter[i] = 0;
+  }
+  
   InitImpInput();
   OSTaskCreate(CoinTask, (void *)0, (OS_STK *)&CoinTaskStk[COIN_TASK_STK_SIZE-1], COIN_TASK_PRIO);
 }

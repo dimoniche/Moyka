@@ -1006,7 +1006,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.21.4.52945</state>
+          <state>6.21.1.52845</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -3149,12 +3149,6 @@
       <file>
         <name>$PROJ_DIR$\PROJECT\app\journal.h</name>
       </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\app\modem_task.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\app\modem_task.h</name>
-      </file>
     </group>
     <group>
       <name>data</name>
@@ -3182,24 +3176,6 @@
     </group>
     <group>
       <name>drivers</name>
-      <group>
-        <name>ccnet</name>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\ccnet\CCRSProtocol.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\ccnet\CCRSProtocol.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\ccnet\uart1.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\ccnet\uart1.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\ccnet\VMCConst.h</name>
-        </file>
-      </group>
       <group>
         <name>fiscal</name>
         <file>
@@ -3246,21 +3222,6 @@
         </file>
         <file>
           <name>$PROJ_DIR$\PROJECT\drivers\lcd\lcd.h</name>
-        </file>
-      </group>
-      <group>
-        <name>modem</name>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\modem\modem.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\modem\modem.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\modem\uart2.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\PROJECT\drivers\modem\uart2.h</name>
         </file>
       </group>
       <file>
@@ -3341,12 +3302,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\PROJECT\services\time.h</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\services\validator.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\services\validator.h</name>
       </file>
     </group>
     <file>

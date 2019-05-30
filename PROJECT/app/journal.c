@@ -67,8 +67,6 @@ int TstCriticalErrors(void)
     */
   }
   
-  errors |= TstErrorFlag(ERROR_VALIDATOR_CONN);
-  
   OS_EXIT_CRITICAL();
   if (errors) return 1;
   return 0;
@@ -82,10 +80,6 @@ int TstCriticalValidatorErrors(void)
 
 void ClrValidatorErrors(void)
 {
-  for (CPU_INT08U i=ERROR_VALIDATOR_FAILURE; i<ERROR_MODEM_CONN; ++i)
-    {
-      ClrErrorFlag(i);
-    }
 }
 
 // получить запись из журнала событий
@@ -132,12 +126,44 @@ void ClearEventJournal(void)
 void GetEventStr(char* str, char event)
 {
   switch (event){
-    case JOURNAL_EVENT_MONEY_NOTE:
-      sprintf(str, "Вн.купюра ");
+    case JOURNAL_EVENT_MONEY_NOTE_POST1:
+      sprintf(str, "Вн.купюра пост 1");
       break;
-    case JOURNAL_EVENT_MONEY_COIN:
-      sprintf(str, "Вн.монеты ");
+    case JOURNAL_EVENT_MONEY_NOTE_POST2:
+      sprintf(str, "Вн.купюра пост 2");
       break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST3:
+      sprintf(str, "Вн.купюра пост 3");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST4:
+      sprintf(str, "Вн.купюра пост 4");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST5:
+      sprintf(str, "Вн.купюра пост 5");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST6:
+      sprintf(str, "Вн.купюра пост 6");
+      break;
+      
+    case JOURNAL_EVENT_MONEY_COIN_POST1:
+      sprintf(str, "Вн.монеты пост 1");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST2:
+      sprintf(str, "Вн.монеты пост 2");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST3:
+      sprintf(str, "Вн.монеты пост 3");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST4:
+      sprintf(str, "Вн.монеты пост 4");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST5:
+      sprintf(str, "Вн.монеты пост 5");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST6:
+      sprintf(str, "Вн.монеты пост 6");
+      break;
+
     case JOURNAL_EVENT_START_SESSION:
       sprintf(str, "Печать чека ");
       break;
@@ -183,12 +209,44 @@ void GetEventStr(char* str, char event)
 void GetEventStrEng(char* str, char event)
 {
   switch (event){
-    case JOURNAL_EVENT_MONEY_NOTE:
-      sprintf(str, " |  Vnesena kupura ");
+    case JOURNAL_EVENT_MONEY_NOTE_POST1:
+      sprintf(str, " |  Vnesena kupura post 1");
       break;
-    case JOURNAL_EVENT_MONEY_COIN:
-      sprintf(str, " |  Vneseny monety ");
+    case JOURNAL_EVENT_MONEY_NOTE_POST2:
+      sprintf(str, " |  Vnesena kupura post 2");
       break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST3:
+      sprintf(str, " |  Vnesena kupura post 3");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST4:
+      sprintf(str, " |  Vnesena kupura post 4");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST5:
+      sprintf(str, " |  Vnesena kupura post 5");
+      break;
+    case JOURNAL_EVENT_MONEY_NOTE_POST6:
+      sprintf(str, " |  Vnesena kupura post 6");
+      break;
+
+    case JOURNAL_EVENT_MONEY_COIN_POST1:
+      sprintf(str, " |  Vneseny monety post 1");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST2:
+      sprintf(str, " |  Vneseny monety post 2");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST3:
+      sprintf(str, " |  Vneseny monety post 3");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST4:
+      sprintf(str, " |  Vneseny monety post 4");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST5:
+      sprintf(str, " |  Vneseny monety post 5");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_POST6:
+      sprintf(str, " |  Vneseny monety post 6");
+      break;
+
     case JOURNAL_EVENT_START_SESSION:
       sprintf(str, " |  Print bill ");
       break;
@@ -245,9 +303,8 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
       GetEventStrEng(&str[strlen(str)], record->event);
       
       // напечатаем дополнительные поля
-      if ((record->event == JOURNAL_EVENT_MONEY_NOTE) || (record->event == JOURNAL_EVENT_MONEY_COIN))
+      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_POST6))
         {
-          sprintf(&str[strlen(str)], "kanal %d ", record->channel+1);
           sprintf(&str[strlen(str)], "%d rub.", record->data);
         }
       else if (record->event == JOURNAL_EVENT_START_SESSION)
@@ -404,7 +461,7 @@ void ClearBillnomCounter(void)
 // сервер ошибок (занесение ошибок в журнал)
 void ErrorServer(void)
 {
-    for (int i = ERROR_VALIDATOR_CONN; i < JOURNAL_EVENTS_COUNT; i++)
+    for (int i = ERROR_FR_CONN; i < JOURNAL_EVENTS_COUNT; i++)
     {
         if (!(PrevFlags[i/32] & (1L<<(i%32)))
             && (TstErrorFlag(i)))

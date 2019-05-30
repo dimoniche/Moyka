@@ -54,8 +54,6 @@ void  main (void)
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)       */
 }
 
-
-
 /*
 *********************************************************************************************************
 *                                          AppTaskStart()

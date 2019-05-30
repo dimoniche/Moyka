@@ -219,8 +219,8 @@ const TMenuLine line_StatisticsMenu_4 = {
   (void*)ClearStatMenu                           // панель для перехода
 };
 
-const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_2, &line_StatisticsMenu_3, &line_StatisticsMenu_4, NULL};
-const TMenuPanel StatisticsMenuPanel[] = {arr_StatisticsMenuArray, NULL, 4, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_2, /*&line_StatisticsMenu_3,*/ &line_StatisticsMenu_4, NULL};
+const TMenuPanel StatisticsMenuPanel[] = {arr_StatisticsMenuArray, NULL, 3, MENU_PANEL_STANDARD};
 
 
 /***********************************
@@ -512,8 +512,8 @@ const TMenuLine line_SettingsMenu_7 = {
   NULL                            // панель для перехода
 };
 */
-const TMenuLineArray arr_SettingsMenuArray[] = {&line_SettingsMenu_0, &line_SettingsMenu_2, &line_SettingsMenu_5, &line_SettingsMenu_3, &line_SettingsMenu_6, &line_SettingsMenu_8, NULL};
-const TMenuPanel SettingsMenuPanel[] = {arr_SettingsMenuArray, NULL, 6, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_SettingsMenuArray[] = {&line_SettingsMenu_0, &line_SettingsMenu_2, &line_SettingsMenu_5, &line_SettingsMenu_3, &line_SettingsMenu_6, /*&line_SettingsMenu_8,*/ NULL};
+const TMenuPanel SettingsMenuPanel[] = {arr_SettingsMenuArray, NULL, 5, MENU_PANEL_STANDARD};
 
 
 
@@ -1065,8 +1065,8 @@ const TMenuLine line_CashMenu_5 = {
   NULL                            // панель для перехода
 };
 
-const TMenuLineArray arr_ValidatorMenuArray[] = {&line_CashMenu_0, &line_CashMenu_1, &line_CashMenu_2, &line_CashMenu_3, &line_CashMenu_4, &line_CashMenu_5, NULL};
-const TMenuPanel ValidatorSetupPanel[] = {arr_ValidatorMenuArray, OnEnterCoinMenu, 6, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_ValidatorMenuArray[] = {&line_CashMenu_0, &line_CashMenu_1, /*&line_CashMenu_2,*/ &line_CashMenu_3, &line_CashMenu_4, &line_CashMenu_5, NULL};
+const TMenuPanel ValidatorSetupPanel[] = {arr_ValidatorMenuArray, OnEnterCoinMenu, 5, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ НАСТРОЙКА МОДЕМА
@@ -1653,9 +1653,9 @@ void PrintEventJournalRecord(TEventRecord *record)
   if (record->event)
     { // есть событие
       GetEventStr(str_EventNumber, record->event);
-      if ((record->event == JOURNAL_EVENT_MONEY_NOTE) || (record->event == JOURNAL_EVENT_MONEY_COIN))
+      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_POST6))
         {
-          sprintf(str_EventData, "%d руб.", record->data);
+          sprintf(str_EventData, "%d руб.пост %d", record->data, record->event%6);
         }
       else if (record->event == JOURNAL_EVENT_START_SESSION)
         {

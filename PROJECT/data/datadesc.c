@@ -13,8 +13,6 @@
 #include "fiscal.h"
 #include "time.h"
 #include "CRC16.h"
-#include "modem_task.h"
-#include "modem.h"
 #include "coin.h"
 
 extern CPU_INT32U modem_status;
@@ -167,7 +165,7 @@ TDataDescStruct const CashPulseLenDesc = {
   (void*)offsetof(TFramMap, cash_pulse_len),            // указатель на переменную или адрес FRAM
   (void*)&CashPulseLenRange,     // указатель на границы параметра
   OnChangeCashPulseLen,                     // функция по изменению
-  0,       // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   CashPulseLenName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -191,7 +189,7 @@ TDataDescStruct const CashPauseLenDesc = {
   (void*)offsetof(TFramMap, cash_pause_len),            // указатель на переменную или адрес FRAM
   (void*)&CashPauseLenRange,     // указатель на границы параметра
   OnChangeCashPulseLen,                     // функция по изменению
-  0,       // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   CashPauseLenName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -417,21 +415,21 @@ CPU_INT08U const *EnableModemList[] = {OnOffList_str0, OnOffList_str1};
 
 void OnchangeEnableModem(void)
 {
-    CPU_INT32U en = 0;
-    GetData(&EnableModemDesc, &en, 0, DATA_FLAG_SYSTEM_INDEX);
-    
-    if (en)
-    {
-        if (!IsModemConn())
-        {
-            modem_status = 2;
-        }
-        else if (!IsModemConf())
-        {
-            modem_status = 1;
-        }
-        PostModemTask(MODEM_TASK_RECONNECT);
-    }
+//    CPU_INT32U en = 0;
+//    GetData(&EnableModemDesc, &en, 0, DATA_FLAG_SYSTEM_INDEX);
+//    
+//    if (en)
+//    {
+//        if (!IsModemConn())
+//        {
+//            modem_status = 2;
+//        }
+//        else if (!IsModemConf())
+//        {
+//            modem_status = 1;
+//        }
+//        //PostModemTask(MODEM_TASK_RECONNECT);
+//    }
 }
 
 TDataDescStruct const EnableModemDesc = {
@@ -653,7 +651,7 @@ TDataDescStruct const CoinPerPulseDesc = {
   (void*)offsetof(TFramMap, DeviceConfig.CoinPerPulse),            // указатель на переменную или адрес FRAM
   (void*)&CoinPerPulseRange,     // указатель на границы параметра
   NULL,                     // функция по изменению
-  0,       // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   CoinPerPulseName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -741,7 +739,7 @@ TDataDescStruct const PrintModeDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   PrintModeList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  0                           
+  1                           
 };
 
 /*************************************
@@ -808,7 +806,7 @@ TDataDescStruct const CashPerPulseDesc = {
   (void*)offsetof(TFramMap, DeviceConfig.CashPerPulse),            // указатель на переменную или адрес FRAM
   (void*)&CashPerPulseRange,     // указатель на границы параметра
   NULL,                     // функция по изменению
-  0,       // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   CashPerPulseName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -1518,37 +1516,17 @@ TDataDescStruct const PrintXReportDesc = {
   Ошибка в журнале ошибок
 *************************************/
 TRangeValueULONG const ErrorNumberRange = {0, JOURNAL_EVENTS_COUNT - 1};
-CPU_INT08U const *ErrorNumberList0[JOURNAL_EVENTS_COUNT] = {"нет", "", "", "",
+CPU_INT08U const *ErrorNumberList0[JOURNAL_EVENTS_COUNT] = 
+                                    {"нет",
+                                    
                                         "", "", "", "",
                                         "", "", "", "",
                                         "", "", "", "",
-                                       "ошибка связи с", 
-                                       "ошибка работы", 
-                                       "1Ch60h-выбр.купюры", 
-                                       "1Ch61h-выбр.купюры",
-                                       "1Ch64h-выбр.купюры",
-                                       "1Ch65h-выбр.купюры",
-                                       "1Ch66h-выбр.купюры",
-                                       "1Ch67h-выбр.купюры",
-                                       "1Ch68h-выбр.купюры",
-                                       "1Ch69h-выбр.купюры",
-                                       "1Ch6Ch-выбр.купюры",
-                                       "к/п:41h-кассета",
-                                       "к/п:42h-кассета",
-                                       "к/п:43h-замин в ",
-                                       "к/п:44h-замин",
-                                       "к/п:45h-попытка",
-                                       "к/п:50h-ошибка",
-                                       "к/п:51h-ошибка скор.",
-                                       "к/п:52h-ошибка",
-                                       "к/п:53h-ошибка мех.",
-                                       "к/п:54h-кассета",
-                                       "к/п:65h-ошибка",
-                                       "к/п:66h-ошибка",
-                                       "к/п:67h-ошибка емк.",
-                                       "ошибка", 
-                                       "ошибка",
-
+                                        
+                                        "", "", "", "",
+                                        "", "", "", "",
+                                        "", "", "", "",
+                                        
                                        "ФР:01h-Неизвестная",
                                        "ФР:02h-Неверное",
                                        "ФР:03h-Ошибка ФН",
@@ -1679,36 +1657,17 @@ TDataDescStruct const JournalErrorNumberDesc0 = {
   0                           
 };
 
-CPU_INT08U const *ErrorNumberList1[JOURNAL_EVENTS_COUNT] = {"", "", "", "",
+CPU_INT08U const *ErrorNumberList1[JOURNAL_EVENTS_COUNT] = 
+                                       {
+                                        "",
+
                                         "", "", "", "",
                                         "", "", "", "",
                                         "", "", "", "",
-                                       "купюроприемником", 
-                                       "купюроприемника", 
-                                       "при замине", 
-                                       "по маг.датчику",
-                                       "при транспорт.",
-                                       "по идентификации",
-                                       "по верификации ",
-                                       "по оптич.датчику ",
-                                       "по запрету",
-                                       "по емкост.датчику",
-                                       "по длине",
-                                       "заполнена",
-                                       "отсутствует",
-                                       "купюроприемнике",
-                                       "в кассете",
-                                       "обмана",
-                                       "стекерного мотора",
-                                       "транспорт.мотора",
-                                       "транспорт.мотора",
-                                       "выравнивания",
-                                       "отсутствует",
-                                       "оптики",
-                                       "маг.датчика",
-                                       "датчика",
-                                       "модема", 
-                                       "связи с ФР", 
+
+                                        "", "", "", "",
+                                        "", "", "", "",
+                                        "", "", "", "",
                                        
                                        "команда",  // ФР:01h
                                        "состояние ФН",                  
@@ -1849,31 +1808,7 @@ CPU_INT08U const *ErrorNumberListEng[JOURNAL_EVENTS_COUNT] =
   "", "", "", "",
   "", "", "", "",
   "", "", "", "",
-  "Oshibka svyazi c kupuropriemnikom",  
-  "Kriticheskaya oshibka kupuropriemnika",
-  "Vybros kupury po mag.datchiku",
-  "Vybros kupury pri transportirovke",
-  "Vybros kupury po identifikacii",
-  "Vybros kupury po verifikacii",
-  "Vybros kupury po opt.datchiku",
-  "Vybros kupury po zapretu",
-  "Vybros kupury po emk.datchiku",
-  "Vybros kupury po dline",
-  "Kasseta zapolnena",
-  "Kasseta otsutstvuet",
-  "Zamin v kupuropriemnike",
-  "Zamin v kassete",
-  "Popytka obmana",
-  "Oshibka stekernogo motora",
-  "Oshibka skorosti transp.motora",
-  "Oshibka transp.motora",
-  "Oshibka mehanizmavyravnivaniya",
-  "Kasseta otsutstvuet",
-  "Oshibka optiki",
-  "Oshibka magn.datchika",
-  "Oshibka emk.datchika",
-  "Nekriticheskaya oshibka kupuropriemnika",
-
+  
   "Oshibka svyazi s modemom",
   "Oshibka svyazi s FR",  
   "Oshibka FR 0x01",
@@ -2560,7 +2495,7 @@ TDataDescStruct const TaxFormatDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   TaxFormatList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           
+  6                           
 };
 
 /*************************************
@@ -2649,7 +2584,7 @@ TDataDescStruct const ServiceNameDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   ServiceNameList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  0                           // значение по умолчанию
+  1                           // значение по умолчанию
 };
 
 /*************************************
@@ -2659,13 +2594,13 @@ TDataDescStruct const AcceptedMoneyDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,                        // размер массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,               // размер массива
   NULL,                     // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, FRAM_AcceptedMoney),            // указатель на переменную или адрес FRAM
   NULL,                     // указатель на границы параметра
   NULL,                     // функция по изменению
-  0,                        // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   NULL,           // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -2680,13 +2615,13 @@ TDataDescStruct const AcceptedMoneyCRC16Desc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,                        // размер массива
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,               // размер массива
   NULL,                     // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, crc_AcceptedMoney),            // указатель на переменную или адрес FRAM
   NULL,                     // указатель на границы параметра
   NULL,                     // функция по изменению
-  0,                        // смещение между элементами в массиве
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
   NULL,           // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
@@ -2906,7 +2841,7 @@ void OnChangeSendTestEmail(void)
 {
     if (send_test)
     {
-        PostModemTask(MODEM_TASK_SEND_TEST_MSG);
+        //PostModemTask(MODEM_TASK_SEND_TEST_MSG);
         send_test = 0;
     }
 }
@@ -2960,7 +2895,7 @@ TDataDescStruct const BillnomIndexDesc = {
 /*************************************
   Значение номинала купюры для просмотра счетчиков
 *************************************/
-extern CPU_INT32U BillNominals[24];
+
 CPU_INT08U const BillnomValName[] = "Значение,руб.";
 
 TDataDescStruct const BillnomDesc = {
@@ -2970,7 +2905,7 @@ TDataDescStruct const BillnomDesc = {
   DATA_IS_ARRAY,            // признак массива
   24,                       // размер массива
   (void*)&BillnomIndexDesc,        // указатель на десриптор индекса массива
-  (void*)&BillNominals,            // указатель на переменную или адрес FRAM
+  NULL,            // указатель на переменную или адрес FRAM
   NULL,     // указатель на границы параметра
   NULL,                     // функция по изменению
   sizeof(CPU_INT32U),       // смещение между элементами в массиве
@@ -3275,9 +3210,17 @@ const TDataDescArrayStruct AllDataArray[] =
 
     {&CashPulseLenDesc, "CashPulseLenDesc"},
     {&CashPauseLenDesc, "CashPauseLenDesc"},
+    
+    {&TaxSystemDesc, "TaxSystemDesc"},
+    {&TaxFormatDesc, "TaxFormatDesc"},
+    {&SubjSellDesc, "SubjSellDesc"},
+    {&CommandV2Desc, "CommandV2Desc"},
+    {&ServiceNameDesc, "ServiceNameDesc"},
 
-
-
+    {&PrintModeDesc, "PrintModeDesc"},
+    {&PrintTimeoutAfterDesc, "PrintTimeoutAfterDesc"},
+    
+    
     {NULL, ""}
 };
 
