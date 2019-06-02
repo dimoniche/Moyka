@@ -29,6 +29,9 @@ typedef struct{
     #define JOURNAL_EVENT_MONEY_COIN_POST4 10  // событие получения монеты (кол-во рублей) пост 4
     #define JOURNAL_EVENT_MONEY_COIN_POST5 11  // событие получения монеты (кол-во рублей) пост 5
     #define JOURNAL_EVENT_MONEY_COIN_POST6 12  // событие получения монеты (кол-во рублей) пост 6
+    // здесь добавить еще два события от пылесосов
+    //#define JOURNAL_EVENT_MONEY_COIN_VACUUM1 13  // событие получения монеты (кол-во рублей) пылесос 1
+    //#define JOURNAL_EVENT_MONEY_COIN_VACUUM1 14  // событие получения монеты (кол-во рублей) пылесос 2
 
     #define JOURNAL_EVENT_START_SESSION    13  // событие начала сеанса
     #define JOURNAL_EVENT_END_SESSION      14  // событие конца сеанса

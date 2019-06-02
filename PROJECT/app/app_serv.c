@@ -21,7 +21,7 @@
 //#define _DEBUG_MONEY
 
 CPU_INT32U SystemTime;
-CPU_INT32U money_timestamp[COUNT_POST];
+CPU_INT32U money_timestamp[COUNT_POST + COUNT_VACUUM];
 CPU_INT08U EnabledChannelsNum;
 CPU_INT08U RecentChannel;
 CPU_INT08U UserMenuState;
@@ -94,7 +94,6 @@ void AddOutPulses(int count, int len_ms)
 void UserAppTask(void *p_arg)
 {
   CPU_INT32U print_timeout;
-  CPU_INT32U print_mode;
   CPU_INT32U accmoney;
   int event;
   CPU_BOOLEAN dontRedraw = DEF_FALSE;
@@ -102,22 +101,6 @@ void UserAppTask(void *p_arg)
 #ifdef BOARD_CENTRAL_CFG
   
   static CPU_INT08U fr_conn_ctr = 0;
-
-//  {
-//    CPU_INT32U m=0;
-//    GetData(&AcceptedMoneyDesc, &m, 0, DATA_FLAG_DIRECT_INDEX);     
-//    if (m)
-//    {
-//         EnabledChannelsNum = 0;
-//         for (CPU_INT08U i=0; i<CHANNELS_NUM; i++)
-//         {
-//            CPU_INT32U en = 0;
-//            GetData(&EnableChannelDesc, &en, i, DATA_FLAG_DIRECT_INDEX);
-//            if (en) {EnabledChannelsNum++;}
-//         }
-//         UserMenuState = USER_STATE_ACCEPT_MONEY;
-//    }
-//  }
     
   incassation = 0;
   was_critical_error = 0;
@@ -183,7 +166,7 @@ void UserAppTask(void *p_arg)
 
               dontRedraw = DEF_FALSE;
 
-              for(int post = 0; post < COUNT_POST; post++)
+              for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
                 accmoney = GetAcceptedMoney(post);
 
@@ -196,42 +179,9 @@ void UserAppTask(void *p_arg)
 
                     LED_OK_ON();
                     CheckFiscalStatus();
-                    GetData(&PrintModeDesc, &print_mode, 0, DATA_FLAG_SYSTEM_INDEX);
-                    if (print_mode == 0)
+
                     {
-                        // если настроена печать ПО ТАЙМАУТУ
-                        GetData(&PrintTimeoutDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
-                        if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
-                        {
-                            UserPrintPrintBillMenu(post);
-                            RefreshMenu();
-                            
-                            // напечатаем чек
-                            if (IsFiscalConnected())
-                            {
-                              if (PrintFiscalBill(accmoney) == 0)
-                              {
-                                  SaveEventRecord(RecentChannel, JOURNAL_EVENT_PRINT_BILL, GetTimeSec());
-                              }
-                            }
-                            IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
-                            SetAcceptedMoney(0, post);
-                            OSTimeDly(1000);
-                            
-                            // повесим меню "СПАСИБО"                      
-                            if (IsFiscalConnected())
-                            {
-                                UserPrintThanksMenu(post);
-                                RefreshMenu();
-                            }
-                            
-                            OSTimeDly(1000);
-                            LED_OK_OFF();
-                        }
-                    }
-                    else if (print_mode == 1)
-                    {
-                        // если настроена печать ПО КНОПКЕ, ждем таймаут отмены
+                        // печать по внешнему сигналу, ждем таймаут отмены
                         GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
                         if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
                         {
@@ -269,6 +219,8 @@ void UserAppTask(void *p_arg)
             case EVENT_COIN_INSERTED_POST4:
             case EVENT_COIN_INSERTED_POST5:
             case EVENT_COIN_INSERTED_POST6:
+            case EVENT_COIN_INSERTED_VACUUM1:
+            case EVENT_COIN_INSERTED_VACUUM2:
               {
                 CPU_INT32U cpp = 1;
                 CPU_INT32U money, accmoney;
@@ -381,48 +333,6 @@ void UserAppTask(void *p_arg)
                 RefreshMenu(); 
                 break;
               }
-              
-              // --------------------------
-              // находимся в рабочем режиме
-              // --------------------------
-                GetData(&PrintModeDesc, &print_mode, 0, DATA_FLAG_SYSTEM_INDEX);
-                for(int post = 0; post < COUNT_POST; post++)
-                {
-                  if (print_mode == 1)
-                  {
-                    // пользователь внес деньги и нажал СТАРТ + режим печати ПО КНОПКЕ
-                    CPU_INT32U accmoney = GetAcceptedMoney(post);
-                    
-                    if (accmoney > 0)
-                    { 
-                        UserPrintPrintBillMenu(post);
-                        RefreshMenu();
-                        
-                        // напечатаем чек
-                        if (IsFiscalConnected())
-                        {
-                          if (PrintFiscalBill(accmoney) == 0)
-                          {
-                              SaveEventRecord(RecentChannel, JOURNAL_EVENT_PRINT_BILL, GetTimeSec());
-                          }
-                        }
-
-                        IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
-                        SetAcceptedMoney(0, post);
-                        OSTimeDly(1000);
-                       
-                        // повесим меню "СПАСИБО"                      
-                        if (IsFiscalConnected())
-                        {
-                            UserPrintThanksMenu(post);
-                            RefreshMenu();
-                        }
-                        
-                        OSTimeDly(1000);
-                        LED_OK_OFF();
-                    }
-                  }
-                }
                   
               break;
             case EVENT_CASH_PRINT_CHECK_POST1:
@@ -433,6 +343,7 @@ void UserAppTask(void *p_arg)
             case EVENT_CASH_PRINT_CHECK_POST6:
             case EVENT_CASH_PRINT_CHECK_VACUUM1:
             case EVENT_CASH_PRINT_CHECK_VACUUM2:
+            if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
 
@@ -453,7 +364,7 @@ void UserAppTask(void *p_arg)
                     }
                   }
 
-                  //IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
+                  IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
                   SetAcceptedMoney(0, number_post);
                   OSTimeDly(1000);
                  
@@ -469,11 +380,15 @@ void UserAppTask(void *p_arg)
               }
             }
             break;
+
             case EVENT_KEY_F1:
                 PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
             case EVENT_KEY_F2:
                 PostUserEvent(EVENT_CASH_INSERTED_POST2);
+            break;
+            case EVENT_KEY_F3:
+                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1);
             break;
 #endif
             default:
@@ -599,8 +514,10 @@ void UserPrintMoneyMenu(int post)
     
     if(post < COUNT_POST)
       sprintf(buf, " Пост %d", post + 1);
-    else 
+    else if(post < COUNT_POST + COUNT_VACUUM)
       sprintf(buf, "Пылесос %d", post + 1 - COUNT_POST);
+    else 
+      sprintf(buf, " ");
 
     PrintUserMenuStr(buf, 3);
 }

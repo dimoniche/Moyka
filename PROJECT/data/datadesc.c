@@ -622,7 +622,7 @@ TDataDescStruct const EnableCoinDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,             // размер массива
+  COUNT_POST+ + COUNT_VACUUM,// размер массива
   &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.EnableCoinAcceptor),            // указатель на переменную или адрес FRAM
   (void*)&EnableCoinRange,     // указатель на границы параметра
@@ -646,7 +646,7 @@ TDataDescStruct const CoinPerPulseDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,             // размер массива
+  COUNT_POST+COUNT_VACUUM,  // размер массива
   &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.CoinPerPulse),            // указатель на переменную или адрес FRAM
   (void*)&CoinPerPulseRange,     // указатель на границы параметра

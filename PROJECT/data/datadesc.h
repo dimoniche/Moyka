@@ -60,18 +60,16 @@ typedef struct{
   
 }TChannelConfig;
 
-
-
 // структура конфигурации аппаратуры
 typedef struct{
-  CPU_INT32U  EnableValidator[COUNT_POST];
-  CPU_INT32U  EnableCoinAcceptor[COUNT_POST];
+  CPU_INT32U  EnableValidator[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  EnableCoinAcceptor[COUNT_POST + COUNT_VACUUM];
   CPU_INT32U  EnableModem;
   CPU_INT32U  EnableFiscal;
   CPU_INT32U  EnableFiscalDayClear;
   CPU_INT32U  ServiceName;
 
-  CPU_INT32U  CoinPerPulse[COUNT_POST]; // цена импульса монетоприемника
+  CPU_INT32U  CoinPerPulse[COUNT_POST + COUNT_VACUUM]; // цена импульса монетоприемника
   CPU_INT32U  BillFormat;
   
   CPU_INT32U  DisableFiscalErrors; // отключение реакции на ошибки ФР
@@ -82,8 +80,8 @@ typedef struct{
   CPU_INT32U  ClearJournalAfterSend;
   CPU_INT32U  StatSendHourMin;
 
-  CPU_INT32U  CashMode[COUNT_POST];
-  CPU_INT32U  CashPerPulse[COUNT_POST]; // цена импульса купюрника
+  CPU_INT32U  CashMode[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  CashPerPulse[COUNT_POST + COUNT_VACUUM]; // цена импульса купюрника
   CPU_INT32U  PrintTimeout;
   CPU_INT32U  PrintTimeoutAfter;
 

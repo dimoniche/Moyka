@@ -50,8 +50,8 @@ typedef struct
   CPU_INT08U manual_service_flag[4];
   char manual_service_name[32];
 
-  CPU_INT32U  cash_pulse_len[COUNT_POST];
-  CPU_INT32U  cash_pause_len[COUNT_POST];
+  CPU_INT32U  cash_pulse_len[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  cash_pause_len[COUNT_POST + COUNT_VACUUM];
 
   CPU_INT32U  TaxFormat;
   CPU_INT32U  SubjSell;

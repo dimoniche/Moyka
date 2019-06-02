@@ -12,13 +12,13 @@ OS_STK  CoinTaskStk[COIN_TASK_STK_SIZE];
 void  InitImpInput(void);
 
 CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U  CashImpCounter[COUNT_POST];
+CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U cash_pulse = 5000;
 static CPU_INT32U cash_pause = 2000;
 
-static char pend_cash_counter[COUNT_POST];
-static CPU_INT32U pend_cash_timestamp[COUNT_POST];
+static char pend_cash_counter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U pend_cash_timestamp[COUNT_POST + COUNT_VACUUM];
 
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause)
 {
@@ -36,8 +36,8 @@ void CoinTask(void *p_arg)
   CPU_INT32U enable_coin;
   CPU_INT32U cash_mode;
   CPU_INT32U cash_enable;
-  CPU_INT32U last_cash_count[COUNT_POST];
-  CPU_INT32U last_cash_time[COUNT_POST];
+  CPU_INT32U last_cash_count[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U last_cash_time[COUNT_POST + COUNT_VACUUM];
   CPU_INT32U last_settings_time = 0;
 
   while(1)
@@ -179,7 +179,7 @@ CPU_INT32U GetResetCashCount(int index)
 // инициализация монетоприемника
 void InitCoin(void)
 {
-  for(int i = 0; i < COUNT_POST; i++)
+  for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
   {
     CoinImpCounter[i] = 0;
     CashImpCounter[i] = 0;
@@ -193,8 +193,8 @@ void InitCoin(void)
 
 void InputCapture_ISR(void)
 {
-  static CPU_INT32U period[COUNT_POST + 2];
-  static CPU_INT32U period_cash[COUNT_POST];
+  static CPU_INT32U period[COUNT_POST + COUNT_VACUUM];
+  static CPU_INT32U period_cash[COUNT_POST + COUNT_VACUUM];
   static CPU_INT32U T3CR = 0;
 
   // наращиваем тики
