@@ -425,6 +425,50 @@ void UserAppTask(void *p_arg)
                 }
                   
               break;
+            case EVENT_CASH_PRINT_CHECK_POST1:
+            case EVENT_CASH_PRINT_CHECK_POST2:
+            case EVENT_CASH_PRINT_CHECK_POST3:
+            case EVENT_CASH_PRINT_CHECK_POST4:
+            case EVENT_CASH_PRINT_CHECK_POST5:
+            case EVENT_CASH_PRINT_CHECK_POST6:
+            case EVENT_CASH_PRINT_CHECK_VACUUM1:
+            case EVENT_CASH_PRINT_CHECK_VACUUM2:
+            {
+              int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
+
+              // здесь событие старта печати чека - включили насос или пылесос
+              CPU_INT32U accmoney = GetAcceptedMoney(number_post);
+              
+              if (accmoney > 0)
+              { 
+                  UserPrintPrintBillMenu(number_post);
+                  RefreshMenu();
+                  
+                  // напечатаем чек
+                  if (IsFiscalConnected())
+                  {
+                    if (PrintFiscalBill(accmoney) == 0) // здесь добавить с какого поста чек
+                    {
+                        SaveEventRecord(RecentChannel, JOURNAL_EVENT_PRINT_BILL, GetTimeSec());
+                    }
+                  }
+
+                  //IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
+                  SetAcceptedMoney(0, number_post);
+                  OSTimeDly(1000);
+                 
+                  // повесим меню "СПАСИБО"                      
+                  if (IsFiscalConnected())
+                  {
+                      UserPrintThanksMenu(number_post);
+                      RefreshMenu();
+                  }
+                  
+                  OSTimeDly(1000);
+                  LED_OK_OFF();
+              }
+            }
+            break;
             case EVENT_KEY_F1:
                 PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
@@ -553,10 +597,10 @@ void UserPrintMoneyMenu(int post)
     sprintf(buf, "Принято %d руб.", accmoney);
     PrintUserMenuStr(buf, 2);
     
-    if(post <= COUNT_POST)
+    if(post < COUNT_POST)
       sprintf(buf, " Пост %d", post + 1);
     else 
-      sprintf(buf, " ");
+      sprintf(buf, "Пылесос %d", post + 1 - COUNT_POST);
 
     PrintUserMenuStr(buf, 3);
 }
@@ -617,7 +661,12 @@ void UserPrintPrintBillMenu(int post)
   PrintUserMenuStr(buf, 1);
   sprintf(buf, "   чека");
   PrintUserMenuStr(buf, 2);
-  sprintf(buf, " Пост %d", post + 1);
+  
+  if(post < COUNT_POST)
+    sprintf(buf, " Пост %d", post + 1);
+  else 
+    sprintf(buf, "Пылесос %d", post + 1 - COUNT_POST);
+
   PrintUserMenuStr(buf, 3);
 }
 
@@ -630,7 +679,12 @@ void UserPrintThanksMenu(int post)
   PrintUserMenuStr(buf, 1);
   sprintf(buf, " ");
   PrintUserMenuStr(buf, 2);
-  sprintf(buf, " Пост %d", post + 1);
+  
+  if(post < COUNT_POST)
+    sprintf(buf, " Пост %d", post + 1);
+  else 
+    sprintf(buf, "Пылесос %d", post + 1 - COUNT_POST);
+
   PrintUserMenuStr(buf, 3);
 }
 
@@ -659,7 +713,7 @@ void LoadAcceptedMoney(void)
 {
   CPU_INT32U m,crc,crct;
 
-  for(int i = 0; i < COUNT_POST; i++)
+  for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
   {
     // считаем cохраненные деньги из FRAM
     GetData(&AcceptedMoneyDesc, &m, i, DATA_FLAG_DIRECT_INDEX);    

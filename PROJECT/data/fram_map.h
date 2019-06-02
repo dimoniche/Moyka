@@ -20,8 +20,8 @@ typedef struct
   // длинные счетчики с CRC16 
   TCountersLong CountersLong;
 
-  CPU_INT32U FRAM_AcceptedMoney[COUNT_POST];
-  CPU_INT32U crc_AcceptedMoney[COUNT_POST];
+  CPU_INT32U FRAM_AcceptedMoney[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U crc_AcceptedMoney[COUNT_POST + COUNT_VACUUM];
   
   // журнал событий+ошибок
   TEventRecord EventRecords[EVENT_RECORDS_COUNT];

@@ -177,8 +177,8 @@ const TMenuLine line_ServiceMenu_4 = {
   (void*)&ReportMenuPanel                           // панель для перехода
 };
 
-const TMenuLineArray arr_ServiceMenuArray[] = {&line_ServiceMenu_0, &line_ServiceMenu_1, &line_ServiceMenu_2, &line_ServiceMenu_3, &line_ServiceMenu_4, NULL};
-const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 5, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_ServiceMenuArray[] = {&line_ServiceMenu_0, &line_ServiceMenu_1, /*&line_ServiceMenu_2,*/ &line_ServiceMenu_3, &line_ServiceMenu_4, NULL};
+const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 4, MENU_PANEL_STANDARD};
 
 
 /***********************************

@@ -10,6 +10,8 @@
 
 // 6 постов мойки - 6 купюроприемников и 6 монетоприемников
 #define COUNT_POST 6
+// плюс два пылесоса
+#define COUNT_VACUUM 2
 
 #define DEFAULT_PASSWORD 1111
 #define MASTER_PASSWORD 11300045//1234567890L

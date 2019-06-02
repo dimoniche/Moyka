@@ -2595,7 +2595,7 @@ TDataDescStruct const AcceptedMoneyDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,               // размер массива
+  COUNT_POST + COUNT_VACUUM,// размер массива
   NULL,                     // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, FRAM_AcceptedMoney),            // указатель на переменную или адрес FRAM
   NULL,                     // указатель на границы параметра
@@ -2616,7 +2616,7 @@ TDataDescStruct const AcceptedMoneyCRC16Desc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,               // размер массива
+  COUNT_POST+COUNT_VACUUM,  // размер массива
   NULL,                     // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, crc_AcceptedMoney),            // указатель на переменную или адрес FRAM
   NULL,                     // указатель на границы параметра

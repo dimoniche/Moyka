@@ -762,6 +762,10 @@
       <name>$PROJ_DIR$\PROJECT\app\app_serv.c</name>
       <outputs>
         <tool>
+          <name>ICCARM</name>
+          <file> 171</file>
+        </tool>
+        <tool>
           <name>BICOMP</name>
           <file> 35</file>
         </tool>
