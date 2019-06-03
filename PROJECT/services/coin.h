@@ -1,11 +1,11 @@
 #ifndef _COIN_H_
 #define _COIN_H_
 
-#define COIN_IMP_MIN_LEN 2200 // мс/100
-#define COIN_IMP_MAX_LEN 9000 // мс/100
+#define COIN_IMP_MIN_LEN 220 // мс/10
+#define COIN_IMP_MAX_LEN 900 // мс/10
 
 // запас измерения периода, плюс-минус
-#define COIN_IMP_SPAN 1000 // мс/100
+#define COIN_IMP_SPAN 100 // мс/10
 
 extern void InitCoin(void);
 extern CPU_INT32U GetCoinCount(int index);

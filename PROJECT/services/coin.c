@@ -29,7 +29,7 @@ void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  cash_pulse[post] = pulse * 100;
+  cash_pulse[post] = pulse * 10;
   cash_pause[post] = pause;
   OS_EXIT_CRITICAL();
 }
@@ -40,7 +40,7 @@ void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post)
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  signal_pulse[post] = pulse * 2000;
+  signal_pulse[post] = pulse * 200;
   OS_EXIT_CRITICAL();
 }
 
@@ -218,9 +218,11 @@ void InputCapture_ISR(void)
   static CPU_INT32U period_signal[COUNT_POST + COUNT_VACUUM];
   static CPU_INT32U T3CR = 0;
 
+  T3IR = 0xFF;
+
   // наращиваем тики
   T3CR++;
-  
+
   // пост 1
   // купюроприемник 1
   if (FIO1PIN_bit.P1_20)
@@ -505,7 +507,6 @@ void InputCapture_ISR(void)
   if (FIO0PIN_bit.P0_10)
   {
   }
-  
 }
 
 extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
@@ -513,7 +514,7 @@ extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
 // инициализация импульсных входов
 void  InitImpInput (void)
 {
-    #define INPUT_CAPTURE_FREQ  100000  // частота тактирования частотных входов
+    #define INPUT_CAPTURE_FREQ  10000  // частота тактирования частотных входов
   
     CPU_INT32U  pclk_freq;
     CPU_INT32U  rld_cnts;
@@ -530,133 +531,133 @@ void  InitImpInput (void)
     // назначим все ножки
     
     // купюроприемник 1
-    PINSEL3_bit.P1_20 = 0x3;
+    PINSEL3_bit.P1_20 = 0;
     PINMODE3_bit.P1_20 = 0;
     FIO1DIR_bit.P1_20  = 0;
     FIO1MASK_bit.P1_20 = 0;
     
     // монетоприемник 1
-    PINSEL3_bit.P1_21 = 0x3;
+    PINSEL3_bit.P1_21 = 0;
     PINMODE3_bit.P1_21 = 0;
     FIO1DIR_bit.P1_21  = 0;
     FIO1MASK_bit.P1_21 = 0;
   
     // сигнал печати чека пост 1
-    PINSEL9_bit.P4_28 = 0x3;
+    PINSEL9_bit.P4_28 = 0;
     PINMODE9_bit.P4_28 = 0;
     FIO4DIR_bit.P4_28  = 0;
     FIO4MASK_bit.P4_28 = 0;
 
     // купюроприемник 2
-    PINSEL3_bit.P1_19 = 0x3;
+    PINSEL3_bit.P1_19 = 0;
     PINMODE3_bit.P1_19 = 0;
     FIO1DIR_bit.P1_19  = 0;
     FIO1MASK_bit.P1_19 = 0;
     
     // монетоприемник 2
-    PINSEL3_bit.P1_18 = 0x3;
+    PINSEL3_bit.P1_18 = 0;
     PINMODE3_bit.P1_18 = 0;
     FIO1DIR_bit.P1_18  = 0;
     FIO1MASK_bit.P1_18 = 0;
   
     // сигнал печати чека пост 2
-    PINSEL0_bit.P0_4 = 0x3;
+    PINSEL0_bit.P0_4 = 0;
     PINMODE0_bit.P0_4 = 0;
     FIO0DIR_bit.P0_4  = 0;
     FIO0MASK_bit.P0_4 = 0;
     
     // купюроприемник 3
-    PINSEL7_bit.P3_25 = 0x3;
+    PINSEL7_bit.P3_25 = 0;
     PINMODE7_bit.P3_25 = 0;
     FIO3DIR_bit.P3_25  = 0;
     FIO3MASK_bit.P3_25 = 0;
     
     // монетоприемник 3
-    PINSEL7_bit.P3_26 = 0x3;
+    PINSEL7_bit.P3_26 = 0;
     PINMODE7_bit.P3_26 = 0;
     FIO3DIR_bit.P3_26  = 0;
     FIO3MASK_bit.P3_26 = 0;
   
     // сигнал печати чека пост 3
-    PINSEL3_bit.P1_28 = 0x3;
+    PINSEL3_bit.P1_28 = 0;
     PINMODE3_bit.P1_28 = 0;
     FIO1DIR_bit.P1_28  = 0;
     FIO1MASK_bit.P1_28 = 0;
     
     // купюроприемник 4
-    PINSEL1_bit.P0_26 = 0x3;
+    PINSEL1_bit.P0_26 = 0;
     PINMODE1_bit.P0_26 = 0;
     FIO0DIR_bit.P0_26  = 0;
     FIO0MASK_bit.P0_26 = 0;
     
     // монетоприемник 4
-    PINSEL1_bit.P0_25 = 0x3;
+    PINSEL1_bit.P0_25 = 0;
     PINMODE1_bit.P0_25 = 0;
     FIO0DIR_bit.P0_25  = 0;
     FIO0MASK_bit.P0_25 = 0;
   
     // сигнал печати чека пост 4
-    PINSEL3_bit.P1_27 = 0x3;
+    PINSEL3_bit.P1_27 = 0;
     PINMODE3_bit.P1_27 = 0;
     FIO1DIR_bit.P1_27  = 0;
     FIO1MASK_bit.P1_27 = 0;
     
     // купюроприемник 5
-    PINSEL0_bit.P0_9 = 0x3;
+    PINSEL0_bit.P0_9 = 0;
     PINMODE0_bit.P0_9 = 0;
     FIO0DIR_bit.P0_9  = 0;
     FIO0MASK_bit.P0_9 = 0;
     
     // монетоприемник 5
-    PINSEL4_bit.P2_2 = 0x3;
+    PINSEL4_bit.P2_2 = 0;
     PINMODE4_bit.P2_2 = 0;
     FIO2DIR_bit.P2_2  = 0;
     FIO2MASK_bit.P2_2 = 0;
   
     // сигнал печати чека пост 5
-    PINSEL3_bit.P1_26 = 0x3;
+    PINSEL3_bit.P1_26 = 0;
     PINMODE3_bit.P1_26 = 0;
     FIO1DIR_bit.P1_26  = 0;
     FIO1MASK_bit.P1_26 = 0;
     
     // купюроприемник 6
-    PINSEL0_bit.P0_7 = 0x3;
+    PINSEL0_bit.P0_7 = 0;
     PINMODE0_bit.P0_7 = 0;
     FIO0DIR_bit.P0_7  = 0;
     FIO0MASK_bit.P0_7 = 0;
     
     // монетоприемник 6
-    PINSEL0_bit.P0_8 = 0x3;
+    PINSEL0_bit.P0_8 = 0;
     PINMODE0_bit.P0_8 = 0;
     FIO0DIR_bit.P0_8  = 0;
     FIO0MASK_bit.P0_8 = 0;
   
     // сигнал печати чека пост 6
-    PINSEL0_bit.P0_0 = 0x3;
+    PINSEL0_bit.P0_0 = 0;
     PINMODE0_bit.P0_0 = 0;
     FIO0DIR_bit.P0_0  = 0;
     FIO0MASK_bit.P0_0 = 0;
 
     // монетоприемник пылесос 1
-    PINSEL0_bit.P0_5 = 0x3;
+    PINSEL0_bit.P0_5 = 0;
     PINMODE0_bit.P0_5 = 0;
     FIO0DIR_bit.P0_5  = 0;
     FIO0MASK_bit.P0_5 = 0;
   
     // сигнал печати чека пылесос 1
-    PINSEL0_bit.P0_6 = 0x3;
+    PINSEL0_bit.P0_6 = 0;
     PINMODE0_bit.P0_6 = 0;
     FIO0DIR_bit.P0_6  = 0;
     FIO0MASK_bit.P0_6 = 0;
     
     // монетоприемник пылесос 2
-    PINSEL3_bit.P1_25 = 0x3;
+    PINSEL3_bit.P1_25 = 0;
     PINMODE3_bit.P1_25 = 0;
     FIO1DIR_bit.P1_25  = 0;
     FIO1MASK_bit.P1_25 = 0;
   
     // сигнал печати чека пылесос 2
-    PINSEL0_bit.P0_10 = 0x3;
+    PINSEL0_bit.P0_10 = 0;
     PINMODE0_bit.P0_10 = 0;
     FIO0DIR_bit.P0_10  = 0;
     FIO0MASK_bit.P0_10 = 0;
@@ -665,12 +666,15 @@ void  InitImpInput (void)
     PCLKSEL1_bit.PCLK_TIMER3 = 2;
 
     pclk_freq         =   BSP_CPU_PclkFreq(23);
-    rld_cnts          =   pclk_freq / INPUT_CAPTURE_FREQ;
+    rld_cnts          =   pclk_freq / INPUT_CAPTURE_FREQ / 2;
 
     T3CTCR_bit.CTM    =   0;
     T3CTCR_bit.CIS    =   0;          // select CAP3.0 input
     T3PR              =   rld_cnts-1;
-    T3MCR             =   0;
+    
+    T3MR0             =   1;
+    T3MCR             =   3;
+    
     T3CCR             =   0x00;
     T3EMR             =   0;
     T3TCR             =   0x03;
