@@ -13,7 +13,7 @@ void  RTC_Isr (void)
   CPU_INT32U ilr;
   
   ilr = ILR & 0x7;
-  if (ilr & 0x1) PostUserEvent(EVENT_SEC); 
+  if (ilr & 0x1) PostUserEvent(EVENT_UPATE_RTC); 
   
   ILR = ilr;
 }
@@ -51,7 +51,6 @@ void RTC_SetTime(TRTC_Data *rtc)
   OS_EXIT_CRITICAL();
 }
 
-
 extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
 
 void InitRTC(void)
@@ -87,7 +86,7 @@ void InitRTC(void)
     
     CISS = 0;
     AMR = 0xff;
-    CIIR = 0x1;  // sec interrupt
+    CIIR_bit.IMSEC = 0x1;  // sec interrupt
     
     OS_EXIT_CRITICAL();
 }

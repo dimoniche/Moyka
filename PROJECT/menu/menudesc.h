@@ -20,6 +20,7 @@ extern const TMenuPanel CommonCountersLongPanel[];
 extern const TMenuPanel BillCountersPanel[];
 extern const TMenuPanel ModemSetupPanel[];
 extern const TMenuPanel CoinSetupPanel[];
+extern const TMenuPanel SignalSetupPanel[];
 extern const TMenuPanel JournalIsReset[];
 extern const TMenuPanel ClearJournalMenuPanel[];
 extern const TMenuPanel StatIsReset[];

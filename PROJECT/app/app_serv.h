@@ -36,6 +36,7 @@ extern CPU_INT32U incas_common_bill_counter;
 enum{
   EVENT_SEC = 1,
   EVENT_STARTUP,
+  EVENT_UPATE_RTC,
   
   EVENT_COIN_INSERTED_POST1,
   EVENT_COIN_INSERTED_POST2,

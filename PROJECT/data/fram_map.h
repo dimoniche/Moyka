@@ -58,5 +58,8 @@ typedef struct
   CPU_INT32U  CommandV2;
   CPU_INT32U  TaxSystem;
 
+  CPU_INT32U  enableSignalPrint[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  signal_pulse_len[COUNT_POST + COUNT_VACUUM];
+
 }TFramMap;
 

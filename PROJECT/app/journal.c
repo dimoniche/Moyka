@@ -163,6 +163,12 @@ void GetEventStr(char* str, char event)
     case JOURNAL_EVENT_MONEY_COIN_POST6:
       sprintf(str, "Âí.ìîíåòû ïîñò 6");
       break;
+    case JOURNAL_EVENT_MONEY_COIN_VACUUM1:
+      sprintf(str, "Âí.ìîíåòû ïûë.1");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_VACUUM2:
+      sprintf(str, "Âí.ìîíåòû ïûë.2");
+      break;
 
     case JOURNAL_EVENT_START_SESSION:
       sprintf(str, "Ïå÷àòü ÷åêà ");
@@ -173,9 +179,32 @@ void GetEventStr(char* str, char event)
     case JOURNAL_EVENT_DEVICE_ON:
       sprintf(str, "Âêëş÷åíèå");
       break;
-    case JOURNAL_EVENT_PRINT_BILL:
-      sprintf(str, "Ïå÷àòü ÷åêà");
+      
+    case JOURNAL_EVENT_PRINT_BILL_POST1:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 1");
       break;
+    case JOURNAL_EVENT_PRINT_BILL_POST2:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 2");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST3:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 3");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST4:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 4");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST5:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 5");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST6:
+      sprintf(str, "Ïå÷àòü ÷åêà ïîñò 6");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_VACUUM1:
+      sprintf(str, "Ïå÷àòü ÷åêà ïûë.1");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_VACUUM2:
+      sprintf(str, "Ïå÷àòü ÷åêà ïûë.2");
+      break;
+      
     case JOURNAL_EVENT_PRINT_Z:
       sprintf(str, "Ïå÷àòü îò÷åòà î çàêğ.ñì.");
       break;
@@ -246,6 +275,12 @@ void GetEventStrEng(char* str, char event)
     case JOURNAL_EVENT_MONEY_COIN_POST6:
       sprintf(str, " |  Vneseny monety post 6");
       break;
+    case JOURNAL_EVENT_MONEY_COIN_VACUUM1:
+      sprintf(str, " |  Vneseny monety vacuu1");
+      break;
+    case JOURNAL_EVENT_MONEY_COIN_VACUUM2:
+      sprintf(str, " |  Vneseny monety vacuu2");
+      break;
 
     case JOURNAL_EVENT_START_SESSION:
       sprintf(str, " |  Print bill ");
@@ -256,9 +291,32 @@ void GetEventStrEng(char* str, char event)
     case JOURNAL_EVENT_DEVICE_ON:
       sprintf(str, " |  Vkluchenie ");
       break;
-    case JOURNAL_EVENT_PRINT_BILL:
-      sprintf(str, " |  Pechat' checka ");
+      
+    case JOURNAL_EVENT_PRINT_BILL_POST1:
+      sprintf(str, " |  Pechat' checka post 1");
       break;
+    case JOURNAL_EVENT_PRINT_BILL_POST2:
+      sprintf(str, " |  Pechat' checka post 2");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST3:
+      sprintf(str, " |  Pechat' checka post 3");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST4:
+      sprintf(str, " |  Pechat' checka post 4");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST5:
+      sprintf(str, " |  Pechat' checka post 5");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_POST6:
+      sprintf(str, " |  Pechat' checka post 6");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_VACUUM1:
+      sprintf(str, " |  Pechat' checka vacuu1");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_VACUUM2:
+      sprintf(str, " |  Pechat' checka vacuu2");
+      break;
+
     case JOURNAL_EVENT_PRINT_Z:
       sprintf(str, " |  Pechat' Z-otcheta ");
       break;
@@ -321,7 +379,7 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
         {
           sprintf(&str[strlen(str)], "");
         }
-      else if (record->event == JOURNAL_EVENT_PRINT_BILL)
+      if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
         {
           sprintf(&str[strlen(str)], " ");
         }

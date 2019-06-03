@@ -22,20 +22,13 @@
 
 CPU_INT32U SystemTime;
 CPU_INT32U money_timestamp[COUNT_POST + COUNT_VACUUM];
-CPU_INT08U EnabledChannelsNum;
-CPU_INT08U RecentChannel;
-CPU_INT08U UserMenuState;
-  #define USER_STATE_FIRST_PAGE                 0
-  #define USER_STATE_ACCEPT_MONEY               1
-  #define USER_STATE_SHOW_THANKS                2
-CPU_INT08U ThanksCtr;
 
-CPU_INT08U ChannelsState[CHANNELS_NUM];
+CPU_INT08U ChannelsState[COUNT_POST + COUNT_VACUUM];
   #define CHANNEL_STATE_FREE            0
   #define CHANNEL_STATE_BUSY            1
   #define CHANNEL_STATE_DISABLED        2
-CPU_INT32U ChannelsCounters[CHANNELS_NUM];
-CPU_INT32U ChannelsPayedTime[CHANNELS_NUM];
+CPU_INT32U ChannelsCounters[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U ChannelsPayedTime[COUNT_POST + COUNT_VACUUM];
 
 CPU_INT32U incas_bill_nom_counter[24];
 CPU_INT32U incas_common_bill_counter;
@@ -88,7 +81,21 @@ void AddOutPulses(int count, int len_ms)
 
 #endif
 
-/*!
+int drawPostInfo[COUNT_POST + COUNT_VACUUM] = {0,0,0,0,0,0,0,0};
+int currentPosition = 0;
+
+void DrawMenu(void)
+{
+  if((SystemTime%2))
+  {
+    UserPrintMoneyMenu(currentPosition++);
+    RefreshMenu();
+    
+    if(currentPosition >= COUNT_POST + COUNT_VACUUM) currentPosition = 0;
+  }
+}
+
+/*
  Сервер обработки событий пользователя
 */
 void UserAppTask(void *p_arg)
@@ -96,7 +103,6 @@ void UserAppTask(void *p_arg)
   CPU_INT32U print_timeout;
   CPU_INT32U accmoney;
   int event;
-  CPU_BOOLEAN dontRedraw = DEF_FALSE;
   
 #ifdef BOARD_CENTRAL_CFG
   
@@ -112,13 +118,24 @@ void UserAppTask(void *p_arg)
         {
           switch (event){
 #ifdef BOARD_CENTRAL_CFG
-            case EVENT_SEC:
-              // проверка режима
-              CheckMode();
-             
-              // прочитаем текущее время
-              SystemTime = GetTimeSec();
+            case EVENT_UPATE_RTC:
+              {
+                // прочитаем текущее время
+                CPU_INT32U time = GetTimeSec();
+
+                if(SystemTime != time)
+                {
+                  SystemTime = time;
+                  PostUserEvent(EVENT_SEC);
+                }
                 
+                // проверка режима
+                CheckMode();
+
+              }
+            break;
+            case EVENT_SEC:
+
               // рабочий сервер - счетчики, состояния и т.п.
               WorkServer();
 
@@ -147,7 +164,8 @@ void UserAppTask(void *p_arg)
               if (TstCriticalErrors()) 
               {
                 UserPrintErrorMenu(); 
-                RefreshMenu(); 
+                RefreshMenu();
+
                 // выключим прием денег
                 if (was_critical_error == 0)
                 {
@@ -164,47 +182,40 @@ void UserAppTask(void *p_arg)
                   break;
               }
 
-              dontRedraw = DEF_FALSE;
-
               for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
                 accmoney = GetAcceptedMoney(post);
 
                 if (accmoney > 0)
                 {
-                    UserPrintMoneyMenu(post);
-                    RefreshMenu();
-
-                    dontRedraw = DEF_TRUE;
+                    drawPostInfo[post] = 1;
 
                     LED_OK_ON();
                     CheckFiscalStatus();
 
+                    // печать по внешнему сигналу, ждем таймаут отмены
+                    GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
+                    if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
                     {
-                        // печать по внешнему сигналу, ждем таймаут отмены
-                        GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
-                        if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
-                        {
-                            SetAcceptedMoney(0, post);
-                            UserPrintThanksMenu(post);
-                            RefreshMenu();
-                            OSTimeDly(1000);
-                            LED_OK_OFF();
-                        }
+                        SetAcceptedMoney(0, post);
+                        
+                        UserPrintThanksMenu(post);
+                        RefreshMenu();
+
+                        OSTimeDly(1000);
+                        LED_OK_OFF();
                     }
                 }
                 else
                 {
+                    drawPostInfo[post] = 0;
+                    
                     LED_OK_OFF();
-                }
-                
-                // принимаем деньги
-                if(!dontRedraw)
-                {
-                  UserPrintMoneyMenu(0xFFFF);
-                  RefreshMenu();
-                }
+                }                
               }
+
+              // принимаем деньги
+              DrawMenu();
 
               break;
               
@@ -235,14 +246,8 @@ void UserAppTask(void *p_arg)
 
                 SetAcceptedMoney(accmoney, number_post);
                 money_timestamp[number_post] = OSTimeGet();
-                
-                if (UserMenuState == USER_STATE_ACCEPT_MONEY)
-                {
-                    UserPrintMoneyMenu(number_post);  
-                    RefreshMenu();
-                }
-                
-                if (money) SaveEventRecord(RecentChannel, JOURNAL_EVENT_MONEY_COIN_POST1 + number_post, money);
+                                
+                if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_COIN_POST1 + number_post, money);
               }
               break;
             case EVENT_CASH_INSERTED_POST1:
@@ -264,14 +269,8 @@ void UserAppTask(void *p_arg)
                 accmoney += money;
                 SetAcceptedMoney(accmoney, number_post);
                 money_timestamp[number_post] = OSTimeGet();
-                
-                if (UserMenuState == USER_STATE_ACCEPT_MONEY)
-                {
-                    UserPrintMoneyMenu(number_post);  
-                    RefreshMenu();
-                }
-                
-                if (money) SaveEventRecord(RecentChannel, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
+                                
+                if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
               }
               break;
               
@@ -360,11 +359,11 @@ void UserAppTask(void *p_arg)
                   {
                     if (PrintFiscalBill(accmoney) == 0) // здесь добавить с какого поста чек
                     {
-                        SaveEventRecord(RecentChannel, JOURNAL_EVENT_PRINT_BILL, GetTimeSec());
+                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
                     }
                   }
 
-                  IncCounter(RecentChannel, ChannelsPayedTime[RecentChannel], accmoney);
+                  IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
                   SetAcceptedMoney(0, number_post);
                   OSTimeDly(1000);
                  

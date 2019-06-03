@@ -233,4 +233,9 @@ extern TDataDescStruct const TaxSystemDesc;
 extern TDataDescStruct const CoinIndexDesc;
 extern TDataDescStruct const CashIndexDesc;
 extern CPU_INT32U CoinIndex;
+
+extern TDataDescStruct const SignalIndexDesc;
+extern TDataDescStruct const EnableSignalDesc;
+extern TDataDescStruct const SignalPulseDesc;
+
 #endif //#ifndef _DATADESC_H_

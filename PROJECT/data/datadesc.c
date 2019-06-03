@@ -570,19 +570,111 @@ TDataDescStruct const StatSendHourMinDesc = {
 };
 
 /*************************************
+  Индекс при настройке сигналов
+*************************************/
+TRangeValueULONG const SignalIndexRange = {0, 7};
+CPU_INT08U const SignalIndexName[] = "НАСТ.СИГН.ПЕЧ.";
+CPU_INT08U const SignalIndex_str0[] = "1";
+CPU_INT08U const SignalIndex_str1[] = "2";
+CPU_INT08U const SignalIndex_str2[] = "3";
+CPU_INT08U const SignalIndex_str3[] = "4";
+CPU_INT08U const SignalIndex_str4[] = "5";
+CPU_INT08U const SignalIndex_str5[] = "6";
+CPU_INT08U const SignalIndex_str6[] = "П1";
+CPU_INT08U const SignalIndex_str7[] = "П2";
+CPU_INT08U const *SignalIndexList[] = {SignalIndex_str0, SignalIndex_str1,SignalIndex_str2,SignalIndex_str3,SignalIndex_str4,SignalIndex_str5,SignalIndex_str6,SignalIndex_str7};
+
+CPU_INT32U CoinIndex = 0;
+
+void OnChangeSignalIndex(void)
+{
+}
+
+TDataDescStruct const SignalIndexDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_RAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,             // размер массива
+  NULL,        // указатель на десриптор индекса массива
+  (void*)&CoinIndex,            // указатель на переменную или адрес FRAM
+  (void*)&SignalIndexRange,     // указатель на границы параметра
+  OnChangeSignalIndex,                     // функция по изменению
+  0,       // смещение между элементами в массиве
+  SignalIndexName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  SignalIndexList,                     // указатель на список строк для индексного параметра
+  DATA_INIT_ENABLE,
+  0                           
+};
+
+/*************************************
+  Включение сигнала печати
+*************************************/
+TRangeValueULONG const EnableSignalRange = {0, 1};
+CPU_INT08U const EnableSignalName[] = "Сигнал ";
+CPU_INT08U const *EnableSignalList[] = {OnOffList_str0, OnOffList_str1};
+
+void OnchangeEnableSignal(void)
+{
+}
+
+TDataDescStruct const EnableSignalDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST+COUNT_VACUUM,// размер массива
+  &SignalIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, enableSignalPrint),            // указатель на переменную или адрес FRAM
+  (void*)&EnableSignalRange,     // указатель на границы параметра
+  OnchangeEnableSignal,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  EnableSignalName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  EnableSignalList,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                           
+};
+
+/*************************************
+  Длительность импульса сигнала печати
+*************************************/
+TRangeValueULONG const SignalPulseRange = {1, 60};
+CPU_INT08U const SignalPulseName[] = "Длит.сек.";
+
+TDataDescStruct const SignalPulseDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST+COUNT_VACUUM,  // размер массива
+  &SignalIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, signal_pulse_len),            // указатель на переменную или адрес FRAM
+  (void*)&SignalPulseRange,     // указатель на границы параметра
+  NULL,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  SignalPulseName,       // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                         // значение по умолчанию
+};
+
+/*************************************
   Индекс при настройке монетоприемников
 *************************************/
-TRangeValueULONG const CoinIndexRange = {0, 5};
-CPU_INT08U const CoinIndexName[] = "НАСТР.МОНЕТОПР.";
+TRangeValueULONG const CoinIndexRange = {0, 7};
+CPU_INT08U const CoinIndexName[] = "НАСТ.МОНЕТОПР.";
 CPU_INT08U const CoinIndex_str0[] = "1";
 CPU_INT08U const CoinIndex_str1[] = "2";
 CPU_INT08U const CoinIndex_str2[] = "3";
 CPU_INT08U const CoinIndex_str3[] = "4";
 CPU_INT08U const CoinIndex_str4[] = "5";
 CPU_INT08U const CoinIndex_str5[] = "6";
-CPU_INT08U const *CoinIndexList[] = {CoinIndex_str0, CoinIndex_str1,CoinIndex_str2,CoinIndex_str3,CoinIndex_str4,CoinIndex_str5};
-
-CPU_INT32U CoinIndex = 0;
+CPU_INT08U const CoinIndex_str6[] = "П1";
+CPU_INT08U const CoinIndex_str7[] = "П2";
+CPU_INT08U const *CoinIndexList[] = {CoinIndex_str0, CoinIndex_str1,CoinIndex_str2,CoinIndex_str3,CoinIndex_str4,CoinIndex_str5,CoinIndex_str6,CoinIndex_str7};
 
 void OnChangeCoinIndex(void)
 {
@@ -622,7 +714,7 @@ TDataDescStruct const EnableCoinDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST+ + COUNT_VACUUM,// размер массива
+  COUNT_POST+COUNT_VACUUM,// размер массива
   &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, DeviceConfig.EnableCoinAcceptor),            // указатель на переменную или адрес FRAM
   (void*)&EnableCoinRange,     // указатель на границы параметра
@@ -787,7 +879,7 @@ TDataDescStruct const PrintTimeoutAfterDesc = {
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  10                           // значение по умолчанию
+  60                           // значение по умолчанию
 };
 
 /*************************************
@@ -3219,6 +3311,9 @@ const TDataDescArrayStruct AllDataArray[] =
 
     {&PrintModeDesc, "PrintModeDesc"},
     {&PrintTimeoutAfterDesc, "PrintTimeoutAfterDesc"},
+    {&DisableFiscalErrorsDesc, "DisableFiscalErrorsDesc"},
+    {&EnableSignalDesc, "EnableSignalDesc"},
+    {&SignalPulseDesc, "SignalPulseDesc"},
     
     
     {NULL, ""}

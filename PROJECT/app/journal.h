@@ -29,28 +29,36 @@ typedef struct{
     #define JOURNAL_EVENT_MONEY_COIN_POST4 10  // событие получения монеты (кол-во рублей) пост 4
     #define JOURNAL_EVENT_MONEY_COIN_POST5 11  // событие получения монеты (кол-во рублей) пост 5
     #define JOURNAL_EVENT_MONEY_COIN_POST6 12  // событие получения монеты (кол-во рублей) пост 6
-    // здесь добавить еще два события от пылесосов
-    //#define JOURNAL_EVENT_MONEY_COIN_VACUUM1 13  // событие получения монеты (кол-во рублей) пылесос 1
-    //#define JOURNAL_EVENT_MONEY_COIN_VACUUM1 14  // событие получения монеты (кол-во рублей) пылесос 2
+    #define JOURNAL_EVENT_MONEY_COIN_VACUUM1 13  // событие получения монеты (кол-во рублей) пылесос 1
+    #define JOURNAL_EVENT_MONEY_COIN_VACUUM2 14  // событие получения монеты (кол-во рублей) пылесос 2
 
-    #define JOURNAL_EVENT_START_SESSION    13  // событие начала сеанса
-    #define JOURNAL_EVENT_END_SESSION      14  // событие конца сеанса
-    #define JOURNAL_EVENT_DEVICE_ON        16  // включение устройства
-    #define JOURNAL_EVENT_PRINT_BILL       17  // печать чека
-    #define JOURNAL_EVENT_PRINT_Z          18  // печать z-отчета
-    #define JOURNAL_EVENT_PRINT_X          19  // печать x-отчета
-    #define JOURNAL_EVENT_PRINT_BUF        20  // печать x-отчета
-    #define JOURNAL_EVENT_CHANGE_MODE      21  // смена режима
-    #define JOURNAL_EVENT_INCASSATION      22  // инкассация 
-    #define JOURNAL_EVENT_PASS_FAIL        23  // неверный ввод пароля
-    #define JOURNAL_EVENT_EMAIL_OK         24  // правильно отправлен email
-    #define JOURNAL_EVENT_EMAIL_FAIL       25  // ошибка при отправке email
+    #define JOURNAL_EVENT_START_SESSION    15  // событие начала сеанса
+    #define JOURNAL_EVENT_END_SESSION      16  // событие конца сеанса
+    #define JOURNAL_EVENT_DEVICE_ON        18  // включение устройства
+  
+    #define JOURNAL_EVENT_PRINT_BILL_POST1       19  // печать чека пост 1
+    #define JOURNAL_EVENT_PRINT_BILL_POST2       20  // печать чека пост 2
+    #define JOURNAL_EVENT_PRINT_BILL_POST3       21  // печать чека пост 3
+    #define JOURNAL_EVENT_PRINT_BILL_POST4       22  // печать чека пост 4
+    #define JOURNAL_EVENT_PRINT_BILL_POST5       23  // печать чека пост 5
+    #define JOURNAL_EVENT_PRINT_BILL_POST6       24  // печать чека пост 6
+    #define JOURNAL_EVENT_PRINT_BILL_VACUUM1     25  // печать чека пылесос 1
+    #define JOURNAL_EVENT_PRINT_BILL_VACUUM2     26  // печать чека пылесос 2
+  
+    #define JOURNAL_EVENT_PRINT_Z          27  // печать z-отчета
+    #define JOURNAL_EVENT_PRINT_X          28  // печать x-отчета
+    #define JOURNAL_EVENT_PRINT_BUF        29  // печать x-отчета
+    #define JOURNAL_EVENT_CHANGE_MODE      30  // смена режима
+    #define JOURNAL_EVENT_INCASSATION      31  // инкассация 
+    #define JOURNAL_EVENT_PASS_FAIL        32  // неверный ввод пароля
+    #define JOURNAL_EVENT_EMAIL_OK         33  // правильно отправлен email
+    #define JOURNAL_EVENT_EMAIL_FAIL       34  // ошибка при отправке email
 
     // ошибка связи с фискальником
-    #define ERROR_FR_CONN                  26
+    #define ERROR_FR_CONN                  35
 
     // ВСЕ ОШИБКИ ФР ФАТАЛЬНЫЕ
-    #define ERROR_FR                       27
+    #define ERROR_FR                       36
   
     #define JOURNAL_EVENTS_COUNT             (ERROR_FR+FR_ERROR_NUMBER)  // число событий
 

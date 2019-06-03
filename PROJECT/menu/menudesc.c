@@ -847,6 +847,7 @@ const CPU_INT08U str_DeviceMenu_1[] = "ÔĞ";
 const CPU_INT08U str_DeviceMenu_2[] = "Ìîíåòîïğèåìíèêè";
 //const CPU_INT08U str_DeviceMenu_3[] = "Ìîäåì";
 const CPU_INT08U str_DeviceMenu_4[] = "Êóïşğîïğèåìíèêè";
+const CPU_INT08U str_DeviceMenu_5[] = "Ñèãíàë ïå÷àòè";
 
 const TMenuLine line_DeviceMenu_0 = {
   MENU_LINE_STRING,               // òèï ïóíêòà ìåíş
@@ -883,8 +884,47 @@ const TMenuLine line_DeviceMenu_3 = {
   (void*)&ModemSetupPanel                            // ïàíåëü äëÿ ïåğåõîäà
 };*/
 
-const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_3, /*&line_DeviceMenu_4,*/ NULL};
-const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 4, MENU_PANEL_STANDARD};
+const TMenuLine line_DeviceMenu_5 = {
+  MENU_LINE_GOTO_MENU,               // òèï ïóíêòà ìåíş
+  0,                              // äîï. ôëàãè  
+  (void*)str_DeviceMenu_5,       // óêàçàòåëü íà òåêñòîâóş ñòğîêó èëè äåñêğèïòîğ
+  (void*)&SignalSetupPanel                            // ïàíåëü äëÿ ïåğåõîäà
+};
+
+const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_3, &line_DeviceMenu_5,/*&line_DeviceMenu_4,*/ NULL};
+const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 5, MENU_PANEL_STANDARD};
+
+/***********************************
+  ÌÅÍŞ ÍÀÑÒĞÎÉÊÀ ñèãíàëîâ ïå÷àòè ÷åêîâ
+***********************************/
+const TMenuLine line_SignalMenu_0 = {
+  MENU_LINE_SHOW_DESC,               // òèï ïóíêòà ìåíş
+  MENU_FIXED_LINE|MENU_INDEX_LINE,                // äîï. ôëàãè  
+  (void*)&SignalIndexDesc,          // óêàçàòåëü íà òåêñòîâóş ñòğîêó èëè äåñêğèïòîğ
+  NULL                            // ïàíåëü äëÿ ïåğåõîäà
+};
+
+const TMenuLine line_SignalMenu_1 = {
+  MENU_LINE_SHOW_DESC,               // òèï ïóíêòà ìåíş
+  0,                              // äîï. ôëàãè  
+  (void*)&EnableSignalDesc,       // óêàçàòåëü íà òåêñòîâóş ñòğîêó èëè äåñêğèïòîğ
+  NULL                            // ïàíåëü äëÿ ïåğåõîäà
+};
+
+const TMenuLine line_SignalMenu_2 = {
+  MENU_LINE_SHOW_DESC,               // òèï ïóíêòà ìåíş
+  0,                              // äîï. ôëàãè  
+  (void*)&SignalPulseDesc,       // óêàçàòåëü íà òåêñòîâóş ñòğîêó èëè äåñêğèïòîğ
+  NULL                            // ïàíåëü äëÿ ïåğåõîäà
+};
+
+void OnEnterSignalMenu(void)
+{
+    CoinIndex = 0;
+}
+
+const TMenuLineArray arr_SignalMenuArray[] = {&line_SignalMenu_0, &line_SignalMenu_1, &line_SignalMenu_2, NULL};
+const TMenuPanel SignalSetupPanel[] = {arr_SignalMenuArray, OnEnterSignalMenu, 3, MENU_PANEL_STANDARD};
 
 
 /***********************************
@@ -984,8 +1024,8 @@ const TMenuLine line_FrMenu_12 = {
   NULL                     
 };
 
-const TMenuLineArray arr_FrMenuArray[] = {&line_FrMenu_0, &line_FrMenu_1, &line_FrMenu_2, &line_FrMenu_3, &line_FrMenu_4, &line_FrMenu_5, &line_FrMenu_6, &line_FrMenu_7, &line_FrMenu_8, &line_FrMenu_9, &line_FrMenu_10, &line_FrMenu_11, &line_FrMenu_12, NULL};
-const TMenuPanel FrMenuPanel[] = {arr_FrMenuArray, NULL, 13, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_FrMenuArray[] = {&line_FrMenu_0, &line_FrMenu_1, /*&line_FrMenu_2, &line_FrMenu_3,*/ &line_FrMenu_4, &line_FrMenu_5, &line_FrMenu_6, &line_FrMenu_7, &line_FrMenu_8, &line_FrMenu_9, &line_FrMenu_10, &line_FrMenu_11, &line_FrMenu_12, NULL};
+const TMenuPanel FrMenuPanel[] = {arr_FrMenuArray, NULL, 11, MENU_PANEL_STANDARD};
 
 /***********************************
   ÌÅÍŞ ÍÀÑÒĞÎÉÊÀ ÌÎÍÅÒÎÏĞÈÅÌÍÈÊÎÂ
@@ -1671,7 +1711,7 @@ void PrintEventJournalRecord(TEventRecord *record)
         {
           sprintf(str_EventData, "");
         }
-      else if (record->event == JOURNAL_EVENT_PRINT_BILL)
+      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
         {
           sprintf(str_EventData, " ");
         }
