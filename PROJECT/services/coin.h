@@ -14,7 +14,8 @@ extern void CoinDisable(void);
 extern void CoinEnable(void);
 extern CPU_INT32U GetCashCount(int index);
 extern CPU_INT32U GetResetCashCount(int index);
-extern void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause);
+extern void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post);
+extern void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post);
 
 #endif //#ifndef _COIN_H_
 

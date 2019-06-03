@@ -222,6 +222,7 @@ extern void OnChangeServiceName(void);
 extern TDataDescStruct const CashPulseLenDesc;
 extern TDataDescStruct const CashPauseLenDesc;
 extern void OnChangeCashPulseLen();
+extern void OnChangeSinalPulseLen();
 
 extern TDataDescStruct const PrintModeDesc;
 extern TDataDescStruct const PrintTimeoutAfterDesc;

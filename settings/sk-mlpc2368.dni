@@ -14,7 +14,7 @@ Count=0
 Enabled=0
 ShowSource=1
 [DebugChecksum]
-Checksum=-1178438452
+Checksum=206192145
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -153,7 +153,8 @@ ActionState=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\PROJECT\services\coin.c}.222.3" 0 0 1 "" 0 "" 0
+Count=1
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

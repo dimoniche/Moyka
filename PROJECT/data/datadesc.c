@@ -149,11 +149,13 @@ CPU_INT08U const CashPulseLenName[] = "Длина имп.,мс";
 void OnChangeCashPulseLen()
 {
     CPU_INT32U pulse, pause;
-    GetData(&CashPulseLenDesc, &pulse, 0, DATA_FLAG_SYSTEM_INDEX);
-    GetData(&CashPauseLenDesc, &pause, 0, DATA_FLAG_SYSTEM_INDEX);
-    SetCashPulseParam(pulse, pause);
+    for(int post = 0; post < COUNT_POST; post++)
+    {
+      GetData(&CashPulseLenDesc, &pulse, post, DATA_FLAG_DIRECT_INDEX);
+      GetData(&CashPauseLenDesc, &pause, post, DATA_FLAG_DIRECT_INDEX);
+      SetCashPulseParam(pulse, pause, post);
+    }
 }
-
 
 TDataDescStruct const CashPulseLenDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
@@ -641,7 +643,17 @@ TDataDescStruct const EnableSignalDesc = {
   Длительность импульса сигнала печати
 *************************************/
 TRangeValueULONG const SignalPulseRange = {1, 60};
-CPU_INT08U const SignalPulseName[] = "Длит.сек.";
+CPU_INT08U const SignalPulseName[] = "Длина.имп.,сек.";
+
+void OnChangeSinalPulseLen()
+{
+    CPU_INT32U pulse;
+    for(int post = 0; post < COUNT_POST; post++)
+    {
+      GetData(&SignalPulseDesc, &pulse, post, DATA_FLAG_DIRECT_INDEX);
+      SetSignalPulseParam(pulse, post);
+    }
+}
 
 TDataDescStruct const SignalPulseDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
@@ -652,7 +664,7 @@ TDataDescStruct const SignalPulseDesc = {
   &SignalIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, signal_pulse_len),            // указатель на переменную или адрес FRAM
   (void*)&SignalPulseRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
+  OnChangeSinalPulseLen,                     // функция по изменению
   sizeof(CPU_INT32U),       // смещение между элементами в массиве
   SignalPulseName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)

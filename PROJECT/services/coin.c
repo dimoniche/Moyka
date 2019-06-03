@@ -14,47 +14,65 @@ void  InitImpInput(void);
 CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
 
-static CPU_INT32U cash_pulse = 5000;
-static CPU_INT32U cash_pause = 2000;
+static CPU_INT32U cash_pulse[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U cash_pause[COUNT_POST + COUNT_VACUUM];
 
 static char pend_cash_counter[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U pend_cash_timestamp[COUNT_POST + COUNT_VACUUM];
 
-void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause)
+static CPU_INT32U signal_pulse[COUNT_POST + COUNT_VACUUM];
+static char pend_signal_counter[COUNT_POST + COUNT_VACUUM];
+
+void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  cash_pulse = pulse * 100;
-  cash_pause = pause;
+  cash_pulse[post] = pulse * 100;
+  cash_pause[post] = pause;
+  OS_EXIT_CRITICAL();
+}
+
+void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  signal_pulse[post] = pulse * 2000;
   OS_EXIT_CRITICAL();
 }
 
 void CoinTask(void *p_arg)
 {
-  CPU_INT32U enable_coin;
-  CPU_INT32U cash_mode;
-  CPU_INT32U cash_enable;
+  CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U cash_enable[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U enable_signal[COUNT_POST + COUNT_VACUUM];
+
   CPU_INT32U last_cash_count[COUNT_POST + COUNT_VACUUM];
   CPU_INT32U last_cash_time[COUNT_POST + COUNT_VACUUM];
   CPU_INT32U last_settings_time = 0;
 
   while(1)
     {
+        if (OSTimeGet() - last_settings_time > 1000)
+        {
+            for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
+            {
+              GetData(&EnableCoinDesc, &enable_coin[i], i, DATA_FLAG_DIRECT_INDEX);  
+              GetData(&EnableValidatorDesc, &cash_enable[i], i, DATA_FLAG_DIRECT_INDEX);
+              GetData(&EnableSignalDesc, &enable_signal[i], i, DATA_FLAG_DIRECT_INDEX);
+            }
+            
+            last_settings_time = OSTimeGet();
+        }
+
 		for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
 		{
-			if (OSTimeGet() - last_settings_time > 1000)
-			{
-				last_settings_time = OSTimeGet();
-				GetData(&EnableCoinDesc, &enable_coin, i, DATA_FLAG_DIRECT_INDEX);  
-				GetData(&CashModeDesc, &cash_mode, i, DATA_FLAG_DIRECT_INDEX);  
-				GetData(&EnableValidatorDesc, &cash_enable, i, DATA_FLAG_DIRECT_INDEX);
-			}
-
 			OSTimeDly(1);
 
-			if (enable_coin)
+			if (enable_coin[i])
 			{
 				if (GetCoinCount(i))
 				{
@@ -67,7 +85,16 @@ void CoinTask(void *p_arg)
 				GetResetCoinCount(i);
 			}
 
-			if (!cash_enable) {GetResetCashCount(i); continue;}
+			if (enable_signal[i])
+			{
+				if (pend_signal_counter[i])
+				{
+                  // есть удержание сигнала печати
+				  PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + i);
+				}
+			}
+
+			if (!cash_enable[i]) {GetResetCashCount(i); continue;}
             if(i >= COUNT_POST) continue;
 
 			#if OS_CRITICAL_METHOD == 3
@@ -78,7 +105,7 @@ void CoinTask(void *p_arg)
 			if (pend_cash_counter[i])
 			{
 			  // импульсы инкрементируем только после выдержки паузы
-			  if (OSTimeGet() - pend_cash_timestamp[i] > cash_pause)
+			  if (OSTimeGet() - pend_cash_timestamp[i] > cash_pause[i])
 			  {
 				pend_cash_counter[i] = 0;
 				CashImpCounter[i]++;
@@ -86,32 +113,25 @@ void CoinTask(void *p_arg)
 			}
 			OS_EXIT_CRITICAL();
 				
-			if (cash_mode == 1)
-			{
-			  if (GetCashCount(i))
-			  {
-				if (last_cash_count[i] == GetCashCount(i))
-				{
-					if (labs(OSTimeGet() - last_cash_time[i]) > 500)
-					{
-					  PostUserEvent(EVENT_CASH_INSERTED_POST1 + i);
-					}
-				}
-				else
-				{
-					last_cash_count[i] = GetCashCount(i);
-					last_cash_time[i] = OSTimeGet();
-				}
-			  }
-			  else
-			  {
-				last_cash_time[i] = OSTimeGet();
-			  }
-			}
-			else
-			{
-			  GetResetCashCount(i);
-			}
+            if (GetCashCount(i))
+            {
+              if (last_cash_count[i] == GetCashCount(i))
+              {
+                  if (labs(OSTimeGet() - last_cash_time[i]) > 500)
+                  {
+                    PostUserEvent(EVENT_CASH_INSERTED_POST1 + i);
+                  }
+              }
+              else
+              {
+                  last_cash_count[i] = GetCashCount(i);
+                  last_cash_time[i] = OSTimeGet();
+              }
+            }
+            else
+            {
+              last_cash_time[i] = OSTimeGet();
+            }
 		}
     }
 }
@@ -195,6 +215,7 @@ void InputCapture_ISR(void)
 {
   static CPU_INT32U period[COUNT_POST + COUNT_VACUUM];
   static CPU_INT32U period_cash[COUNT_POST + COUNT_VACUUM];
+  static CPU_INT32U period_signal[COUNT_POST + COUNT_VACUUM];
   static CPU_INT32U T3CR = 0;
 
   // наращиваем тики
@@ -207,8 +228,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[0];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[0] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[0] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[0] = 1;
 		  pend_cash_timestamp[0] = OSTimeGet();
@@ -236,8 +257,21 @@ void InputCapture_ISR(void)
   
   // сигнал печати чека 1
   if (FIO4PIN_bit.P4_28)
-  {
-  }
+	{ // пришел задний фронт
+	  CPU_INT32U cr=T3CR;
+	  cr -= period_signal[0];
+	  
+	  if ((cr > (signal_pulse[0] - COIN_IMP_SPAN))
+		   &&  (cr < (signal_pulse[0] + COIN_IMP_SPAN)))
+	  {
+		  pend_signal_counter[0] = 1;
+	  }
+	}
+  else
+	{ // пришел передний фронт
+	  period_signal[0] = T3CR;
+	  pend_signal_counter[0] = 0;
+	}
   
   // пост 2
   // купюроприемник 2
@@ -246,8 +280,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[1];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[1] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[1] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[1] = 1;
 		  pend_cash_timestamp[1] = OSTimeGet();
@@ -285,8 +319,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[2];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[2] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[2] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[2] = 1;
 		  pend_cash_timestamp[2] = OSTimeGet();
@@ -324,8 +358,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[3];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[3] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[3] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[3] = 1;
 		  pend_cash_timestamp[3] = OSTimeGet();
@@ -363,8 +397,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[4];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[4] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[4] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[4] = 1;
 		  pend_cash_timestamp[4] = OSTimeGet();
@@ -402,8 +436,8 @@ void InputCapture_ISR(void)
 	  CPU_INT32U cr=T3CR;
 	  cr -= period_cash[5];
 	  
-	  if ((cr > (cash_pulse - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse + COIN_IMP_SPAN)))
+	  if ((cr > (cash_pulse[5] - COIN_IMP_SPAN))
+		   &&  (cr < (cash_pulse[5] + COIN_IMP_SPAN)))
 	  {
 		  pend_cash_counter[5] = 1;
 		  pend_cash_timestamp[5] = OSTimeGet();
@@ -489,11 +523,9 @@ void  InitImpInput (void)
     #endif
 
     OnChangeCashPulseLen();
+    OnChangeSinalPulseLen();
         
     OS_ENTER_CRITICAL();
-
-    PCONP_bit.PCTIM3 = 1;
-    PCLKSEL1_bit.PCLK_TIMER3 = 2;
     
     // назначим все ножки
     
@@ -629,6 +661,9 @@ void  InitImpInput (void)
     FIO0DIR_bit.P0_10  = 0;
     FIO0MASK_bit.P0_10 = 0;
     
+    PCONP_bit.PCTIM3 = 1;
+    PCLKSEL1_bit.PCLK_TIMER3 = 2;
+
     pclk_freq         =   BSP_CPU_PclkFreq(23);
     rld_cnts          =   pclk_freq / INPUT_CAPTURE_FREQ;
 
