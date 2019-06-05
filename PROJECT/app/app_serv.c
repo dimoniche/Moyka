@@ -379,7 +379,7 @@ void UserAppTask(void *p_arg)
             }
             break;
 
-            case EVENT_KEY_F1:
+            /*case EVENT_KEY_F1:
                 PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
             case EVENT_KEY_F2:
@@ -387,7 +387,7 @@ void UserAppTask(void *p_arg)
             break;
             case EVENT_KEY_F3:
                 PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1);
-            break;
+            break;*/
 #endif
             default:
               break;
