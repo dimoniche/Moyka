@@ -424,17 +424,6 @@ void IncCounter(CPU_INT08U ch, CPU_INT32U time, CPU_INT32U money)
 {
   CPU_INT32U r, t, m;
   TCountersLong long_ctrs;
-
-  // увеличим канальные счетчики
-  ReadArrayFram(offsetof(TFramMap, Counters.CounterChannelRun)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&r);
-  ReadArrayFram(offsetof(TFramMap, Counters.CounterChannelTime)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&t);
-  ReadArrayFram(offsetof(TFramMap, Counters.CounterChannelMoney)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&m);
-  r++;
-  t+=time;
-  m+=money;
-  WriteArrayFram(offsetof(TFramMap, Counters.CounterChannelRun)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&r);
-  WriteArrayFram(offsetof(TFramMap, Counters.CounterChannelTime)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&t);
-  WriteArrayFram(offsetof(TFramMap, Counters.CounterChannelMoney)+sizeof(CPU_INT32U)*ch, sizeof(CPU_INT32U), (unsigned char*)&m);
   
   // увеличим общие счетчики
   ReadArrayFram(offsetof(TFramMap, Counters.CounterRun), sizeof(CPU_INT32U), (unsigned char*)&r);
@@ -449,9 +438,7 @@ void IncCounter(CPU_INT08U ch, CPU_INT32U time, CPU_INT32U money)
 
   // увеличим длинные счетчики
   ReadArrayFram(offsetof(TFramMap, CountersLong), sizeof(TCountersLong), (unsigned char*)&long_ctrs);
-  long_ctrs.CounterChannelRunLong[ch]++;
-  long_ctrs.CounterChannelTimeLong[ch] += time;
-  long_ctrs.CounterChannelMoneyLong[ch] += money;
+
   long_ctrs.CounterRunLong++;
   long_ctrs.CounterTimeLong += time;
   long_ctrs.CounterMoneyLong += money;
@@ -478,14 +465,8 @@ void CheckLongCounters(void)
         long_ctrs.crc = CRC16((unsigned char*)&long_ctrs, offsetof(TCountersLong, crc));
         WriteArrayFram(offsetof(TFramMap, CountersLong), sizeof(TCountersLong), (unsigned char*)&long_ctrs);    
         /// обычные счетчики тоже очистим
-        ClearCounters();
         ClearBillnomCounter();
     }
-}
-
-void ClearCounters(void)
-{
-  SetArrayFram(offsetof(TFramMap, Counters), sizeof(CPU_INT32U)*(CHANNELS_NUM+1)*3, 0x00);
 }
 
 /// инкремент счетчика купюр по номиналам

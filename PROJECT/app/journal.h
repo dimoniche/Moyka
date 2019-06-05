@@ -1,7 +1,6 @@
 #ifndef _JOURNAL_H_
 #define _JOURNAL_H_
 
-#include "control.h"
 #include "fiscal.h"
 
 #define EVENT_RECORDS_COUNT  512 // число записей в журнале
@@ -73,12 +72,6 @@ typedef struct{
 
 // структура для хранения счетчиков
 typedef struct{
-  // число запусков поканально
-  CPU_INT32U  CounterChannelRun[CHANNELS_NUM];
-  // Суммарное время работы поканально, сек.
-  CPU_INT32U  CounterChannelTime[CHANNELS_NUM];
-  // Сумма денег поканально  
-  CPU_INT32U  CounterChannelMoney[CHANNELS_NUM];
   
   // общее число запусков 
   CPU_INT32U  CounterRun;
@@ -97,12 +90,6 @@ typedef struct{
 // структура для хранения длинных счетчиков
 // ведем пока только эти три длинных
 typedef struct{
-  // число запусков поканально
-  CPU_INT32U  CounterChannelRunLong[CHANNELS_NUM];
-  // Суммарное время работы поканально, сек.
-  CPU_INT32U  CounterChannelTimeLong[CHANNELS_NUM];
-  // Сумма денег поканально  
-  CPU_INT32U  CounterChannelMoneyLong[CHANNELS_NUM];
   CPU_INT32U  CounterRunLong;
   CPU_INT32U  CounterTimeLong;
   CPU_INT32U  CounterMoneyLong;
@@ -122,7 +109,6 @@ extern void ClearEventJournal(void);
 extern void GetEventStr(char* str, char event);
 extern int GetEventRecord(TEventRecord* record, CPU_INT32U index);
 extern void IncCounter(CPU_INT08U ch, CPU_INT32U time, CPU_INT32U money);
-extern void ClearCounters(void);
 extern void ErrorServer(void);
 extern int TstCriticalValidatorErrors(void);
 extern void ClrValidatorErrors(void);

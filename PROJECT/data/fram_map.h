@@ -10,10 +10,7 @@ typedef struct
     
   CPU_INT32U SerialNum;
 
-  TChannelConfig ChannelConfig;
-
   TDeviceConfig DeviceConfig;
-
   // счетчики
   TCounters Counters;
 
@@ -26,6 +23,8 @@ typedef struct
   // журнал событий+ошибок
   TEventRecord EventRecords[EVENT_RECORDS_COUNT];
 
+  CPU_INT32U Price;
+
   CPU_INT32U Pass;
   CPU_INT32U crc_Pass;
 
@@ -36,8 +35,6 @@ typedef struct
   CPU_INT32U IncasTime;
 
   CPU_INT32U StartButtonName;
-
-  CPU_INT32U  DefferedStartEnabled[CHANNELS_NUM];
 #endif
   
   CPU_INT08U  mac_addr[6];

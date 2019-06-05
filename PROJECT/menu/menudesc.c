@@ -4,7 +4,6 @@
 #include "menudesc.h"
 #include "data.h"
 #include "datadesc.h"
-#include "control.h"
 #include "journal.h"
 #include "time.h"
 #include "mode.h"
@@ -515,85 +514,6 @@ const TMenuLine line_SettingsMenu_7 = {
 const TMenuLineArray arr_SettingsMenuArray[] = {&line_SettingsMenu_0, &line_SettingsMenu_2, &line_SettingsMenu_5, &line_SettingsMenu_3, &line_SettingsMenu_6, /*&line_SettingsMenu_8,*/ NULL};
 const TMenuPanel SettingsMenuPanel[] = {arr_SettingsMenuArray, NULL, 5, MENU_PANEL_STANDARD};
 
-
-
-/***********************************
-  МЕНЮ НАСТРОЙКА КАНАЛОВ
-***********************************/
-const TMenuLine line_ChannelMenu_0 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
-  (void*)&ChannelIndexDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_1 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&EnableChannelDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_2 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&PostIpAddrDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_3 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&SelectProtectDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_4 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&PostImpCostDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_5 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&PostLenCostDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelMenu_6 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&PostMinutePriceDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLineArray arr_ChannelMenuArray[] = {&line_ChannelMenu_0,
-                                               &line_ChannelMenu_1,
-                                               &line_ChannelMenu_2,
-                                               &line_ChannelMenu_4,
-                                               &line_ChannelMenu_5,
-                                               &line_ChannelMenu_3,
-                                               &line_ChannelMenu_6,
-                                               NULL};
-char flag_enter_periods=0;
-
-void OnEnterChannelSettingsMenu(void)
-{
-  if (!flag_enter_periods)
-    {
-      ChannelIndex = 0;
-    }
-  else
-    {
-      flag_enter_periods = 0;
-    }
-}
-
-const TMenuPanel ChannelMenuPanel[] = {arr_ChannelMenuArray, OnEnterChannelSettingsMenu, 7, MENU_PANEL_STANDARD};
-
-
 /***********************************
   МЕНЮ НАСТРОЙКА СЕТИ
 ***********************************/
@@ -629,54 +549,6 @@ const TMenuLine line_NetworkMenu_3 = {
 
 const TMenuLineArray arr_NetworkMenuArray[] = {&line_NetworkMenu_0, &line_NetworkMenu_1, &line_NetworkMenu_2, &line_NetworkMenu_3, NULL};
 const TMenuPanel NetworkMenuPanel[] = {arr_NetworkMenuArray, NULL, 4, MENU_PANEL_STANDARD};
-
-/***********************************
-  МЕНЮ НАСТРОЙКА ЦЕНЫ НА БУДНЯХ
-***********************************/
-void OnEnterPanelPrice(void)
-{
-  PeriodIndex = ChannelIndex*PRICE_PERIODS_NUM;
-  flag_enter_periods = 1;
-}
-
-const TMenuLine line_PriceMenu_0 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
-  (void*)&PeriodWeekdaysIndexDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenu_1 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&T_Start_WeekdaysDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenu_2 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&T_End_WeekdaysDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenu_3 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&PriceWeekdaysDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenu_4 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&PriceTimeWeekdaysDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLineArray arr_PriceMenuArray[] = {&line_PriceMenu_0, &line_PriceMenu_1, &line_PriceMenu_2, &line_PriceMenu_3, &line_PriceMenu_4, NULL};
-const TMenuPanel PriceWeekdaysMenuPanel[] = {arr_PriceMenuArray, OnEnterPanelPrice, 5, MENU_PANEL_STANDARD};
-
 
 /***********************************
   МЕНЮ ВВОД ТЕКУЩЕГО ПАРОЛЯ
@@ -795,48 +667,6 @@ const TMenuLine line_SetNewPassMenu_1 = {
 
 const TMenuLineArray arr_SetNewPassMenuArray[] = {&line_SetNewPassMenu_0, &line_SetNewPassMenu_1, NULL};
 const TMenuPanel SetNewPassMenuPanel[] = {arr_SetNewPassMenuArray, NULL, 2, MENU_PANEL_STANDARD};
-
-/***********************************
-  МЕНЮ НАСТРОЙКА ЦЕНЫ НА ВЫХОДНЫХ
-***********************************/
-const TMenuLine line_PriceMenuWend_0 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
-  (void*)&PeriodWeekendIndexDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenuWend_1 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&T_Start_WeekendDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenuWend_2 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&T_End_WeekendDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenuWend_3 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&PriceWeekendDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_PriceMenuWend_4 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  0,                // доп. флаги  
-  (void*)&PriceTimeWeekendDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLineArray arr_PriceMenuArrayWend[] = {&line_PriceMenuWend_0, &line_PriceMenuWend_1, &line_PriceMenuWend_2, &line_PriceMenuWend_3, &line_PriceMenuWend_4, NULL};
-const TMenuPanel PriceWeekendMenuPanel[] = {arr_PriceMenuArrayWend, OnEnterPanelPrice, 5, MENU_PANEL_STANDARD};
-
 
 /***********************************
   МЕНЮ НАСТРОЙКА ОБОРУДОВАНИЯ

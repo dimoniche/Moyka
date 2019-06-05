@@ -624,7 +624,7 @@ void ClrFiscalErrorByCode(CPU_INT08U err)
 
 // печать чека на ФР
 // ext - расширенный формат команды (Операция V2  расширенное закрытие чека)
-int PrintFiscalBill(CPU_INT32U money)
+int PrintFiscalBill(CPU_INT32U money, CPU_INT32U post)
 {
     CPU_INT08U err;
     CPU_INT64U count = 1000;
@@ -716,8 +716,7 @@ repeat_sell1:
                 GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
                 if (serv_index == 1)
                 {
-                    static const char sss[] = "Услуги мойки самообслуживания";
-                    strcpy(service_name, sss);
+                    sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
                 }
                 else
                 {
@@ -731,8 +730,7 @@ repeat_sell1:
             GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
             if (serv_index == 1)
             {
-                static const char sss[] = "Услуги мойки самообслуживания";
-                strcpy(service_name, sss);
+                sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
             }
             else
             {
@@ -810,8 +808,7 @@ repeat_sell2:
                 GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
                 if (serv_index == 1)
                 {
-                    static const char sss[] = "Услуги мойки самообслуживания";
-                    strcpy(service_name, sss);
+                  sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
                 }
                 else
                 {
@@ -825,8 +822,7 @@ repeat_sell2:
             GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
             if (serv_index == 1)
             {
-                static const char sss[] = "Услуги мойки самообслуживания";
-                strcpy(service_name, sss);
+              sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
             }
             else
             {

@@ -3126,12 +3126,6 @@
         <name>$PROJ_DIR$\PROJECT\app\console_cmd.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\PROJECT\app\control.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\app\control.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\PROJECT\app\host_app.c</name>
         <excluded>
           <configuration>Flash Post</configuration>

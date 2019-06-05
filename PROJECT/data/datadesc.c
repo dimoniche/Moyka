@@ -9,85 +9,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
-#include "control.h"
 #include "fiscal.h"
 #include "time.h"
 #include "CRC16.h"
 #include "coin.h"
 
 extern CPU_INT32U modem_status;
-
-/*************************************
-  Индекс канала
-*************************************/
-CPU_INT32U  ChannelIndex=0;
-TRangeValueULONG const ChannelIndexRange = {0, CHANNELS_NUM-1};
-CPU_INT08U const ChannelIndexName[] = "    ПОСТ";
-CPU_INT08U const* ChannelItems[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-
-TDataDescStruct const ChannelIndexDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,             // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,                        // размер массива
-  NULL,                     // указатель на десриптор индекса массива
-  &ChannelIndex,            // указатель на переменную или адрес FRAM
-  (void*)&ChannelIndexRange,       // указатель на границы параметра
-  NULL,                     // функция по изменению
-  0,                        // смещение между элементами в массиве
-  ChannelIndexName,         // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  ChannelItems,             // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
-
-/*************************************
-  Индекс канала в меню канальной статистии
-*************************************/
-CPU_INT08U const ChannelStIndexName[] = "КОР.СЧ.ПОСТ";
-
-TDataDescStruct const ChannelStIndexDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,             // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,                        // размер массива
-  NULL,                     // указатель на десриптор индекса массива
-  &ChannelIndex,            // указатель на переменную или адрес FRAM
-  (void*)&ChannelIndexRange,       // указатель на границы параметра
-  NULL,                     // функция по изменению
-  0,                        // смещение между элементами в массиве
-  ChannelStIndexName,         // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  ChannelItems,             // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
-
-/*************************************
-  Индекс канала в меню канальной статистии
-*************************************/
-CPU_INT08U const ChannelStLongIndexName[] = "ДЛ.СЧ.КАНАЛ";
-
-TDataDescStruct const ChannelStLongIndexDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,             // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,                        // размер массива
-  NULL,                     // указатель на десриптор индекса массива
-  &ChannelIndex,            // указатель на переменную или адрес FRAM
-  (void*)&ChannelIndexRange,       // указатель на границы параметра
-  NULL,                     // функция по изменению
-  0,                        // смещение между элементами в массиве
-  ChannelStLongIndexName,         // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  ChannelItems,             // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
 
 /*************************************
   Последнее время отправки email
@@ -108,34 +35,6 @@ TDataDescStruct const LastEmailSendTime = {
   NULL,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Включение канала
-*************************************/
-TRangeValueULONG const EnableChannelRange = {0, 1};
-CPU_INT08U const EnableChannelName[] = "Включить";
-CPU_INT08U const EnableChannelList_str0[] = "нет";
-CPU_INT08U const EnableChannelList_str1[] = "да";
-CPU_INT08U const *EnableChannelList[] = {EnableChannelList_str0, EnableChannelList_str1};
-
-
-TDataDescStruct const EnableChannelDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.Enable),            // указатель на переменную или адрес FRAM
-  (void*)&EnableChannelRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  EnableChannelName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  EnableChannelList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
   0                           
 };
@@ -197,158 +96,6 @@ TDataDescStruct const CashPauseLenDesc = {
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
   20                           
-};
-
-/*************************************
-  IP-адрес поста
-*************************************/
-CPU_INT08U const PostIpAddrName[] = "IP";
-
-TDataDescStruct const PostIpAddrDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_IP_ADDR,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.post_ip),            // указатель на переменную или адрес FRAM
-  NULL,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PostIpAddrName,       // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0xC0A80065
-};
-
-/*************************************
-  Использовать запрет выбора поста
-*************************************/
-TRangeValueULONG const SelectProtectNameRange = {0, 1};
-CPU_INT08U const SelectProtectNameName[] = "Запрет выбора";
-CPU_INT08U const SelectProtectNameList_str0[] = "нет";
-CPU_INT08U const SelectProtectNameList_str1[] = "да";
-CPU_INT08U const *SelectProtectNameList[] = {SelectProtectNameList_str0, SelectProtectNameList_str1};
-
-
-TDataDescStruct const SelectProtectDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,                        // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.select_protect),            // указатель на переменную или адрес FRAM
-  (void*)&SelectProtectNameRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  SelectProtectNameName,      // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  SelectProtectNameList,      // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  1                           
-};
-
-/*************************************
-  Цена импульса контроллера ПОСТА
-*************************************/
-TRangeValueULONG const PostImpCostRange = {1, 9999};
-CPU_INT08U const PostImpCostName[] = "Руб./имп.";
-
-TDataDescStruct const PostImpCostDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.imp_cost),            // указатель на переменную или адрес FRAM
-  (void*)&PostImpCostRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PostImpCostName,       // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  10                           // значение по умолчанию
-};
-
-/*************************************
-  Длина импульса контроллера ПОСТА
-*************************************/
-TRangeValueULONG const PostImpLenRange = {1, 999};
-CPU_INT08U const PostImpLenName[] = "Дл.имп.,мс";
-
-TDataDescStruct const PostLenCostDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.imp_len),            // указатель на переменную или адрес FRAM
-  (void*)&PostImpLenRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PostImpLenName,       // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  50                           // значение по умолчанию
-};
-
-/*************************************
-  Цена минуты
-*************************************/
-TRangeValueULONG const PostMinutePriceRange = {1, 999};
-CPU_INT08U const PostMinutePriceName[] = "Стоим.мин.";
-
-TDataDescStruct const PostMinutePriceDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.minute_cost),            // указатель на переменную или адрес FRAM
-  (void*)&PostMinutePriceRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PostMinutePriceName,       // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  20                           // значение по умолчанию
-};
-
-/*************************************
-  Название канала
-*************************************/
-TRangeValueULONG const NameChannelRange = {0, 2};
-CPU_INT08U const NameChannelName[] = "Название";
-CPU_INT08U const NameChannelList_str0[] = "#";
-CPU_INT08U const NameChannelList_str1[] = "Солярий";
-CPU_INT08U const NameChannelList_str2[] = "Устройство";
-CPU_INT08U const *NameChannelList[] = {NameChannelList_str0, NameChannelList_str1, NameChannelList_str2};
-
-
-TDataDescStruct const NameChannelDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.Name),            // указатель на переменную или адрес FRAM
-  (void*)&NameChannelRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  NameChannelName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  NameChannelList,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
 };
 
 /*************************************
@@ -971,321 +718,9 @@ TDataDescStruct const DisableFiscalErrorsDesc = {
   0                           
 };
 
-/*************************************
-  Время идущего сеанса
-*************************************/
-CPU_INT32U  WorkTime[CHANNELS_NUM];
-TRangeValueULONG const WorkTimeRange = {0, 0xffffffffL};
-CPU_INT08U const WorkTimeName[] = "Вр.работы";
-
-TDataDescStruct const WorkTimeDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  &WorkTime,                // указатель на переменную или адрес FRAM
-  (void*)&WorkTimeRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  WorkTimeName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
-
 
 /*************************************
-  Тайм-аут перед запуском поканально
-*************************************/
-TRangeValueULONG const TimeOutBeforeRange = {0, 999};
-CPU_INT08U const TimeOutBeforeName[] = "Пауза до,сек.";
-
-TDataDescStruct const TimeOutBeforeDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.TimeOutBefore),                // указатель на переменную или адрес FRAM
-  (void*)&TimeOutBeforeRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  TimeOutBeforeName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  30                           
-};
-
-/*************************************
-  Тайм-аут после работы поканально
-*************************************/
-TRangeValueULONG const TimeOutAfterRange = {0, 99};
-CPU_INT08U const TimeOutAfterName[] = "Пауза после,мин.";
-
-TDataDescStruct const TimeOutAfterDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.TimeOutAfter),                // указатель на переменную или адрес FRAM
-  (void*)&TimeOutAfterRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  TimeOutAfterName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  3                           
-};
-
-/*************************************
-  Максимальное время поканально, мин.
-*************************************/
-TRangeValueULONG const MaxWorkTimeRange = {1, 999};
-CPU_INT08U const MaxWorkTimeName[] = "Tmax,мин.";
-
-TDataDescStruct const MaxWorkTimeDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.MaxWorkTime),                // указатель на переменную или адрес FRAM
-  (void*)&MaxWorkTimeRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  MaxWorkTimeName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  20                           
-};
-
-/*************************************
-  Минимальное время поканально, мин.
-*************************************/
-TRangeValueULONG const MinWorkTimeRange = {1, 999};
-CPU_INT08U const MinWorkTimeName[] = "Tmin,мин.";
-
-TDataDescStruct const MinWorkTimeDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.MinWorkTime),                // указатель на переменную или адрес FRAM
-  (void*)&MinWorkTimeRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  MinWorkTimeName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  5                           
-};
-
-/*************************************
-  Настройка выходных
-*************************************/
-TRangeValueULONG const WeekEndRange = {0, 4};
-CPU_INT08U const WeekEndName[] = "Выходные:";
-CPU_INT08U const WeekEndList_str0[] = "нет";
-CPU_INT08U const WeekEndList_str1[] = "пт-вс";
-CPU_INT08U const WeekEndList_str2[] = "сб-вс";
-CPU_INT08U const WeekEndList_str3[] = "пт-сб";
-CPU_INT08U const WeekEndList_str4[] = "пт-пн";
-CPU_INT08U const *WeekEndList[] = {WeekEndList_str0, WeekEndList_str1, WeekEndList_str2, WeekEndList_str3, WeekEndList_str4, NULL};
-
-TDataDescStruct const WeekEndDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.WeekEnd),            // указатель на переменную или адрес FRAM
-  (void*)&WeekEndRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  WeekEndName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  WeekEndList,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Настройка отложенного старта
-*************************************/
-TRangeValueULONG const DeferredStartRange = {0, 1};
-CPU_INT08U const DeferredStartName[] = "Отлож.старт";
-CPU_INT08U const DeferredStart_str0[] = "нет";
-CPU_INT08U const DeferredStart_str1[] = "да";
-CPU_INT08U const *DeferredStartList[] = {DeferredStart_str0, DeferredStart_str1, NULL};
-
-TDataDescStruct const DeferredStartDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,             // размер массива
-  &ChannelIndexDesc,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, DefferedStartEnabled),            // указатель на переменную или адрес FRAM
-  (void*)&DeferredStartRange,     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  DeferredStartName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  DeferredStartList,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Индекс при настройке цен
-*************************************/
-TRangeValueULONG const PeriodIndexRange = {0, 0xffffffff/*CHANNELS_NUM*PRICE_PERIODS_NUM-1*/};
-CPU_INT08U const PeriodIndexName[] = "";
-CPU_INT08U const *PeriodWeekendIndexList[] = {
-                                              "КАН.1 ПЕР.1 ВЫХ.",
-                                              "КАН.1 ПЕР.2 ВЫХ.",
-                                              "КАН.1 ПЕР.3 ВЫХ.",
-                                              "КАН.1 ПЕР.4 ВЫХ.",
-                                              "КАН.2 ПЕР.1 ВЫХ.",
-                                              "КАН.2 ПЕР.2 ВЫХ.",
-                                              "КАН.2 ПЕР.3 ВЫХ.",
-                                              "КАН.2 ПЕР.4 ВЫХ.",
-                                              "КАН.3 ПЕР.1 ВЫХ.",
-                                              "КАН.3 ПЕР.2 ВЫХ.",
-                                              "КАН.3 ПЕР.3 ВЫХ.",
-                                              "КАН.3 ПЕР.4 ВЫХ.",
-                                              "КАН.4 ПЕР.1 ВЫХ.",
-                                              "КАН.4 ПЕР.2 ВЫХ.",
-                                              "КАН.4 ПЕР.3 ВЫХ.",
-                                              "КАН.4 ПЕР.4 ВЫХ.",
-                                              "КАН.5 ПЕР.1 ВЫХ.",
-                                              "КАН.5 ПЕР.2 ВЫХ.",
-                                              "КАН.5 ПЕР.3 ВЫХ.",
-                                              "КАН.5 ПЕР.4 ВЫХ.",
-                                              "КАН.6 ПЕР.1 ВЫХ.",
-                                              "КАН.6 ПЕР.2 ВЫХ.",
-                                              "КАН.6 ПЕР.3 ВЫХ.",
-                                              "КАН.6 ПЕР.4 ВЫХ.",
-                                              "КАН.7 ПЕР.1 ВЫХ.",
-                                              "КАН.7 ПЕР.2 ВЫХ.",
-                                              "КАН.7 ПЕР.3 ВЫХ.",
-                                              "КАН.7 ПЕР.4 ВЫХ.",
-                                              "КАН.8 ПЕР.1 ВЫХ.",
-                                              "КАН.8 ПЕР.2 ВЫХ.",
-                                              "КАН.8 ПЕР.3 ВЫХ.",
-                                              "КАН.8 ПЕР.4 ВЫХ.",
-                                              "КАН.9 ПЕР.1 ВЫХ.",
-                                              "КАН.9 ПЕР.2 ВЫХ.",
-                                              "КАН.9 ПЕР.3 ВЫХ.",
-                                              "КАН.9 ПЕР.4 ВЫХ.",
-                                              "КАН.10 ПЕР.1 ВЫХ.",
-                                              "КАН.10 ПЕР.2 ВЫХ.",
-                                              "КАН.10 ПЕР.3 ВЫХ.",
-                                              "КАН.10 ПЕР.4 ВЫХ.",
-                                               NULL};
-
-CPU_INT32U PeriodIndex = 0;
-
-void OnChangePeriodIndex(void)
-{
-  if ((PeriodIndex == 0xffffffff) || (PeriodIndex < ChannelIndex*PRICE_PERIODS_NUM)) PeriodIndex = (ChannelIndex+1)*PRICE_PERIODS_NUM-1;
-  else if (PeriodIndex >= (ChannelIndex+1)*PRICE_PERIODS_NUM) PeriodIndex = (ChannelIndex)*PRICE_PERIODS_NUM;
-}
-
-TDataDescStruct const PeriodWeekendIndexDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  NULL,        // указатель на десриптор индекса массива
-  (void*)&PeriodIndex,            // указатель на переменную или адрес FRAM
-  (void*)&PeriodIndexRange,     // указатель на границы параметра
-  OnChangePeriodIndex,                     // функция по изменению
-  0,       // смещение между элементами в массиве
-  PeriodIndexName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  PeriodWeekendIndexList,                     // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
-
-CPU_INT08U const *PeriodWeekdaysIndexList[] = {
-                                              "КАН.1 ПЕР.1 БУД.",
-                                              "КАН.1 ПЕР.2 БУД.",
-                                              "КАН.1 ПЕР.3 БУД.",
-                                              "КАН.1 ПЕР.4 БУД.",
-                                              "КАН.2 ПЕР.1 БУД.",
-                                              "КАН.2 ПЕР.2 БУД.",
-                                              "КАН.2 ПЕР.3 БУД.",
-                                              "КАН.2 ПЕР.4 БУД.",
-                                              "КАН.3 ПЕР.1 БУД.",
-                                              "КАН.3 ПЕР.2 БУД.",
-                                              "КАН.3 ПЕР.3 БУД.",
-                                              "КАН.3 ПЕР.4 БУД.",
-                                              "КАН.4 ПЕР.1 БУД.",
-                                              "КАН.4 ПЕР.2 БУД.",
-                                              "КАН.4 ПЕР.3 БУД.",
-                                              "КАН.4 ПЕР.4 БУД.",
-                                              "КАН.5 ПЕР.1 БУД.",
-                                              "КАН.5 ПЕР.2 БУД.",
-                                              "КАН.5 ПЕР.3 БУД.",
-                                              "КАН.5 ПЕР.4 БУД.",
-                                              "КАН.6 ПЕР.1 БУД.",
-                                              "КАН.6 ПЕР.2 БУД.",
-                                              "КАН.6 ПЕР.3 БУД.",
-                                              "КАН.6 ПЕР.4 БУД.",
-                                              "КАН.7 ПЕР.1 БУД.",
-                                              "КАН.7 ПЕР.2 БУД.",
-                                              "КАН.7 ПЕР.3 БУД.",
-                                              "КАН.7 ПЕР.4 БУД.",
-                                              "КАН.8 ПЕР.1 БУД.",
-                                              "КАН.8 ПЕР.2 БУД.",
-                                              "КАН.8 ПЕР.3 БУД.",
-                                              "КАН.8 ПЕР.4 БУД.",
-                                              "КАН.9 ПЕР.1 БУД.",
-                                              "КАН.9 ПЕР.2 БУД.",
-                                              "КАН.9 ПЕР.3 БУД.",
-                                              "КАН.9 ПЕР.4 БУД.",
-                                              "КАН.10 ПЕР.1 БУД.",
-                                              "КАН.10 ПЕР.2 БУД.",
-                                              "КАН.10 ПЕР.3 БУД.",
-                                              "КАН.10 ПЕР.4 БУД.",
-                                               NULL};
-TDataDescStruct const PeriodWeekdaysIndexDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_RAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  NULL,        // указатель на десриптор индекса массива
-  (void*)&PeriodIndex,            // указатель на переменную или адрес FRAM
-  (void*)&PeriodIndexRange,     // указатель на границы параметра
-  OnChangePeriodIndex,                     // функция по изменению
-  0,       // смещение между элементами в массиве
-  PeriodIndexName,       // указатель на строку названия параметра
-  DATA_IS_INDEX,            // признак индексного параметра (список строк)
-  PeriodWeekdaysIndexList,                     // указатель на список строк для индексного параметра
-  DATA_INIT_ENABLE,
-  0                           
-};
-
-/*************************************
-  Цена по выходным
+  Цена 
 *************************************/
 TRangeValueULONG const PriceRange = {1, 10000};
 CPU_INT08U const PriceName[] = "Цена,руб.";
@@ -1297,7 +732,7 @@ TDataDescStruct const PriceDesc = {
   DATA_NO_ARRAY,            // признак массива
   1,             // размер массива
   NULL,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.Price),                // указатель на переменную или адрес FRAM
+  (void*)offsetof(TFramMap, Price),                // указатель на переменную или адрес FRAM
   (void*)&PriceRange,           // указатель на границы параметра
   NULL,                     // функция по изменению
   sizeof(CPU_INT32U),       // смещение между элементами в массиве
@@ -1307,202 +742,6 @@ TDataDescStruct const PriceDesc = {
   DATA_INIT_DISABLE,
   100                           
 };
-
-/*************************************
-  Цена по выходным
-*************************************/
-TRangeValueULONG const PriceWeekendRange = {1, MAX_PRICE};
-CPU_INT08U const PriceWeekendName[] = "Цена,руб.";
-
-TDataDescStruct const PriceWeekendDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekendIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.Price_Weekend),                // указатель на переменную или адрес FRAM
-  (void*)&PriceWeekendRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PriceWeekendName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  15                           
-};
-
-/*************************************
-  Цена по будням
-*************************************/
-TRangeValueULONG const PriceWeekdaysRange = {1, MAX_PRICE};
-CPU_INT08U const PriceWeekdaysName[] = "Цена,руб.";
-
-TDataDescStruct const PriceWeekdaysDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekdaysIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.Price_Weekdays),                // указатель на переменную или адрес FRAM
-  (void*)&PriceWeekdaysRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PriceWeekdaysName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  15                         
-};
-
-
-/*************************************
-  Время за цену по выходным
-*************************************/
-TRangeValueULONG const PriceTimeWeekendRange = {1, 999};
-CPU_INT08U const PriceTimeWeekendName[] = "За время,мин.";
-
-TDataDescStruct const PriceTimeWeekendDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekendIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.PriceTime_Weekend),                // указатель на переменную или адрес FRAM
-  (void*)&PriceTimeWeekendRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PriceTimeWeekendName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  1                           
-};
-
-/*************************************
-  Время за цену по будням
-*************************************/
-TRangeValueULONG const PriceTimeWeekdaysRange = {1, 999};
-CPU_INT08U const PriceTimeWeekdaysName[] = "За время,мин.";
-
-TDataDescStruct const PriceTimeWeekdaysDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekdaysIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.PriceTime_Weekdays),                // указатель на переменную или адрес FRAM
-  (void*)&PriceTimeWeekdaysRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  PriceTimeWeekdaysName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  1                           
-};
-
-
-/*************************************
-  Начало периодов по будням
-*************************************/
-TRangeValueULONG const T_Start_WeekdaysRange = {0, 24};
-CPU_INT08U const T_Start_WeekdaysName[] = "Начало,ч";
-
-TDataDescStruct const T_Start_WeekdaysDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekdaysIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.T_Start_Weekdays),                // указатель на переменную или адрес FRAM
-  (void*)&T_Start_WeekdaysRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  T_Start_WeekdaysName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Конец периодов по будням
-*************************************/
-TRangeValueULONG const T_End_WeekdaysRange = {0, 24};
-CPU_INT08U const T_End_WeekdaysName[] = "Конец,ч";
-
-TDataDescStruct const T_End_WeekdaysDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekdaysIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.T_End_Weekdays),                // указатель на переменную или адрес FRAM
-  (void*)&T_End_WeekdaysRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  T_End_WeekdaysName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  24                           
-};
-
-
-/*************************************
-  Начало периодов по выходным
-*************************************/
-TRangeValueULONG const T_Start_WeekendRange = {0, 24};
-CPU_INT08U const T_Start_WeekendName[] = "Начало,ч";
-
-TDataDescStruct const T_Start_WeekendDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekendIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.T_Start_Weekend),                // указатель на переменную или адрес FRAM
-  (void*)&T_Start_WeekendRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  T_Start_WeekendName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Конец периодов по выходным
-*************************************/
-TRangeValueULONG const T_End_WeekendRange = {0, 24};
-CPU_INT08U const T_End_WeekendName[] = "Конец,ч";
-
-TDataDescStruct const T_End_WeekendDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,             // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM*PRICE_PERIODS_NUM,             // размер массива
-  &PeriodWeekendIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, ChannelConfig.T_End_Weekend),                // указатель на переменную или адрес FRAM
-  (void*)&T_End_WeekendRange,           // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  T_End_WeekendName,             // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  24                           
-};
-
 
 /*************************************
   Команда инициализации по умолчанию
@@ -2324,133 +1563,6 @@ TDataDescStruct const CounterLongTimeDesc = {
 };
 
 /*************************************
-  Канальный счетчик числа запусков
-*************************************/
-TDataDescStruct const CounterChannelRunDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,                        // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, Counters.CounterChannelRun[0]),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterRunName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Канальный счетчик денег
-*************************************/
-TDataDescStruct const CounterChannelMoneyDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,              // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, Counters.CounterChannelMoney[0]),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterMoneyName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Канальный счетчик времени работы
-*************************************/
-TDataDescStruct const CounterChannelTimeDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_TIME_COUNT,     // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,                        // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, Counters.CounterChannelTime),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterTimeName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-
-/*************************************
-  Канальный счетчик числа запусков
-*************************************/
-TDataDescStruct const CounterChannelRunLongDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,                        // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, CountersLong.CounterChannelRunLong[0]),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterRunName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Канальный счетчик денег
-*************************************/
-TDataDescStruct const CounterChannelMoneyLongDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,              // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, CountersLong.CounterChannelMoneyLong[0]),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterMoneyName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
-  Канальный счетчик времени работы
-*************************************/
-TDataDescStruct const CounterChannelTimeLongDesc = {
-  DATA_DESC_VIEW,           // тип дескриптора
-  DATA_TYPE_TIME_COUNT,     // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_IS_ARRAY,            // признак массива
-  CHANNELS_NUM,                        // размер массива
-  &ChannelStIndexDesc,                     // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, CountersLong.CounterChannelTimeLong),            // указатель на переменную или адрес FRAM
-  NULL,                     // указатель на границы параметра
-  NULL,                     // функция по изменению
-  sizeof(CPU_INT32U),                        // смещение между элементами в массиве
-  CounterTimeName,           // указатель на строку названия параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк для индексного параметра
-  DATA_INIT_DISABLE,
-  0                           
-};
-
-/*************************************
   Команда на очистку статистики 
 *************************************/
 CPU_INT32U ClearStatCmd = 0;
@@ -2461,7 +1573,6 @@ void OnChangeClearStatCmd(void)
 {
   if (ClearStatCmd)
     {
-      ClearCounters();
       ClearStatCmd = 0;
     }
 }
@@ -2834,7 +1945,6 @@ void OnChangeTempPass(void)
       }
       else {ClearJournalCmd = 1; OnChangeClearJournalCmd(); GoToPreviousMenu(); GoToMenu(JournalIsReset);}
     }
-
 }
 
 TDataDescStruct const PassTempDesc = {
@@ -3143,7 +2253,12 @@ void OnChangeIpMask()
     GetData(&NetMaskDesc, &mask, 0, DATA_FLAG_SYSTEM_INDEX);  
     NetIP_CfgAddrThisHost(ip, mask);
 }
-    
+
+TRangeValueULONG const DeferredStartRange = {0, 1};
+CPU_INT08U const DeferredStart_str0[] = "нет";
+CPU_INT08U const DeferredStart_str1[] = "да";
+CPU_INT08U const *DeferredStartList[] = {DeferredStart_str0, DeferredStart_str1, NULL};
+
 CPU_INT08U const IpAddrName[] = "IP";
 
 TDataDescStruct const IpAddrDesc = {
@@ -3244,30 +2359,10 @@ TDataDescStruct const IncasTimeDesc = {
 //**************************************************
 const TDataDescArrayStruct AllDataArray[] = 
 {
-    {&WorkTimeDesc, "WorkTimeDesc"},
-    {&ChannelIndexDesc,  "ChannelIndexDesc"},
-    {&EnableChannelDesc,  "EnableChannelDesc"},
     {&EnableValidatorDesc,  "EnableValidatorDesc"},
     {&EnableModemDesc,  "EnableModemDesc"},
     {&EnableFiscalDesc,  "EnableFiscalDesc"},
     {&EnableCoinDesc, "EnableCoinDesc"},
-    {&TimeOutBeforeDesc, "TimeOutBeforeDesc"},
-    {&TimeOutAfterDesc, "TimeOutAfterDesc"},
-    {&MaxWorkTimeDesc, "MaxWorkTimeDesc"},
-    {&MinWorkTimeDesc, "MinWorkTimeDesc"},
-    {&WeekEndDesc, "WeekEndDesc"},
-    {&PeriodWeekendIndexDesc, "PeriodWeekendIndexDesc"},
-    {&PeriodWeekdaysIndexDesc, "PeriodWeekdaysIndexDesc"},
-    
-    {&PriceWeekendDesc, "PriceWeekendDesc"},
-    {&PriceWeekdaysDesc, "PriceWeekdaysDesc"},
-    
-    {&PriceTimeWeekendDesc, "PriceTimeWeekendDesc"},
-    {&PriceTimeWeekdaysDesc, "PriceTimeWeekdaysDesc"},
-    {&T_Start_WeekdaysDesc, "T_Start_WeekdaysDesc"},
-    {&T_End_WeekdaysDesc, "T_End_WeekdaysDesc"},
-    {&T_Start_WeekendDesc, "T_Start_WeekendDesc"},
-    {&T_End_WeekendDesc, "T_End_WeekendDesc"},
     
     {&PrintZReportDesc, "PrintZReportDesc"},
     {&PrintXReportDesc, "PrintXReportDesc"},
@@ -3276,7 +2371,6 @@ const TDataDescArrayStruct AllDataArray[] =
     {&CoinPerPulseDesc, "CoinPerPulseDesc"},
     
     {&BillFormatDesc, "BillFormatDesc"},
-    {&NameChannelDesc, "NameChannelDesc"},
     
     {&PassDesc, "PassDesc"},
     {&DeviceIDDesc, "DeviceIDDesc"},
@@ -3288,20 +2382,12 @@ const TDataDescArrayStruct AllDataArray[] =
     {&SendTestEmailDesc, "SendTestEmailDesc"},
     {&BillnomIndexDesc, "BillnomIndexDesc"},
     
-    {&DeferredStartDesc, "DeferredStartDesc"},
     {&StartButtonNameDesc, "StartButtonNameDesc"},
     
     {&GatewayDesc, "GatewayDesc"},
     {&NetMaskDesc, "NetMaskDesc"},
     {&IpAddrDesc, "IpAddrDesc"},
     
-    {&SelectProtectDesc, "SelectProtectDesc"},
-    {&PostIpAddrDesc, "PostIpAddrDesc"},
-    
-    {&PostImpCostDesc, "PostImpCostDesc"},
-    {&PostLenCostDesc, "PostLenCostDesc"},
-    {&PostMinutePriceDesc, "PostMinutePriceDesc"},
-
     {&CashModeDesc, "CashModeDesc"},
     {&CashPerPulseDesc, "CashPerPulseDesc"},
 

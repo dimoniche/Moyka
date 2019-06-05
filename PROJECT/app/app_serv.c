@@ -8,7 +8,6 @@
 #include "mode.h"
 #include "menudesc.h"
 #include "datadesc.h"
-#include "control.h"
 #include "menu.h"
 #include "journal.h"
 #include "fr.h"
@@ -357,7 +356,7 @@ void UserAppTask(void *p_arg)
                   // напечатаем чек
                   if (IsFiscalConnected())
                   {
-                    if (PrintFiscalBill(accmoney) == 0) // здесь добавить с какого поста чек
+                    if (PrintFiscalBill(accmoney,number_post) == 0) // здесь добавить с какого поста чек
                     {
                         SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
                     }
@@ -483,19 +482,6 @@ void PostUserEvent(int event)
 
 void InitUserMenu(void)
 {
-  for (int i = 0; i < CHANNELS_NUM; i++)
-  {
-    CPU_INT32U en = 0;
-    GetData(&EnableChannelDesc, &en, i, DATA_FLAG_DIRECT_INDEX);
-    if (en)
-    {
-        ChannelsState[i] = CHANNEL_STATE_FREE;
-    }
-    else
-    {
-        ChannelsState[i] = CHANNEL_STATE_DISABLED;
-    }
-  }
 }
 
 void UserPrintMoneyMenu(int post)
@@ -550,18 +536,6 @@ void UserPrintErrorMenu(void)
       PrintUserMenuStr(buf, 3);
     }
 }
-
-int CheckChannelEnabled(CPU_INT08U channel)
-{
-    CPU_INT32U en = 0;
-    GetData(&EnableChannelDesc, &en, channel, DATA_FLAG_DIRECT_INDEX);
-    if (en)
-    {
-        return 1;
-    }
-    return 0;
-}
-
 
 void WorkServer(void)
 {
