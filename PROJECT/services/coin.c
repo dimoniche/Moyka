@@ -91,6 +91,7 @@ void CoinTask(void *p_arg)
 				{
                   // есть удержание сигнала печати
 				  PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + i);
+                  pend_signal_counter[i] = 0;
 				}
 			}
 
@@ -227,6 +228,106 @@ void InitCoin(void)
   OSTaskCreate(CoinTask, (void *)0, (OS_STK *)&CoinTaskStk[COIN_TASK_STK_SIZE-1], COIN_TASK_PRIO);
 }
 
+CPU_INT32U input_register()
+{
+  CPU_INT32U input = 0xFFFFFFFF;
+  
+  if (!FIO1PIN_bit.P1_20)
+  {
+     CLRBIT(input, 0);
+  }
+  if (!FIO1PIN_bit.P1_21)
+  {
+     CLRBIT(input, 1);
+  }
+  if (!FIO4PIN_bit.P4_28)
+  {
+     CLRBIT(input, 2);
+  }
+  if (!FIO1PIN_bit.P1_19)
+  {
+     CLRBIT(input, 3);
+  }
+  if (!FIO1PIN_bit.P1_18)
+  {
+     CLRBIT(input, 4);
+  }  
+  if (!FIO0PIN_bit.P0_4)
+  {
+     CLRBIT(input, 5);
+  }
+  if (!FIO3PIN_bit.P3_25)
+  {
+     CLRBIT(input, 6);
+  }
+  if (!FIO3PIN_bit.P3_26)
+  {
+     CLRBIT(input, 7);
+  }
+  if (!FIO1PIN_bit.P1_28)
+  {
+     CLRBIT(input, 8);
+  }
+  if (!FIO0PIN_bit.P0_26)
+  {
+     CLRBIT(input, 9);
+  }
+  if (!FIO0PIN_bit.P0_25)
+  {
+     CLRBIT(input, 10);
+  }
+  if (!FIO1PIN_bit.P1_27)
+  {
+     CLRBIT(input, 11);
+  }
+  if (!FIO0PIN_bit.P0_9)
+  {
+     CLRBIT(input, 12);
+  }
+  if (!FIO2PIN_bit.P2_2)
+  {
+     CLRBIT(input, 13);
+  }
+  if (!FIO1PIN_bit.P1_26)
+  {
+     CLRBIT(input, 14);
+  }
+  if (!FIO0PIN_bit.P0_7)
+  {
+     CLRBIT(input, 15);
+  }
+  if (!FIO0PIN_bit.P0_8)
+  {
+     CLRBIT(input, 16);
+  }
+  if (!FIO0PIN_bit.P0_0)
+  {
+     CLRBIT(input, 17);
+  }
+  if (!FIO0PIN_bit.P0_5)
+  {
+     CLRBIT(input, 18);
+  }
+  if (!FIO0PIN_bit.P0_6)
+  {
+     CLRBIT(input, 19);
+  }
+  if (!FIO1PIN_bit.P1_25)
+  {
+     CLRBIT(input, 20);
+  }
+  if (!FIO0PIN_bit.P0_10)
+  {
+     CLRBIT(input, 21);
+  }
+  
+  return input;
+}
+
+CPU_INT32U input_event = 0xFFFFFFFF;
+CPU_INT32U prev_input = 0xFFFFFFFF;
+CPU_INT32U curr_input = 0xFFFFFFFF;
+
 void InputCapture_ISR(void)
 {
   T3IR = 0xFF;
@@ -234,388 +335,429 @@ void InputCapture_ISR(void)
   // наращиваем тики
   T3CR++;
 
+  curr_input = input_register();
+  input_event = curr_input^prev_input;
+  prev_input = curr_input;
+
   // пост 1
   // купюроприемник 1
-  if (!FIO1PIN_bit.P1_20)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[0];
-	  
-	  if ((cr > (cash_pulse[0] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[0] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[0] = 1;
-		  pend_cash_timestamp[0] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[0] = T3CR;
-	  pend_cash_counter[0] = 0;
-	}
+  if(TSTBIT(input_event, 0))
+  {
+    if (FIO1PIN_bit.P1_20)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[0];
+        
+        if (cr > (cash_pulse[0] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[0] = 1;
+            pend_cash_timestamp[0] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[0] = T3CR;
+        pend_cash_counter[0] = 0;
+      }
+  }
 
   // монетоприемник 1
-  if (!FIO1PIN_bit.P1_21)
-	{ // пришел задний фронт
-	  if (((T3CR-period[0]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[0]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[0]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[0] = T3CR;
-	}
+  if(TSTBIT(input_event, 1))
+  {
+    if (FIO1PIN_bit.P1_21)
+      { // пришел задний фронт
+        if ((T3CR-period[0]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[0]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[0] = T3CR;
+      }
+  }
   
   // сигнал печати чека 1
-  if (!FIO4PIN_bit.P4_28)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[0];
-	  
-	  if ((cr > (signal_pulse[0] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[0] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[0] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[0] = T3CR;
-	  pend_signal_counter[0] = 0;
-	}
+  if(TSTBIT(input_event, 2))
+  {
+    if (FIO4PIN_bit.P4_28)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[0];
+        
+        if (cr > (signal_pulse[0] - COIN_IMP_SPAN))
+        {
+          pend_signal_counter[0] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[0] = T3CR;
+        pend_signal_counter[0] = 0;
+      }
+  }
   
   // пост 2
   // купюроприемник 2
-  if (!FIO1PIN_bit.P1_19)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[1];
-	  
-	  if ((cr > (cash_pulse[1] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[1] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[1] = 1;
-		  pend_cash_timestamp[1] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[1] = T3CR;
-	  pend_cash_counter[1] = 0;
-	}
+  if(TSTBIT(input_event, 3))
+  {
+    if (FIO1PIN_bit.P1_19)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[1];
+        
+        if (cr > (cash_pulse[1] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[1] = 1;
+            pend_cash_timestamp[1] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[1] = T3CR;
+        pend_cash_counter[1] = 0;
+      }
+  }
 
   // монетоприемник 2
-  if (!FIO1PIN_bit.P1_18)
-	{ // пришел задний фронт
-	  if (((T3CR-period[1]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[1]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[1]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[1] = T3CR;
-	}
+  if(TSTBIT(input_event, 4))
+  {
+    if (FIO1PIN_bit.P1_18)
+      { // пришел задний фронт
+        if ((T3CR-period[1]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[1]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[1] = T3CR;
+      }
+  }
   
   // сигнал печати чека 2
-  if (!FIO0PIN_bit.P0_4)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[1];
-	  
-	  if ((cr > (signal_pulse[1] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[1] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[0] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[1] = T3CR;
-	  pend_signal_counter[1] = 0;
-	}
+  if(TSTBIT(input_event, 5))
+  {
+    if (FIO0PIN_bit.P0_4)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[1];
+        
+        if (cr > (signal_pulse[1] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[0] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[1] = T3CR;
+        pend_signal_counter[1] = 0;
+      }
+  }
 
-  
   // пост 3
   // купюроприемник 3
-  if (!FIO3PIN_bit.P3_25)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[2];
-	  
-	  if ((cr > (cash_pulse[2] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[2] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[2] = 1;
-		  pend_cash_timestamp[2] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[2] = T3CR;
-	  pend_cash_counter[2] = 0;
-	}
+  if(TSTBIT(input_event, 6))
+  {
+    if (FIO3PIN_bit.P3_25)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[2];
+        
+        if (cr > (cash_pulse[2] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[2] = 1;
+            pend_cash_timestamp[2] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[2] = T3CR;
+        pend_cash_counter[2] = 0;
+      }
+  }
 
   // монетоприемник 3
-  if (!FIO3PIN_bit.P3_26)
-	{ // пришел задний фронт
-	  if (((T3CR-period[2]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[2]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[2]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[2] = T3CR;
-	}
+  if(TSTBIT(input_event, 7))
+  {
+    if (FIO3PIN_bit.P3_26)
+      { // пришел задний фронт
+        if ((T3CR-period[2]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[2]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[2] = T3CR;
+      }
+  }
   
   // сигнал печати чека 3
-  if (!FIO1PIN_bit.P1_28)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[2];
-	  
-	  if ((cr > (signal_pulse[2] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[2] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[2] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[2] = T3CR;
-	  pend_signal_counter[2] = 0;
-	}
+  if(TSTBIT(input_event, 8))
+  {
+    if (FIO1PIN_bit.P1_28)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[2];
+        
+        if (cr > (signal_pulse[2] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[2] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[2] = T3CR;
+        pend_signal_counter[2] = 0;
+      }
+  }
 
-  
   // пост 4
   // купюроприемник 4
-  if (!FIO0PIN_bit.P0_26)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[3];
-	  
-	  if ((cr > (cash_pulse[3] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[3] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[3] = 1;
-		  pend_cash_timestamp[3] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[3] = T3CR;
-	  pend_cash_counter[3] = 0;
-	}
+  if(TSTBIT(input_event, 9))
+  {
+    if (FIO0PIN_bit.P0_26)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[3];
+        
+        if (cr > (cash_pulse[3] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[3] = 1;
+            pend_cash_timestamp[3] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[3] = T3CR;
+        pend_cash_counter[3] = 0;
+      }
+  }
 
   // монетоприемник 4
-  if (!FIO0PIN_bit.P0_25)
-	{ // пришел задний фронт
-	  if (((T3CR-period[3]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[3]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[3]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[3] = T3CR;
-	}
+  if(TSTBIT(input_event, 10))
+  {
+    if (FIO0PIN_bit.P0_25)
+      { // пришел задний фронт
+        if ((T3CR-period[3]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[3]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[3] = T3CR;
+      }
+  }
   
   // сигнал печати чека 4
-  if (!FIO1PIN_bit.P1_27)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[3];
-	  
-	  if ((cr > (signal_pulse[3] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[3] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[3] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[3] = T3CR;
-	  pend_signal_counter[3] = 0;
-	}
+  if(TSTBIT(input_event, 11))
+  {
+    if (FIO1PIN_bit.P1_27)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[3];
+        
+        if (cr > (signal_pulse[3] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[3] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[3] = T3CR;
+        pend_signal_counter[3] = 0;
+      }
+  }
 
-  
   // пост 5
   // купюроприемник 5
-  if (!FIO0PIN_bit.P0_9)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[4];
-	  
-	  if ((cr > (cash_pulse[4] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[4] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[4] = 1;
-		  pend_cash_timestamp[4] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[4] = T3CR;
-	  pend_cash_counter[4] = 0;
-	}
+  if(TSTBIT(input_event, 12))
+  {
+    if (FIO0PIN_bit.P0_9)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[4];
+        
+        if (cr > (cash_pulse[4] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[4] = 1;
+            pend_cash_timestamp[4] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[4] = T3CR;
+        pend_cash_counter[4] = 0;
+      }
+  }
 
   // монетоприемник 5
-  if (!FIO2PIN_bit.P2_2)
-	{ // пришел задний фронт
-	  if (((T3CR-period[4]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[4]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[4]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[4] = T3CR;
-	}
+  if(TSTBIT(input_event, 13))
+  {
+    if (FIO2PIN_bit.P2_2)
+      { // пришел задний фронт
+        if ((T3CR-period[4]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[4]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[4] = T3CR;
+      }
+  }
   
   // сигнал печати чека 5
-  if (!FIO1PIN_bit.P1_26)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[4];
-	  
-	  if ((cr > (signal_pulse[4] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[4] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[4] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[4] = T3CR;
-	  pend_signal_counter[4] = 0;
-	}
+  if(TSTBIT(input_event, 14))
+  {
+    if (FIO1PIN_bit.P1_26)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[4];
+        
+        if (cr > (signal_pulse[4] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[4] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[4] = T3CR;
+        pend_signal_counter[4] = 0;
+      }
+  }
 
-  
   // пост 6
   // купюроприемник 6
-  if (!FIO0PIN_bit.P0_7)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_cash[5];
-	  
-	  if ((cr > (cash_pulse[5] - COIN_IMP_SPAN))
-		   &&  (cr < (cash_pulse[5] + COIN_IMP_SPAN)))
-	  {
-		  pend_cash_counter[5] = 1;
-		  pend_cash_timestamp[5] = OSTimeGet();
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_cash[5] = T3CR;
-	  pend_cash_counter[5] = 0;
-	}
+  if(TSTBIT(input_event, 15))
+  {
+    if (FIO0PIN_bit.P0_7)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_cash[5];
+        
+        if (cr > (cash_pulse[5] - COIN_IMP_SPAN))
+        {
+            pend_cash_counter[5] = 1;
+            pend_cash_timestamp[5] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_cash[5] = T3CR;
+        pend_cash_counter[5] = 0;
+      }
+  }
 
   // монетоприемник 6
-  if (!FIO0PIN_bit.P0_8)
-	{ // пришел задний фронт
-	  if (((T3CR-period[5]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[5]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[5]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[5] = T3CR;
-	}
+  if(TSTBIT(input_event, 16))
+  {
+    if (FIO0PIN_bit.P0_8)
+      { // пришел задний фронт
+        if ((T3CR-period[5]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[5]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[5] = T3CR;
+      }
+  }
   
-  // сигнал печати чека 5
-  if (!FIO0PIN_bit.P0_0)
- 	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[5];
-	  
-	  if ((cr > (signal_pulse[5] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[5] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[5] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[5] = T3CR;
-	  pend_signal_counter[5] = 0;
-	}
-
+  // сигнал печати чека 6
+  if(TSTBIT(input_event, 17))
+  {
+    if (FIO0PIN_bit.P0_0)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[5];
+        
+        if (cr > (signal_pulse[5] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[5] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[5] = T3CR;
+        pend_signal_counter[5] = 0;
+      }
+  }
 
   // монетоприемник пылесос 1
-  if (!FIO0PIN_bit.P0_5)
-	{ // пришел задний фронт
-	  if (((T3CR-period[6]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[6]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[6]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[6] = T3CR;
-	}
+  if(TSTBIT(input_event, 18))
+  {
+    if (FIO0PIN_bit.P0_5)
+      { // пришел задний фронт
+        if ((T3CR-period[6]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[6]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[6] = T3CR;
+      }
+  }
   
   // сигнал печати чека пылесос 1
-  if (!FIO0PIN_bit.P0_6)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[6];
-	  
-	  if ((cr > (signal_pulse[6] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[6] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[6] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[6] = T3CR;
-	  pend_signal_counter[6] = 0;
-	}
-
+  if(TSTBIT(input_event, 19))
+  {
+    if (FIO0PIN_bit.P0_6)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[6];
+        
+        if (cr > (signal_pulse[6] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[6] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[6] = T3CR;
+        pend_signal_counter[6] = 0;
+      }
+  }
 
   // монетоприемник пылесос 2
-  if (!FIO1PIN_bit.P1_25)
-	{ // пришел задний фронт
-	  if (((T3CR-period[7]) > COIN_IMP_MIN_LEN)
-	  &&  ((T3CR-period[7]) < COIN_IMP_MAX_LEN))
-		{
-			CoinImpCounter[7]++;
-		}
-	}
-  else
-	{ // пришел передний фронт
-	  period[7] = T3CR;
-	}
+  if(TSTBIT(input_event, 20))
+  {
+    if (FIO1PIN_bit.P1_25)
+      { // пришел задний фронт
+        if ((T3CR-period[7]) > COIN_IMP_MIN_LEN)
+          {
+              CoinImpCounter[7]++;
+          }
+      }
+    else
+      { // пришел передний фронт
+        period[7] = T3CR;
+      }
+  }
   
   // сигнал печати чека пылесос 2
-  if (!FIO0PIN_bit.P0_10)
-	{ // пришел задний фронт
-	  CPU_INT32U cr=T3CR;
-	  cr -= period_signal[7];
-	  
-	  if ((cr > (signal_pulse[7] - COIN_IMP_SPAN))
-		   &&  (cr < (signal_pulse[7] + COIN_IMP_SPAN)))
-	  {
-		  pend_signal_counter[7] = 1;
-	  }
-	}
-  else
-	{ // пришел передний фронт
-	  period_signal[7] = T3CR;
-	  pend_signal_counter[7] = 0;
-	}
-
+  if(TSTBIT(input_event, 21))
+  {
+    if (FIO0PIN_bit.P0_10)
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[7];
+        
+        if (cr > (signal_pulse[7] - COIN_IMP_SPAN))
+        {
+            pend_signal_counter[7] = 1;
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_signal[7] = T3CR;
+        pend_signal_counter[7] = 0;
+      }
+  }
 }
 
 extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);

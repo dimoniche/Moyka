@@ -262,7 +262,7 @@ void UserAppTask(void *p_arg)
                 
                 GetData(&CashPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
-                money = cpp * 10 /*GetResetCashCount(number_post)*/;
+                money = /*cpp * 10*/ GetResetCashCount(number_post);
                 
                 accmoney = GetAcceptedMoney(number_post);
                 accmoney += money;
