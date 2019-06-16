@@ -29,7 +29,7 @@ void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  cash_pulse[post] = pulse * 10;
+  cash_pulse[post] = pulse * 1;
   cash_pause[post] = pause;
   OS_EXIT_CRITICAL();
 }
@@ -40,7 +40,7 @@ void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post)
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  signal_pulse[post] = pulse * 200;
+  signal_pulse[post] = pulse * 1000;
   OS_EXIT_CRITICAL();
 }
 
@@ -765,7 +765,7 @@ extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
 // инициализация импульсных входов
 void  InitImpInput (void)
 {
-    #define INPUT_CAPTURE_FREQ  10000  // частота тактирования частотных входов
+    #define INPUT_CAPTURE_FREQ  1000  // частота тактирования частотных входов
   
     CPU_INT32U  pclk_freq;
     CPU_INT32U  rld_cnts;
