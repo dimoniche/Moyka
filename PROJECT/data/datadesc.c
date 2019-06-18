@@ -665,6 +665,113 @@ TDataDescStruct const CashPerPulseDesc = {
   10                           // значение по умолчанию
 };
 
+void OnChangeLevel()
+{
+    CPU_INT32U level1, level2, level3;
+    for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+    {
+      if(post < COUNT_POST) GetData(&CashLevelDesc, &level1, post, DATA_FLAG_DIRECT_INDEX);
+      GetData(&CoinLevelDesc, &level2, post, DATA_FLAG_DIRECT_INDEX);
+      GetData(&SignalStopMoneyLevelDesc, &level3, post, DATA_FLAG_DIRECT_INDEX);
+
+      SetLevelParam(level1, level2, level3, post);
+    }
+}
+
+/*************************************
+  Уровень сигнала купюрника
+*************************************/
+TRangeValueULONG const LevelRange = {0, 1};
+CPU_INT08U const LevelName[] = "Уровень";
+CPU_INT08U const Level_str0[] = "LOW";
+CPU_INT08U const Level_str1[] = "HIGH";
+CPU_INT08U const *LevelList[] = {Level_str0, Level_str1};
+
+TDataDescStruct const CashLevelDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CashIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, DeviceConfig.CashLevel),            // указатель на переменную или адрес FRAM
+  (void*)&LevelRange,     // указатель на границы параметра
+  OnChangeLevel,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  LevelName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  LevelList,                  // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                          // значение по умолчанию
+};
+
+/*************************************
+  Уровень сигнала монетника
+*************************************/
+TDataDescStruct const CoinLevelDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST + COUNT_VACUUM,             // размер массива
+  &CoinIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, DeviceConfig.CoinLevel),            // указатель на переменную или адрес FRAM
+  (void*)&LevelRange,     // указатель на границы параметра
+  OnChangeLevel,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  LevelName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  LevelList,                  // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                          // значение по умолчанию
+};
+
+/*************************************
+  Уровень сигнала окончания внесения денег
+*************************************/
+CPU_INT08U const SignalStopLevelName[] = "Старт мойки ";
+
+TDataDescStruct const SignalStopMoneyLevelDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST + COUNT_VACUUM,             // размер массива
+  &SignalIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, DeviceConfig.SignalLevel),            // указатель на переменную или адрес FRAM
+  (void*)&LevelRange,     // указатель на границы параметра
+  OnChangeLevel,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  SignalStopLevelName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  LevelList,                  // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                          // значение по умолчанию
+};
+
+/*************************************
+  Уровень сигнала печати чека
+*************************************/
+CPU_INT08U const SignalPrintLevelName[] = "Печать чека";
+CPU_INT08U const *SignalLevelList[] = {Level_str1, Level_str0};
+
+TDataDescStruct const SignalPrintLevelDesc = {
+  DATA_DESC_VIEW,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &SignalIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, DeviceConfig.SignalLevel),            // указатель на переменную или адрес FRAM
+  (void*)&LevelRange,     // указатель на границы параметра
+  NULL,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  SignalPrintLevelName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  SignalLevelList,                  // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  1                          // значение по умолчанию
+};
 
 /*************************************
   Включение ФР
@@ -2419,6 +2526,9 @@ const TDataDescArrayStruct AllDataArray[] =
     {&EnableSignalDesc, "EnableSignalDesc"},
     {&SignalPulseDesc, "SignalPulseDesc"},
     
+    {&CashLevelDesc, "CashLevelDesc"},
+    {&CoinLevelDesc, "CoinLevelDesc"},
+    {&SignalStopMoneyLevelDesc, "SignalStopMoneyLevelDesc"},
     
     {NULL, ""}
 };

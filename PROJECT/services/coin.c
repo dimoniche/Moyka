@@ -23,6 +23,10 @@ static CPU_INT32U pend_cash_timestamp[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U signal_pulse[COUNT_POST + COUNT_VACUUM];
 static char pend_signal_counter[COUNT_POST + COUNT_VACUUM];
 
+CPU_INT32U cashLevel[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U coinLevel[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U SignalLevel[COUNT_POST + COUNT_VACUUM];
+
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
@@ -41,6 +45,18 @@ void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post)
   #endif
   OS_ENTER_CRITICAL();
   signal_pulse[post] = pulse * 1000;
+  OS_EXIT_CRITICAL();
+}
+
+void SetLevelParam(CPU_INT32U level1, CPU_INT32U level2, CPU_INT32U level3, CPU_INT32U post)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  if(post < COUNT_POST) cashLevel[post] = level1;
+  coinLevel[post] = level2;
+  SignalLevel[post] = level3;
   OS_EXIT_CRITICAL();
 }
 
@@ -230,103 +246,103 @@ void InitCoin(void)
 
 CPU_INT32U input_register()
 {
-  CPU_INT32U input = 0xFFFFFFFF;
+  CPU_INT32U input = 0;
   
-  if (!FIO1PIN_bit.P1_20)
+  if (FIO1PIN_bit.P1_20)
   {
-     CLRBIT(input, 0);
+     SETBIT(input, 0);
   }
-  if (!FIO1PIN_bit.P1_21)
+  if (FIO1PIN_bit.P1_21)
   {
-     CLRBIT(input, 1);
+     SETBIT(input, 1);
   }
-  if (!FIO4PIN_bit.P4_28)
+  if (FIO4PIN_bit.P4_28)
   {
-     CLRBIT(input, 2);
+     SETBIT(input, 2);
   }
-  if (!FIO1PIN_bit.P1_19)
+  if (FIO1PIN_bit.P1_19)
   {
-     CLRBIT(input, 3);
+     SETBIT(input, 3);
   }
-  if (!FIO1PIN_bit.P1_18)
+  if (FIO1PIN_bit.P1_18)
   {
-     CLRBIT(input, 4);
+     SETBIT(input, 4);
   }  
-  if (!FIO0PIN_bit.P0_4)
+  if (FIO0PIN_bit.P0_4)
   {
-     CLRBIT(input, 5);
+     SETBIT(input, 5);
   }
-  if (!FIO3PIN_bit.P3_25)
+  if (FIO3PIN_bit.P3_25)
   {
-     CLRBIT(input, 6);
+     SETBIT(input, 6);
   }
-  if (!FIO3PIN_bit.P3_26)
+  if (FIO3PIN_bit.P3_26)
   {
-     CLRBIT(input, 7);
+     SETBIT(input, 7);
   }
-  if (!FIO1PIN_bit.P1_28)
+  if (FIO1PIN_bit.P1_28)
   {
-     CLRBIT(input, 8);
+     SETBIT(input, 8);
   }
-  if (!FIO0PIN_bit.P0_26)
+  if (FIO0PIN_bit.P0_26)
   {
-     CLRBIT(input, 9);
+     SETBIT(input, 9);
   }
-  if (!FIO0PIN_bit.P0_25)
+  if (FIO0PIN_bit.P0_25)
   {
-     CLRBIT(input, 10);
+     SETBIT(input, 10);
   }
-  if (!FIO1PIN_bit.P1_27)
+  if (FIO1PIN_bit.P1_27)
   {
-     CLRBIT(input, 11);
+     SETBIT(input, 11);
   }
-  if (!FIO0PIN_bit.P0_9)
+  if (FIO0PIN_bit.P0_9)
   {
-     CLRBIT(input, 12);
+     SETBIT(input, 12);
   }
-  if (!FIO2PIN_bit.P2_2)
+  if (FIO2PIN_bit.P2_2)
   {
-     CLRBIT(input, 13);
+     SETBIT(input, 13);
   }
-  if (!FIO1PIN_bit.P1_26)
+  if (FIO1PIN_bit.P1_26)
   {
-     CLRBIT(input, 14);
+     SETBIT(input, 14);
   }
-  if (!FIO0PIN_bit.P0_7)
+  if (FIO0PIN_bit.P0_7)
   {
-     CLRBIT(input, 15);
+     SETBIT(input, 15);
   }
-  if (!FIO0PIN_bit.P0_8)
+  if (FIO0PIN_bit.P0_8)
   {
-     CLRBIT(input, 16);
+     SETBIT(input, 16);
   }
-  if (!FIO0PIN_bit.P0_0)
+  if (FIO0PIN_bit.P0_0)
   {
-     CLRBIT(input, 17);
+     SETBIT(input, 17);
   }
-  if (!FIO0PIN_bit.P0_5)
+  if (FIO0PIN_bit.P0_5)
   {
-     CLRBIT(input, 18);
+     SETBIT(input, 18);
   }
-  if (!FIO0PIN_bit.P0_6)
+  if (FIO0PIN_bit.P0_6)
   {
-     CLRBIT(input, 19);
+     SETBIT(input, 19);
   }
-  if (!FIO1PIN_bit.P1_25)
+  if (FIO1PIN_bit.P1_25)
   {
-     CLRBIT(input, 20);
+     SETBIT(input, 20);
   }
-  if (!FIO0PIN_bit.P0_10)
+  if (FIO0PIN_bit.P0_10)
   {
-     CLRBIT(input, 21);
+     SETBIT(input, 21);
   }
   
   return input;
 }
 
-CPU_INT32U input_event = 0xFFFFFFFF;
-CPU_INT32U prev_input = 0xFFFFFFFF;
-CPU_INT32U curr_input = 0xFFFFFFFF;
+CPU_INT32U input_event = 0;
+CPU_INT32U prev_input = 0;
+CPU_INT32U curr_input = 0;
 
 void InputCapture_ISR(void)
 {
@@ -343,7 +359,7 @@ void InputCapture_ISR(void)
   // купюроприемник 1
   if(TSTBIT(input_event, 0))
   {
-    if (FIO1PIN_bit.P1_20)
+    if ((!FIO1PIN_bit.P1_20 && cashLevel[0]) || (FIO1PIN_bit.P1_20 && !cashLevel[0]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[0];
@@ -364,7 +380,7 @@ void InputCapture_ISR(void)
   // монетоприемник 1
   if(TSTBIT(input_event, 1))
   {
-    if (FIO1PIN_bit.P1_21)
+    if ((!FIO1PIN_bit.P1_21 && coinLevel[0]) || (FIO1PIN_bit.P1_21 && !coinLevel[0]))
       { // пришел задний фронт
         if ((T3CR-period[0]) > COIN_IMP_MIN_LEN)
           {
@@ -380,8 +396,8 @@ void InputCapture_ISR(void)
   // сигнал печати чека 1
   if(TSTBIT(input_event, 2))
   {
-    if (FIO4PIN_bit.P4_28)
-      { // пришел задний фронт
+    if ((FIO4PIN_bit.P4_28 && SignalLevel[0]) || (!FIO4PIN_bit.P4_28 && !SignalLevel[0]))
+      {
         CPU_INT32U cr=T3CR;
         cr -= period_signal[0];
         
@@ -389,11 +405,20 @@ void InputCapture_ISR(void)
         {
           pend_signal_counter[0] = 1;
         }
+        
+        period_signal[0] = T3CR;
       }
     else
-      { // пришел передний фронт
+      {
+        CPU_INT32U cr=T3CR;
+        cr -= period_signal[0];
+        
+        if (cr > (signal_pulse[0] - COIN_IMP_SPAN))
+        {
+          pend_signal_counter[0] = 0;
+        }
+
         period_signal[0] = T3CR;
-        pend_signal_counter[0] = 0;
       }
   }
   
@@ -776,7 +801,8 @@ void  InitImpInput (void)
 
     OnChangeCashPulseLen();
     OnChangeSinalPulseLen();
-        
+    OnChangeLevel();
+     
     OS_ENTER_CRITICAL();
     
     // назначим все ножки
@@ -796,7 +822,7 @@ void  InitImpInput (void)
     // сигнал печати чека пост 1
     PINSEL9_bit.P4_28 = 0;
     PINMODE9_bit.P4_28 = 0;
-    FIO4DIR_bit.P4_28  = 0;
+    FIO4DIR_bit.P4_28  = 1;
     FIO4MASK_bit.P4_28 = 0;
 
     // купюроприемник 2

@@ -40,6 +40,10 @@ typedef struct{
   CPU_INT32U  PrintTimeout;
   CPU_INT32U  PrintTimeoutAfter;
 
+  CPU_INT32U  CashLevel[COUNT_POST + COUNT_VACUUM];   // уровень сигнала купюрника
+  CPU_INT32U  CoinLevel[COUNT_POST + COUNT_VACUUM];   // уровень сигнала монетника
+  CPU_INT32U  SignalLevel[COUNT_POST + COUNT_VACUUM]; // уровень сигнала сигнала печати
+  
   CPU_INT32U  PrintMode;
 
   CPU_INT32U  DeviceId;
@@ -149,6 +153,7 @@ extern TDataDescStruct const CashPulseLenDesc;
 extern TDataDescStruct const CashPauseLenDesc;
 extern void OnChangeCashPulseLen();
 extern void OnChangeSinalPulseLen();
+extern void OnChangeLevel();
 
 extern TDataDescStruct const PrintModeDesc;
 extern TDataDescStruct const PrintTimeoutAfterDesc;
@@ -165,4 +170,8 @@ extern TDataDescStruct const SignalIndexDesc;
 extern TDataDescStruct const EnableSignalDesc;
 extern TDataDescStruct const SignalPulseDesc;
 
+extern TDataDescStruct const CashLevelDesc;
+extern TDataDescStruct const CoinLevelDesc;
+extern TDataDescStruct const SignalPrintLevelDesc;
+extern TDataDescStruct const SignalStopMoneyLevelDesc;
 #endif //#ifndef _DATADESC_H_

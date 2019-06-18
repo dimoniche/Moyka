@@ -189,28 +189,21 @@ void UserAppTask(void *p_arg)
                 {
                     drawPostInfo[post] = 1;
 
-                    LED_OK_ON();
-                    CheckFiscalStatus();
-
                     // печать по внешнему сигналу, ждем таймаут отмены
                     GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
-                    if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                    if(print_timeout)
                     {
-                        SetAcceptedMoney(0, post);
-                        
-                        UserPrintThanksMenu(post);
-                        RefreshMenu();
-
-                        OSTimeDly(1000);
-                        LED_OK_OFF();
+                      // если указан таймаут обнуления денег - просто их обнуляем
+                      if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                      {
+                          SetAcceptedMoney(0, post);
+                      }
                     }
                 }
                 else
                 {
                     drawPostInfo[post] = 0;
-                    
-                    LED_OK_OFF();
-                }                
+                }
               }
 
               // принимаем деньги
@@ -262,7 +255,7 @@ void UserAppTask(void *p_arg)
                 
                 GetData(&CashPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
-                money = /*cpp * 10*/ GetResetCashCount(number_post);
+                money = cpp * GetResetCashCount(number_post);
                 
                 accmoney = GetAcceptedMoney(number_post);
                 accmoney += money;
@@ -333,6 +326,19 @@ void UserAppTask(void *p_arg)
               }
                   
               break;
+            case EVENT_STOP_MONEY_POST1:
+            case EVENT_STOP_MONEY_POST2:
+            case EVENT_STOP_MONEY_POST3:
+            case EVENT_STOP_MONEY_POST4:
+            case EVENT_STOP_MONEY_POST5:
+            case EVENT_STOP_MONEY_POST6:
+            case EVENT_STOP_MONEY_VACUUM1:
+            case EVENT_STOP_MONEY_VACUUM2:
+            if (GetMode() == MODE_WORK) //
+            {
+            }
+
+            break;
             case EVENT_CASH_PRINT_CHECK_POST1:
             case EVENT_CASH_PRINT_CHECK_POST2:
             case EVENT_CASH_PRINT_CHECK_POST3:
@@ -379,10 +385,28 @@ void UserAppTask(void *p_arg)
             }
             break;
 
-            /*case EVENT_KEY_F1:
-                PostUserEvent(EVENT_CASH_INSERTED_POST1);
+            case EVENT_KEY_F1:
+                FIO4SET_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4CLR_bit.P4_28 = 1; 
+                OSTimeDly(50);
+                FIO4SET_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4CLR_bit.P4_28 = 1; 
+                OSTimeDly(50);
+                FIO4SET_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4CLR_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4SET_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4CLR_bit.P4_28 = 1; 
+                OSTimeDly(50);
+                FIO4SET_bit.P4_28 = 1;
+                OSTimeDly(50);
+                FIO4CLR_bit.P4_28 = 1;
             break;
-            case EVENT_KEY_F2:
+            /*case EVENT_KEY_F2:
                 PostUserEvent(EVENT_CASH_INSERTED_POST2);
             break;
             case EVENT_KEY_F3:

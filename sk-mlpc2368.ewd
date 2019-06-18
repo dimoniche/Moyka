@@ -1799,7 +1799,7 @@
         </option>
         <option>
           <name>MemFile</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\CONFIG\debugger\NXP\iolpc2368.ddf</state>
         </option>
         <option>
           <name>RunToEnable</name>
@@ -1839,11 +1839,11 @@
         </option>
         <option>
           <name>OCDynDriverList</name>
-          <state>ARMSIM_ID</state>
+          <state>JLINK_ID</state>
         </option>
         <option>
           <name>OCLastSavedByProductVersion</name>
-          <state></state>
+          <state>6.21.1.52845</state>
         </option>
         <option>
           <name>OCDownloadAttachToProgram</name>
@@ -1871,7 +1871,7 @@
         </option>
         <option>
           <name>FlashLoadersV3</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\config\flashloader\NXP\FlashNXPLPC512k2.board</state>
         </option>
         <option>
           <name>OCImagesSuppressCheck1</name>
