@@ -21,7 +21,9 @@ static char pend_cash_counter[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U pend_cash_timestamp[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U signal_pulse[COUNT_POST + COUNT_VACUUM];
-static char pend_signal_counter[COUNT_POST + COUNT_VACUUM];
+static char pend_upsignal_counter[COUNT_POST + COUNT_VACUUM];
+static char pend_downsignal_counter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U pend_signal_timestamp[COUNT_POST + COUNT_VACUUM];
 
 CPU_INT32U cashLevel[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U coinLevel[COUNT_POST + COUNT_VACUUM];
@@ -103,11 +105,23 @@ void CoinTask(void *p_arg)
 
 			if (enable_signal[i])
 			{
-				if (pend_signal_counter[i])
+				if (pend_upsignal_counter[i])
 				{
-                  // есть удержание сигнала печати
-				  PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + i);
-                  pend_signal_counter[i] = 0;
+                  if (OSTimeGet() - pend_signal_timestamp[i] > signal_pulse[i])
+                  {
+                    // есть удержание сигнала печати
+                    PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + i);
+                    pend_upsignal_counter[i] = 0;
+                  }
+				}
+                if (pend_downsignal_counter[i])
+				{
+                  if (OSTimeGet() - pend_signal_timestamp[i] > signal_pulse[i])
+                  {
+                    // есть окончание приема денег
+                    PostUserEvent(EVENT_STOP_MONEY_POST1 + i);
+                    pend_downsignal_counter[i] = 0;
+                  }
 				}
 			}
 
@@ -226,14 +240,16 @@ void InitCoin(void)
     CoinImpCounter[i] = 0;
     CashImpCounter[i] = 0;
     
-    cash_pulse[i] = 0;
-    cash_pause[i] = 0;
+    cash_pulse[i] = 50;
+    cash_pause[i] = 50;
 
     pend_cash_counter[i] = 0;
     pend_cash_timestamp[i] = 0;
 
-    signal_pulse[i] = 0;
-    pend_signal_counter[i] = 0;
+    signal_pulse[i] = 1000;
+    pend_upsignal_counter[i] = 0;
+    pend_downsignal_counter[i] = 0;
+    pend_signal_timestamp[i] = 0;
     
     period[i] = 0;
     period_cash[i] = 0;
@@ -396,29 +412,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека 1
   if(TSTBIT(input_event, 2))
   {
+    pend_signal_timestamp[0] = OSTimeGet();
+    
     if ((FIO4PIN_bit.P4_28 && SignalLevel[0]) || (!FIO4PIN_bit.P4_28 && !SignalLevel[0]))
       {
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[0];
-        
-        if (cr > (signal_pulse[0] - COIN_IMP_SPAN))
-        {
-          pend_signal_counter[0] = 1;
-        }
-        
-        period_signal[0] = T3CR;
+          pend_upsignal_counter[0] = 1;
+          pend_downsignal_counter[0] = 0;
       }
     else
       {
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[0];
-        
-        if (cr > (signal_pulse[0] - COIN_IMP_SPAN))
-        {
-          pend_signal_counter[0] = 0;
-        }
-
-        period_signal[0] = T3CR;
+          pend_upsignal_counter[0] = 0;
+          pend_downsignal_counter[0] = 1;
       }
   }
   
@@ -426,7 +430,7 @@ void InputCapture_ISR(void)
   // купюроприемник 2
   if(TSTBIT(input_event, 3))
   {
-    if (FIO1PIN_bit.P1_19)
+    if ((!FIO1PIN_bit.P1_19 && cashLevel[1]) || (FIO1PIN_bit.P1_19 && !cashLevel[1]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[1];
@@ -447,7 +451,7 @@ void InputCapture_ISR(void)
   // монетоприемник 2
   if(TSTBIT(input_event, 4))
   {
-    if (FIO1PIN_bit.P1_18)
+    if ((!FIO1PIN_bit.P1_18 && coinLevel[1]) || (FIO1PIN_bit.P1_18 && !coinLevel[1]))
       { // пришел задний фронт
         if ((T3CR-period[1]) > COIN_IMP_MIN_LEN)
           {
@@ -463,20 +467,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека 2
   if(TSTBIT(input_event, 5))
   {
-    if (FIO0PIN_bit.P0_4)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[1];
-        
-        if (cr > (signal_pulse[1] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[0] = 1;
-        }
+    pend_signal_timestamp[1] = OSTimeGet();
+    
+    if ((FIO0PIN_bit.P0_4 && SignalLevel[1]) || (!FIO0PIN_bit.P0_4 && !SignalLevel[1]))
+      {
+          pend_upsignal_counter[1] = 1;
+          pend_downsignal_counter[1] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[1] = T3CR;
-        pend_signal_counter[1] = 0;
+      {
+          pend_upsignal_counter[1] = 0;
+          pend_downsignal_counter[1] = 1;
       }
   }
 
@@ -484,7 +485,7 @@ void InputCapture_ISR(void)
   // купюроприемник 3
   if(TSTBIT(input_event, 6))
   {
-    if (FIO3PIN_bit.P3_25)
+    if ((!FIO3PIN_bit.P3_25 && cashLevel[2]) || (FIO3PIN_bit.P3_25 && !cashLevel[2]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[2];
@@ -505,7 +506,7 @@ void InputCapture_ISR(void)
   // монетоприемник 3
   if(TSTBIT(input_event, 7))
   {
-    if (FIO3PIN_bit.P3_26)
+    if ((!FIO3PIN_bit.P3_26 && coinLevel[2]) || (FIO3PIN_bit.P3_26 && !coinLevel[2]))
       { // пришел задний фронт
         if ((T3CR-period[2]) > COIN_IMP_MIN_LEN)
           {
@@ -521,20 +522,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека 3
   if(TSTBIT(input_event, 8))
   {
-    if (FIO1PIN_bit.P1_28)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[2];
-        
-        if (cr > (signal_pulse[2] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[2] = 1;
-        }
+    pend_signal_timestamp[2] = OSTimeGet();
+    
+    if ((FIO1PIN_bit.P1_28 && SignalLevel[2]) || (!FIO1PIN_bit.P1_28 && !SignalLevel[2]))
+      {
+          pend_upsignal_counter[2] = 1;
+          pend_downsignal_counter[2] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[2] = T3CR;
-        pend_signal_counter[2] = 0;
+      {
+          pend_upsignal_counter[2] = 0;
+          pend_downsignal_counter[2] = 1;
       }
   }
 
@@ -542,7 +540,7 @@ void InputCapture_ISR(void)
   // купюроприемник 4
   if(TSTBIT(input_event, 9))
   {
-    if (FIO0PIN_bit.P0_26)
+    if ((!FIO0PIN_bit.P0_26 && cashLevel[3]) || (FIO0PIN_bit.P0_26 && !cashLevel[3]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[3];
@@ -563,7 +561,7 @@ void InputCapture_ISR(void)
   // монетоприемник 4
   if(TSTBIT(input_event, 10))
   {
-    if (FIO0PIN_bit.P0_25)
+    if ((!FIO0PIN_bit.P0_25 && coinLevel[3]) || (FIO0PIN_bit.P0_25 && !coinLevel[3]))
       { // пришел задний фронт
         if ((T3CR-period[3]) > COIN_IMP_MIN_LEN)
           {
@@ -579,20 +577,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека 4
   if(TSTBIT(input_event, 11))
   {
-    if (FIO1PIN_bit.P1_27)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[3];
-        
-        if (cr > (signal_pulse[3] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[3] = 1;
-        }
+    pend_signal_timestamp[3] = OSTimeGet();
+    
+    if ((FIO1PIN_bit.P1_27 && SignalLevel[2]) || (!FIO1PIN_bit.P1_27 && !SignalLevel[3]))
+      {
+          pend_upsignal_counter[3] = 1;
+          pend_downsignal_counter[3] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[3] = T3CR;
-        pend_signal_counter[3] = 0;
+      {
+          pend_upsignal_counter[3] = 0;
+          pend_downsignal_counter[3] = 1;
       }
   }
 
@@ -600,7 +595,7 @@ void InputCapture_ISR(void)
   // купюроприемник 5
   if(TSTBIT(input_event, 12))
   {
-    if (FIO0PIN_bit.P0_9)
+    if ((!FIO0PIN_bit.P0_9 && cashLevel[4]) || (FIO0PIN_bit.P0_9 && !cashLevel[4]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[4];
@@ -621,7 +616,7 @@ void InputCapture_ISR(void)
   // монетоприемник 5
   if(TSTBIT(input_event, 13))
   {
-    if (FIO2PIN_bit.P2_2)
+    if ((!FIO2PIN_bit.P2_2 && coinLevel[4]) || (FIO2PIN_bit.P2_2 && !coinLevel[4]))
       { // пришел задний фронт
         if ((T3CR-period[4]) > COIN_IMP_MIN_LEN)
           {
@@ -637,20 +632,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека 5
   if(TSTBIT(input_event, 14))
   {
-    if (FIO1PIN_bit.P1_26)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[4];
-        
-        if (cr > (signal_pulse[4] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[4] = 1;
-        }
+    pend_signal_timestamp[4] = OSTimeGet();
+    
+    if ((FIO1PIN_bit.P1_26 && SignalLevel[4]) || (!FIO1PIN_bit.P1_26 && !SignalLevel[4]))
+      {
+          pend_upsignal_counter[4] = 1;
+          pend_downsignal_counter[4] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[4] = T3CR;
-        pend_signal_counter[4] = 0;
+      {
+          pend_upsignal_counter[4] = 0;
+          pend_downsignal_counter[4] = 1;
       }
   }
 
@@ -658,7 +650,7 @@ void InputCapture_ISR(void)
   // купюроприемник 6
   if(TSTBIT(input_event, 15))
   {
-    if (FIO0PIN_bit.P0_7)
+    if ((!FIO0PIN_bit.P0_7 && cashLevel[5]) || (FIO0PIN_bit.P0_7 && !cashLevel[5]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[5];
@@ -679,7 +671,7 @@ void InputCapture_ISR(void)
   // монетоприемник 6
   if(TSTBIT(input_event, 16))
   {
-    if (FIO0PIN_bit.P0_8)
+    if ((!FIO0PIN_bit.P0_8 && coinLevel[5]) || (FIO0PIN_bit.P0_8 && !coinLevel[5]))
       { // пришел задний фронт
         if ((T3CR-period[5]) > COIN_IMP_MIN_LEN)
           {
@@ -695,27 +687,24 @@ void InputCapture_ISR(void)
   // сигнал печати чека 6
   if(TSTBIT(input_event, 17))
   {
-    if (FIO0PIN_bit.P0_0)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[5];
-        
-        if (cr > (signal_pulse[5] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[5] = 1;
-        }
+    pend_signal_timestamp[5] = OSTimeGet();
+    
+    if ((FIO0PIN_bit.P0_0 && SignalLevel[5]) || (!FIO0PIN_bit.P0_0 && !SignalLevel[5]))
+      {
+          pend_upsignal_counter[5] = 1;
+          pend_downsignal_counter[5] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[5] = T3CR;
-        pend_signal_counter[5] = 0;
+      {
+          pend_upsignal_counter[5] = 0;
+          pend_downsignal_counter[5] = 1;
       }
   }
 
   // монетоприемник пылесос 1
   if(TSTBIT(input_event, 18))
   {
-    if (FIO0PIN_bit.P0_5)
+    if ((!FIO0PIN_bit.P0_5 && coinLevel[6]) || (FIO0PIN_bit.P0_5 && !coinLevel[6]))
       { // пришел задний фронт
         if ((T3CR-period[6]) > COIN_IMP_MIN_LEN)
           {
@@ -731,27 +720,24 @@ void InputCapture_ISR(void)
   // сигнал печати чека пылесос 1
   if(TSTBIT(input_event, 19))
   {
-    if (FIO0PIN_bit.P0_6)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[6];
-        
-        if (cr > (signal_pulse[6] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[6] = 1;
-        }
+    pend_signal_timestamp[6] = OSTimeGet();
+    
+    if ((FIO0PIN_bit.P0_6 && SignalLevel[6]) || (!FIO0PIN_bit.P0_6 && !SignalLevel[6]))
+      {
+          pend_upsignal_counter[6] = 1;
+          pend_downsignal_counter[6] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[6] = T3CR;
-        pend_signal_counter[6] = 0;
+      {
+          pend_upsignal_counter[6] = 0;
+          pend_downsignal_counter[6] = 1;
       }
   }
 
   // монетоприемник пылесос 2
   if(TSTBIT(input_event, 20))
   {
-    if (FIO1PIN_bit.P1_25)
+    if ((!FIO1PIN_bit.P1_25 && coinLevel[7]) || (FIO1PIN_bit.P1_25 && !coinLevel[7]))
       { // пришел задний фронт
         if ((T3CR-period[7]) > COIN_IMP_MIN_LEN)
           {
@@ -767,20 +753,17 @@ void InputCapture_ISR(void)
   // сигнал печати чека пылесос 2
   if(TSTBIT(input_event, 21))
   {
-    if (FIO0PIN_bit.P0_10)
-      { // пришел задний фронт
-        CPU_INT32U cr=T3CR;
-        cr -= period_signal[7];
-        
-        if (cr > (signal_pulse[7] - COIN_IMP_SPAN))
-        {
-            pend_signal_counter[7] = 1;
-        }
+    pend_signal_timestamp[7] = OSTimeGet();
+    
+    if ((FIO0PIN_bit.P0_10 && SignalLevel[7]) || (!FIO0PIN_bit.P0_10 && !SignalLevel[7]))
+      {
+          pend_upsignal_counter[7] = 1;
+          pend_downsignal_counter[7] = 0;
       }
     else
-      { // пришел передний фронт
-        period_signal[7] = T3CR;
-        pend_signal_counter[7] = 0;
+      {
+          pend_upsignal_counter[7] = 0;
+          pend_downsignal_counter[7] = 1;
       }
   }
 }

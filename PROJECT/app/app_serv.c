@@ -94,6 +94,17 @@ void DrawMenu(void)
   }
 }
 
+typedef enum {
+  
+  waitMoney = 0,
+  insertMoney,
+  washing,
+  printCheck
+    
+} washStateEnum;
+
+washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney};
+
 /*
  Сервер обработки событий пользователя
 */
@@ -240,6 +251,8 @@ void UserAppTask(void *p_arg)
                 money_timestamp[number_post] = OSTimeGet();
                                 
                 if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_COIN_POST1 + number_post, money);
+                
+                wash_State[number_post] = insertMoney;
               }
               break;
             case EVENT_CASH_INSERTED_POST1:
@@ -263,6 +276,8 @@ void UserAppTask(void *p_arg)
                 money_timestamp[number_post] = OSTimeGet();
                                 
                 if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
+                
+                wash_State[number_post] = insertMoney;
               }
               break;
               
@@ -336,6 +351,8 @@ void UserAppTask(void *p_arg)
             case EVENT_STOP_MONEY_VACUUM2:
             if (GetMode() == MODE_WORK) //
             {
+                int number_post = event - EVENT_STOP_MONEY_POST1;
+                wash_State[number_post] = washing;
             }
 
             break;
@@ -350,7 +367,7 @@ void UserAppTask(void *p_arg)
             if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
-
+               
               // здесь событие старта печати чека - включили насос или пылесос
               CPU_INT32U accmoney = GetAcceptedMoney(number_post);
               
@@ -380,7 +397,7 @@ void UserAppTask(void *p_arg)
                   }
                   
                   OSTimeDly(1000);
-                  LED_OK_OFF();
+                  wash_State[number_post] = waitMoney;
               }
             }
             break;
