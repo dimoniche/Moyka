@@ -83,17 +83,6 @@ void AddOutPulses(int count, int len_ms)
 int drawPostInfo[COUNT_POST + COUNT_VACUUM] = {0,0,0,0,0,0,0,0};
 int currentPosition = 0;
 
-void DrawMenu(void)
-{
-  if((SystemTime%2))
-  {
-    UserPrintMoneyMenu(currentPosition++);
-    RefreshMenu();
-    
-    if(currentPosition >= COUNT_POST + COUNT_VACUUM) currentPosition = 0;
-  }
-}
-
 typedef enum {
   
   waitMoney = 0,
@@ -103,7 +92,19 @@ typedef enum {
     
 } washStateEnum;
 
-washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney,waitMoney};
+washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney};
+
+int countSecWait[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+void DrawMenu(void)
+{
+  if((SystemTime%2))
+  {
+    UserPrintMoneyMenu(currentPosition++);
+    
+    if(currentPosition >= COUNT_POST + COUNT_VACUUM) currentPosition = 0;
+  }
+}
 
 /*
  Сервер обработки событий пользователя
@@ -122,6 +123,8 @@ void UserAppTask(void *p_arg)
   was_critical_error = 0;
 #endif
       
+  int testMoney = 0;
+
   while (1)
     {
       if (GetUserEvent(&event))
@@ -208,12 +211,21 @@ void UserAppTask(void *p_arg)
                       if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
                       {
                           SetAcceptedMoney(0, post);
+                          wash_State[post] = waitMoney;
                       }
                     }
                 }
                 else
                 {
                     drawPostInfo[post] = 0;
+                }
+                
+                if(countSecWait[post])
+                {
+                  countSecWait[post]--;
+
+                  // пришло время печати чека
+                  if(!countSecWait[post]) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
                 }
               }
 
@@ -242,7 +254,7 @@ void UserAppTask(void *p_arg)
                 
                 GetData(&CoinPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
-                money = cpp*GetResetCoinCount(number_post);
+                money = cpp * GetResetCoinCount(number_post) + testMoney;
 
                 accmoney = GetAcceptedMoney(number_post);
                 accmoney += money;
@@ -253,6 +265,7 @@ void UserAppTask(void *p_arg)
                 if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_COIN_POST1 + number_post, money);
                 
                 wash_State[number_post] = insertMoney;
+                testMoney = 0;
               }
               break;
             case EVENT_CASH_INSERTED_POST1:
@@ -268,7 +281,7 @@ void UserAppTask(void *p_arg)
                 
                 GetData(&CashPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
-                money = cpp * GetResetCashCount(number_post);
+                money = cpp * GetResetCashCount(number_post) + testMoney;
                 
                 accmoney = GetAcceptedMoney(number_post);
                 accmoney += money;
@@ -354,8 +367,27 @@ void UserAppTask(void *p_arg)
                 int number_post = event - EVENT_STOP_MONEY_POST1;
                 wash_State[number_post] = washing;
             }
-
             break;
+
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST1:
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST2:
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST3:
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST4:
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST5:
+            case EVENT_WAIT_CASH_PRINT_CHECK_POST6:
+            case EVENT_WAIT_CASH_PRINT_CHECK_VACUUM1:
+            case EVENT_WAIT_CASH_PRINT_CHECK_VACUUM2:
+              if (GetMode() == MODE_WORK) //
+              {
+                  int number_post = event - EVENT_WAIT_CASH_PRINT_CHECK_POST1;
+                  int count_delay = 0;
+
+                  // запустим задержку печати чека
+                  GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
+                  countSecWait[number_post] = count_delay;
+              }
+            break;
+              
             case EVENT_CASH_PRINT_CHECK_POST1:
             case EVENT_CASH_PRINT_CHECK_POST2:
             case EVENT_CASH_PRINT_CHECK_POST3:
@@ -367,7 +399,7 @@ void UserAppTask(void *p_arg)
             if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
-               
+              
               // здесь событие старта печати чека - включили насос или пылесос
               CPU_INT32U accmoney = GetAcceptedMoney(number_post);
               
@@ -403,7 +435,10 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                FIO4SET_bit.P4_28 = 1;
+                testMoney = 100;
+                PostUserEvent(EVENT_CASH_INSERTED_POST1);
+
+                /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
                 FIO4CLR_bit.P4_28 = 1; 
                 OSTimeDly(50);
@@ -421,14 +456,14 @@ void UserAppTask(void *p_arg)
                 OSTimeDly(50);
                 FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
-                FIO4CLR_bit.P4_28 = 1;
+                FIO4CLR_bit.P4_28 = 1;*/
             break;
-            /*case EVENT_KEY_F2:
-                PostUserEvent(EVENT_CASH_INSERTED_POST2);
+            case EVENT_KEY_F2:
+                PostUserEvent(EVENT_STOP_MONEY_POST1);
             break;
             case EVENT_KEY_F3:
-                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1);
-            break;*/
+                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
+            break;
 #endif
             default:
               break;
@@ -532,12 +567,34 @@ void UserPrintMoneyMenu(int post)
 
     strcpy(buf, " ");
     PrintUserMenuStr(buf, 0);
-    sprintf(buf, " Внесите деньги");
-    PrintUserMenuStr(buf, 1);
-    accmoney = GetAcceptedMoney(post);
-    sprintf(buf, "Принято %d руб.", accmoney);
-    PrintUserMenuStr(buf, 2);
-    
+
+    if(wash_State[post] == waitMoney)
+    {
+      sprintf(buf, " Внесите деньги");
+      PrintUserMenuStr(buf, 1);
+
+      sprintf(buf, " ");
+      PrintUserMenuStr(buf, 2);
+    }
+    else if(wash_State[post] == insertMoney)
+    {
+      accmoney = GetAcceptedMoney(post);
+
+      sprintf(buf, " Внесите деньги");
+      PrintUserMenuStr(buf, 1);
+
+      sprintf(buf, "Принято %d руб.", accmoney);
+      PrintUserMenuStr(buf, 2);
+    }
+    else if(wash_State[post] == washing)
+    {
+      sprintf(buf, "Началась мойка");
+      PrintUserMenuStr(buf, 1);
+
+      sprintf(buf, " ");
+      PrintUserMenuStr(buf, 2);
+    }
+      
     if(post < COUNT_POST)
       sprintf(buf, " Пост %d", post + 1);
     else if(post < COUNT_POST + COUNT_VACUUM)
@@ -548,7 +605,7 @@ void UserPrintMoneyMenu(int post)
     PrintUserMenuStr(buf, 3);
 }
                          
-// вывод меню о невозможости работы
+// вывод меню о невозможности работы
 void UserPrintErrorMenu(void)
 {
   char buf[32];

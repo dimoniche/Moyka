@@ -110,7 +110,7 @@ void CoinTask(void *p_arg)
                   if (OSTimeGet() - pend_signal_timestamp[i] > signal_pulse[i])
                   {
                     // есть удержание сигнала печати
-                    PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + i);
+                    PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1 + i);
                     pend_upsignal_counter[i] = 0;
                   }
 				}
@@ -805,7 +805,7 @@ void  InitImpInput (void)
     // сигнал печати чека пост 1
     PINSEL9_bit.P4_28 = 0;
     PINMODE9_bit.P4_28 = 0;
-    FIO4DIR_bit.P4_28  = 1;
+    FIO4DIR_bit.P4_28  = 0;
     FIO4MASK_bit.P4_28 = 0;
 
     // купюроприемник 2
@@ -947,6 +947,8 @@ void  InitImpInput (void)
 
     T3IR = 0xFF;
     
+    prev_input = curr_input = input_register();
+
     OS_EXIT_CRITICAL();
 }
 
