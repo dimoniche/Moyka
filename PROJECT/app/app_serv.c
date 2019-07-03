@@ -96,13 +96,28 @@ washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney, waitMoney, wai
 
 int countSecWait[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U cash_enable[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U enable_signal[COUNT_POST + COUNT_VACUUM];
+
 void DrawMenu(void)
 {
   if((SystemTime%2))
   {
-    UserPrintMoneyMenu(currentPosition++);
-    
+    for( ;currentPosition < COUNT_POST + COUNT_VACUUM; currentPosition++)
+    {
+      if((enable_coin[currentPosition] 
+         || cash_enable[currentPosition] 
+           || enable_signal[currentPosition])
+             && currentPosition < COUNT_POST) break;
+      else if((enable_coin[currentPosition] 
+           || enable_signal[currentPosition])
+              && currentPosition >= COUNT_POST) break;
+    }
+
     if(currentPosition >= COUNT_POST + COUNT_VACUUM) currentPosition = 0;
+
+    UserPrintMoneyMenu(currentPosition++);    
   }
 }
 
@@ -172,9 +187,13 @@ void UserAppTask(void *p_arg)
               {
                   break;
               }
-              
+
               for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
+                GetData(&EnableCoinDesc, &enable_coin[post], post, DATA_FLAG_DIRECT_INDEX);  
+                GetData(&EnableValidatorDesc, &cash_enable[post], post, DATA_FLAG_DIRECT_INDEX);
+                GetData(&EnableSignalDesc, &enable_signal[post], post, DATA_FLAG_DIRECT_INDEX);
+
                 accmoney = GetAcceptedMoney(post);
 
                 if (accmoney > 0)
