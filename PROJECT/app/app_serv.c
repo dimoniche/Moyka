@@ -172,47 +172,34 @@ void UserAppTask(void *p_arg)
               {
                   break;
               }
-                
-              // если есть ошибки, не работаем
-              if (TstCriticalErrors()) 
-              {
-                UserPrintErrorMenu(); 
-                RefreshMenu();
-
-                // выключим прием денег
-                if (was_critical_error == 0)
-                {
-                    CoinDisable();
-                    was_critical_error = 1;
-                }
-                break;
-              }
               
-              // включим заново прием денег, если была ошибка
-              if (was_critical_error)
-              {
-                  was_critical_error = 0;
-                  break;
-              }
-
               for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
                 accmoney = GetAcceptedMoney(post);
 
                 if (accmoney > 0)
                 {
+                    // есть принятые деньги
                     drawPostInfo[post] = 1;
 
-                    // печать по внешнему сигналу, ждем таймаут отмены
-                    GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
-                    if(print_timeout)
+                    if(wash_State[post] != washing)
                     {
-                      // если указан таймаут обнуления денег - просто их обнуляем
-                      if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                      // печать по внешнему сигналу, ждем таймаут отмены, но не в режиме мойки
+                      GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
+                      if(print_timeout)
                       {
-                          SetAcceptedMoney(0, post);
-                          wash_State[post] = waitMoney;
+                        // если указан таймаут обнуления денег - просто их обнуляем
+                        if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                        {
+                            SetAcceptedMoney(0, post);
+                            wash_State[post] = waitMoney;
+                        }
                       }
+                    }
+                    else
+                    {
+                      // в режиме мойки продлеваем ожидание
+                      money_timestamp[post] = OSTimeGet();
                     }
                 }
                 else
@@ -231,6 +218,27 @@ void UserAppTask(void *p_arg)
 
               // принимаем деньги
               DrawMenu();
+
+              // если есть ошибки, не работаем
+              if (TstCriticalErrors()) 
+              {
+                UserPrintErrorMenu(); 
+                RefreshMenu();
+
+                // выключим прием денег
+                if (was_critical_error == 0)
+                {
+                    was_critical_error = 1;
+                }
+                break;
+              }
+              
+              // включим заново прием денег, если была ошибка
+              if (was_critical_error)
+              {
+                  was_critical_error = 0;
+                  break;
+              }
 
               break;
               
@@ -365,7 +373,12 @@ void UserAppTask(void *p_arg)
             if (GetMode() == MODE_WORK) //
             {
                 int number_post = event - EVENT_STOP_MONEY_POST1;
-                wash_State[number_post] = washing;
+
+                accmoney = GetAcceptedMoney(number_post);
+                if (accmoney > 0)
+                {
+                  wash_State[number_post] = washing;
+                }
             }
             break;
 
@@ -382,9 +395,18 @@ void UserAppTask(void *p_arg)
                   int number_post = event - EVENT_WAIT_CASH_PRINT_CHECK_POST1;
                   int count_delay = 0;
 
-                  // запустим задержку печати чека
-                  GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
-                  countSecWait[number_post] = count_delay;
+                  accmoney = GetAcceptedMoney(number_post);
+                  if (accmoney > 0)
+                  {
+                    // запустим задержку печати чека
+                    GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
+                    countSecWait[number_post] = count_delay;
+  
+                    // если задержки нет - сразу печатаем
+                    if(countSecWait[number_post] == 0) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + number_post);
+                    
+                    wash_State[number_post] = printCheck;
+                  }
               }
             break;
               
@@ -435,8 +457,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                testMoney = 100;
-                PostUserEvent(EVENT_CASH_INSERTED_POST1);
+                //testMoney = 100;
+                //PostUserEvent(EVENT_CASH_INSERTED_POST1);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -459,10 +481,10 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                PostUserEvent(EVENT_STOP_MONEY_POST1);
+                //PostUserEvent(EVENT_STOP_MONEY_POST1);
             break;
             case EVENT_KEY_F3:
-                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
+                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
             break;
 #endif
             default:
@@ -589,6 +611,14 @@ void UserPrintMoneyMenu(int post)
     else if(wash_State[post] == washing)
     {
       sprintf(buf, "Началась мойка");
+      PrintUserMenuStr(buf, 1);
+
+      sprintf(buf, " ");
+      PrintUserMenuStr(buf, 2);
+    }
+    else if(wash_State[post] == printCheck)
+    {
+      sprintf(buf, "Ожидание печати");
       PrintUserMenuStr(buf, 1);
 
       sprintf(buf, " ");

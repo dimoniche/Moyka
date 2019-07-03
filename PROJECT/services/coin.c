@@ -86,10 +86,14 @@ void CoinTask(void *p_arg)
             last_settings_time = OSTimeGet();
         }
 
+		OSTimeDly(1);
+
+        #if OS_CRITICAL_METHOD == 3
+        OS_CPU_SR  cpu_sr = 0;
+        #endif
+
 		for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
 		{
-			OSTimeDly(1);
-
 			if (enable_coin[i])
 			{
 				if (GetCoinCount(i))
@@ -103,6 +107,7 @@ void CoinTask(void *p_arg)
 				GetResetCoinCount(i);
 			}
 
+            OS_ENTER_CRITICAL();
 			if (enable_signal[i])
 			{
 				if (pend_upsignal_counter[i])
@@ -124,15 +129,12 @@ void CoinTask(void *p_arg)
                   }
 				}
 			}
+            OS_EXIT_CRITICAL();
 
 			if (!cash_enable[i]) {GetResetCashCount(i); continue;}
             if(i >= COUNT_POST) continue;
 
-			#if OS_CRITICAL_METHOD == 3
-			OS_CPU_SR  cpu_sr = 0;
-			#endif
 			OS_ENTER_CRITICAL();
-			
 			if (pend_cash_counter[i])
 			{
 			  // импульсы инкрементируем только после выдержки паузы
