@@ -11,22 +11,42 @@ typedef struct
   CPU_INT32U SerialNum;
 
   TDeviceConfig DeviceConfig;
-  // счетчики
-  TCounters Counters;
-
-  // длинные счетчики с CRC16 
-  TCountersLong CountersLong;
 
   CPU_INT32U FRAM_AcceptedMoney[COUNT_POST + COUNT_VACUUM];
   CPU_INT32U crc_AcceptedMoney[COUNT_POST + COUNT_VACUUM];
+
+  CPU_INT32U FRAM_AcceptedBankMoney[COUNT_POST];
+  CPU_INT32U crc_AcceptedBankMoney[COUNT_POST];
   
+  CPU_INT32U  enableSignalPrint[COUNT_POST];
+  CPU_INT32U  signal_pulse_len[COUNT_POST];
+
+  CPU_INT32U  cash_pulse_len[COUNT_POST];
+  CPU_INT32U  cash_pause_len[COUNT_POST];
+
+  CPU_INT32U  bank_pulse_len[COUNT_POST];
+  CPU_INT32U  bank_pause_len[COUNT_POST];
+
+  CPU_INT08U manual_service_flag[4];
+  char manual_service_name[32];
+
+  CPU_INT32U  TaxFormat;
+  CPU_INT32U  SubjSell;
+  CPU_INT32U  CommandV2;
+  CPU_INT32U  TaxSystem;
+
+  CPU_INT32U Pass;
+  CPU_INT32U crc_Pass;
+
   // журнал событий+ошибок
   TEventRecord EventRecords[EVENT_RECORDS_COUNT];
 
   CPU_INT32U Price;
 
-  CPU_INT32U Pass;
-  CPU_INT32U crc_Pass;
+  // счетчики
+  TCounters Counters;
+  // длинные счетчики с CRC16 
+  TCountersLong CountersLong;
 
   CPU_INT32U LastEmailTime;
 
@@ -44,19 +64,5 @@ typedef struct
 
   CPU_INT16U  port;
   
-  CPU_INT08U manual_service_flag[4];
-  char manual_service_name[32];
-
-  CPU_INT32U  cash_pulse_len[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U  cash_pause_len[COUNT_POST + COUNT_VACUUM];
-
-  CPU_INT32U  TaxFormat;
-  CPU_INT32U  SubjSell;
-  CPU_INT32U  CommandV2;
-  CPU_INT32U  TaxSystem;
-
-  CPU_INT32U  enableSignalPrint[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U  signal_pulse_len[COUNT_POST + COUNT_VACUUM];
-
 }TFramMap;
 

@@ -17,14 +17,19 @@
 
 // структура конфигурации аппаратуры
 typedef struct{
-  CPU_INT32U  EnableValidator[COUNT_POST + COUNT_VACUUM];
+  
   CPU_INT32U  EnableCoinAcceptor[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  EnableValidator[COUNT_POST];
+  CPU_INT32U  EnableBank[COUNT_POST];
+  
   CPU_INT32U  EnableModem;
   CPU_INT32U  EnableFiscal;
   CPU_INT32U  EnableFiscalDayClear;
   CPU_INT32U  ServiceName;
 
   CPU_INT32U  CoinPerPulse[COUNT_POST + COUNT_VACUUM]; // цена импульса монетоприемника
+  CPU_INT32U  CoinTimeOut[COUNT_POST + COUNT_VACUUM];  // таймаут печати чека монетоприемника
+
   CPU_INT32U  BillFormat;
   
   CPU_INT32U  DisableFiscalErrors; // отключение реакции на ошибки ФР
@@ -35,14 +40,19 @@ typedef struct{
   CPU_INT32U  ClearJournalAfterSend;
   CPU_INT32U  StatSendHourMin;
 
-  CPU_INT32U  CashMode[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U  CashPerPulse[COUNT_POST + COUNT_VACUUM]; // цена импульса купюрника
+  CPU_INT32U  CashMode[COUNT_POST];
+  CPU_INT32U  CashPerPulse[COUNT_POST]; // цена импульса купюрника
+
+  CPU_INT32U  BankPerPulse[COUNT_POST]; // цена импульса банковского терминала
+  
   CPU_INT32U  PrintTimeout;
   CPU_INT32U  PrintTimeoutAfter;
 
-  CPU_INT32U  CashLevel[COUNT_POST + COUNT_VACUUM];   // уровень сигнала купюрника
   CPU_INT32U  CoinLevel[COUNT_POST + COUNT_VACUUM];   // уровень сигнала монетника
-  CPU_INT32U  SignalLevel[COUNT_POST + COUNT_VACUUM]; // уровень сигнала сигнала печати
+  
+  CPU_INT32U  CashLevel[COUNT_POST];   // уровень сигнала купюрника
+  CPU_INT32U  SignalLevel[COUNT_POST]; // уровень сигнала сигнала печати
+  CPU_INT32U  BankLevel[COUNT_POST];   // уровень сигнала купюрника
   
   CPU_INT32U  PrintMode;
 
@@ -69,6 +79,7 @@ extern TDataDescStruct const EnableFiscalDesc;
 extern TDataDescStruct const EnableCoinDesc;
 extern TDataDescStruct const EnableModemDesc;
 extern TDataDescStruct const EnableValidatorDesc;
+extern TDataDescStruct const EnableBankDesc;
 extern TDataDescStruct const CoinPerPulseDesc;
 extern TDataDescStruct const EnableFiscalDayClearDesc;
 
@@ -104,6 +115,8 @@ extern TDataDescStruct const BillFormatDesc;
 
 extern TDataDescStruct const AcceptedMoneyDesc;
 extern TDataDescStruct const AcceptedMoneyCRC16Desc;
+extern TDataDescStruct const AcceptedBankMoneyDesc;
+extern TDataDescStruct const AcceptedBankMoneyCRC16Desc;
 
 extern TDataDescStruct const DisableFiscalErrorsDesc;
 
@@ -164,6 +177,8 @@ extern TDataDescStruct const TaxSystemDesc;
 
 extern TDataDescStruct const CoinIndexDesc;
 extern TDataDescStruct const CashIndexDesc;
+extern TDataDescStruct const BankIndexDesc;
+
 extern CPU_INT32U CoinIndex;
 
 extern TDataDescStruct const SignalIndexDesc;
@@ -174,4 +189,12 @@ extern TDataDescStruct const CashLevelDesc;
 extern TDataDescStruct const CoinLevelDesc;
 extern TDataDescStruct const SignalPrintLevelDesc;
 extern TDataDescStruct const SignalStopMoneyLevelDesc;
+
+extern TDataDescStruct const BankPerPulseDesc;
+extern TDataDescStruct const BankPulseLenDesc;
+extern TDataDescStruct const BankPauseLenDesc;
+extern TDataDescStruct const BankLevelDesc;
+
+extern TDataDescStruct const CoinTimeOutDesc;
+
 #endif //#ifndef _DATADESC_H_

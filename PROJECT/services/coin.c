@@ -13,12 +13,17 @@ void  InitImpInput(void);
 
 CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U  BankImpCounter[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U cash_pulse[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U cash_pause[COUNT_POST + COUNT_VACUUM];
-
 static char pend_cash_counter[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U pend_cash_timestamp[COUNT_POST + COUNT_VACUUM];
+
+static CPU_INT32U bank_pulse[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U bank_pause[COUNT_POST + COUNT_VACUUM];
+static char pend_bank_counter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U pend_bank_timestamp[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U signal_pulse[COUNT_POST + COUNT_VACUUM];
 static char pend_upsignal_counter[COUNT_POST + COUNT_VACUUM];
@@ -28,6 +33,7 @@ static CPU_INT32U pend_signal_timestamp[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U cashLevel[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U coinLevel[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U SignalLevel[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U bankLevel[COUNT_POST + COUNT_VACUUM];
 
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
@@ -37,6 +43,17 @@ void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
   OS_ENTER_CRITICAL();
   cash_pulse[post] = pulse * 1;
   cash_pause[post] = pause;
+  OS_EXIT_CRITICAL();
+}
+
+void SetBankPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  bank_pulse[post] = pulse * 1;
+  bank_pause[post] = pause;
   OS_EXIT_CRITICAL();
 }
 
@@ -50,26 +67,38 @@ void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post)
   OS_EXIT_CRITICAL();
 }
 
-void SetLevelParam(CPU_INT32U level1, CPU_INT32U level2, CPU_INT32U level3, CPU_INT32U post)
+void SetLevelParam(CPU_INT32U level1, CPU_INT32U level2, CPU_INT32U level3, CPU_INT32U level4, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
   #endif
   OS_ENTER_CRITICAL();
-  if(post < COUNT_POST) cashLevel[post] = level1;
-  coinLevel[post] = level2;
-  SignalLevel[post] = level3;
+  if(post < COUNT_POST)
+  {
+    cashLevel[post] = level1;
+    bankLevel[post] = level2;
+    SignalLevel[post] = level3;
+  }
+  
+  coinLevel[post] = level4;
+  
   OS_EXIT_CRITICAL();
 }
 
 void CoinTask(void *p_arg)
 {
   CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U cash_enable[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U enable_signal[COUNT_POST + COUNT_VACUUM];
+  
+  CPU_INT32U cash_enable[COUNT_POST];
+  CPU_INT32U enable_signal[COUNT_POST];
+  CPU_INT32U bank_enable[COUNT_POST];
 
-  CPU_INT32U last_cash_count[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U last_cash_time[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U last_cash_count[COUNT_POST];
+  CPU_INT32U last_cash_time[COUNT_POST];
+
+  CPU_INT32U last_bank_count[COUNT_POST];
+  CPU_INT32U last_bank_time[COUNT_POST];
+
   CPU_INT32U last_settings_time = 0;
 
   while(1)
@@ -79,8 +108,13 @@ void CoinTask(void *p_arg)
             for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
             {
               GetData(&EnableCoinDesc, &enable_coin[i], i, DATA_FLAG_DIRECT_INDEX);  
-              GetData(&EnableValidatorDesc, &cash_enable[i], i, DATA_FLAG_DIRECT_INDEX);
-              GetData(&EnableSignalDesc, &enable_signal[i], i, DATA_FLAG_DIRECT_INDEX);
+              
+              if(i < COUNT_POST)
+              {
+                GetData(&EnableValidatorDesc, &cash_enable[i], i, DATA_FLAG_DIRECT_INDEX);
+                GetData(&EnableSignalDesc, &enable_signal[i], i, DATA_FLAG_DIRECT_INDEX);
+                GetData(&EnableBankDesc, &bank_enable[i], i, DATA_FLAG_DIRECT_INDEX);
+              }
             }
             
             last_settings_time = OSTimeGet();
@@ -107,6 +141,9 @@ void CoinTask(void *p_arg)
 				GetResetCoinCount(i);
 			}
 
+            if(i >= COUNT_POST) continue;
+            // только монетоприемников 8 - остальных каналов 6
+            
             OS_ENTER_CRITICAL();
 			if (enable_signal[i])
 			{
@@ -131,8 +168,46 @@ void CoinTask(void *p_arg)
 			}
             OS_EXIT_CRITICAL();
 
+            if (bank_enable[i])
+            {
+              OS_ENTER_CRITICAL();
+              if (pend_bank_counter[i])
+              {
+                // импульсы инкрементируем только после выдержки паузы
+                if (OSTimeGet() - pend_bank_timestamp[i] > bank_pause[i])
+                {
+                  pend_bank_counter[i] = 0;
+                  BankImpCounter[i]++;
+                }
+              }
+              OS_EXIT_CRITICAL();
+                  
+              if (GetbankCount(i))
+              {
+                if (last_bank_count[i] == GetbankCount(i))
+                {
+                    if (labs(OSTimeGet() - last_bank_time[i]) > 500)
+                    {
+                      PostUserEvent(EVENT_BANK_INSERTED_POST1 + i);
+                    }
+                }
+                else
+                {
+                    last_bank_count[i] = GetbankCount(i);
+                    last_bank_time[i] = OSTimeGet();
+                }
+              }
+              else
+              {
+                last_bank_time[i] = OSTimeGet();
+              }
+            }
+            else
+            {
+              GetResetbankCount(i);
+            }
+
 			if (!cash_enable[i]) {GetResetCashCount(i); continue;}
-            if(i >= COUNT_POST) continue;
 
 			OS_ENTER_CRITICAL();
 			if (pend_cash_counter[i])
@@ -229,9 +304,36 @@ CPU_INT32U GetResetCashCount(int index)
   return ctr;
 }
 
+// получить число импульсов от купюрника
+CPU_INT32U GetbankCount(int index)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  CPU_INT32U ctr = BankImpCounter[index];
+  OS_EXIT_CRITICAL();
+  return ctr;
+}
+
+// получить число импульсов от купюрника и сбросить счетчик
+CPU_INT32U GetResetbankCount(int index)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  CPU_INT32U ctr = BankImpCounter[index];
+  BankImpCounter[index] = 0;
+  OS_EXIT_CRITICAL();
+  return ctr;
+}
+
 CPU_INT32U period[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U period_cash[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U period_bank[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U period_signal[COUNT_POST + COUNT_VACUUM];
+
 CPU_INT32U T3CR = 0;
 
 // инициализация монетоприемника
@@ -241,12 +343,17 @@ void InitCoin(void)
   {
     CoinImpCounter[i] = 0;
     CashImpCounter[i] = 0;
+    BankImpCounter[i] = 0;
     
     cash_pulse[i] = 50;
     cash_pause[i] = 50;
-
     pend_cash_counter[i] = 0;
     pend_cash_timestamp[i] = 0;
+
+    bank_pulse[i] = 50;
+    bank_pause[i] = 50;
+    pend_bank_counter[i] = 0;
+    pend_bank_timestamp[i] = 0;
 
     signal_pulse[i] = 1000;
     pend_upsignal_counter[i] = 0;
@@ -255,6 +362,7 @@ void InitCoin(void)
     
     period[i] = 0;
     period_cash[i] = 0;
+    period_bank[i] = 0;
     period_signal[i] = 0;
   }
   
@@ -342,19 +450,35 @@ CPU_INT32U input_register()
   {
      SETBIT(input, 18);
   }
-  if (FIO0PIN_bit.P0_6)
+  if (FIO1PIN_bit.P1_25)
   {
      SETBIT(input, 19);
   }
-  if (FIO1PIN_bit.P1_25)
+  if (FIO0PIN_bit.P0_28)
   {
      SETBIT(input, 20);
   }
-  if (FIO0PIN_bit.P0_10)
+  if (FIO0PIN_bit.P0_27)
   {
      SETBIT(input, 21);
   }
-  
+  if (FIO1PIN_bit.P1_24)
+  {
+     SETBIT(input, 22);
+  }
+  if (FIO1PIN_bit.P1_23)
+  {
+     SETBIT(input, 23);
+  }
+  if (FIO0PIN_bit.P0_6)
+  {
+     SETBIT(input, 24);
+  }
+  if (FIO0PIN_bit.P0_10)
+  {
+     SETBIT(input, 25);
+  }
+
   return input;
 }
 
@@ -718,26 +842,9 @@ void InputCapture_ISR(void)
         period[6] = T3CR;
       }
   }
-  
-  // сигнал печати чека пылесос 1
-  if(TSTBIT(input_event, 19))
-  {
-    pend_signal_timestamp[6] = OSTimeGet();
-    
-    if ((FIO0PIN_bit.P0_6 && SignalLevel[6]) || (!FIO0PIN_bit.P0_6 && !SignalLevel[6]))
-      {
-          pend_upsignal_counter[6] = 1;
-          pend_downsignal_counter[6] = 0;
-      }
-    else
-      {
-          pend_upsignal_counter[6] = 0;
-          pend_downsignal_counter[6] = 1;
-      }
-  }
 
   // монетоприемник пылесос 2
-  if(TSTBIT(input_event, 20))
+  if(TSTBIT(input_event, 19))
   {
     if ((!FIO1PIN_bit.P1_25 && coinLevel[7]) || (FIO1PIN_bit.P1_25 && !coinLevel[7]))
       { // пришел задний фронт
@@ -752,20 +859,129 @@ void InputCapture_ISR(void)
       }
   }
   
-  // сигнал печати чека пылесос 2
-  if(TSTBIT(input_event, 21))
+  // банк 1
+  if(TSTBIT(input_event, 20))
   {
-    pend_signal_timestamp[7] = OSTimeGet();
-    
-    if ((FIO0PIN_bit.P0_10 && SignalLevel[7]) || (!FIO0PIN_bit.P0_10 && !SignalLevel[7]))
-      {
-          pend_upsignal_counter[7] = 1;
-          pend_downsignal_counter[7] = 0;
+    if ((!FIO0PIN_bit.P0_28 && bankLevel[0]) || (FIO0PIN_bit.P0_28 && !bankLevel[0]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[0];
+        
+        if (cr > (bank_pulse[0] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[0] = 1;
+            pend_bank_timestamp[0] = OSTimeGet();
+        }
       }
     else
-      {
-          pend_upsignal_counter[7] = 0;
-          pend_downsignal_counter[7] = 1;
+      { // пришел передний фронт
+        period_bank[0] = T3CR;
+        pend_bank_counter[0] = 0;
+      }
+  }
+
+  // банк 2
+  if(TSTBIT(input_event, 21))
+  {
+    if ((!FIO0PIN_bit.P0_27 && bankLevel[1]) || (FIO0PIN_bit.P0_27 && !bankLevel[1]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[1];
+        
+        if (cr > (bank_pulse[1] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[1] = 1;
+            pend_bank_timestamp[1] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_bank[1] = T3CR;
+        pend_bank_counter[1] = 0;
+      }
+  }
+  
+  // банк 3
+  if(TSTBIT(input_event, 22))
+  {
+    if ((!FIO1PIN_bit.P1_24 && bankLevel[2]) || (FIO1PIN_bit.P1_24 && !bankLevel[2]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[2];
+        
+        if (cr > (bank_pulse[2] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[2] = 1;
+            pend_bank_timestamp[2] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_bank[2] = T3CR;
+        pend_bank_counter[2] = 0;
+      }
+  }
+  
+  // банк 4
+  if(TSTBIT(input_event, 23))
+  {
+    if ((!FIO1PIN_bit.P1_23 && bankLevel[3]) || (FIO1PIN_bit.P1_23 && !bankLevel[3]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[3];
+        
+        if (cr > (bank_pulse[3] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[3] = 1;
+            pend_bank_timestamp[3] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_bank[3] = T3CR;
+        pend_bank_counter[3] = 0;
+      }
+  }
+  
+  // банк 5
+  if(TSTBIT(input_event, 24))
+  {
+    if ((!FIO0PIN_bit.P0_6 && bankLevel[4]) || (FIO0PIN_bit.P0_6 && !bankLevel[4]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[4];
+        
+        if (cr > (bank_pulse[4] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[4] = 1;
+            pend_bank_timestamp[4] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_bank[4] = T3CR;
+        pend_bank_counter[4] = 0;
+      }
+  }
+  
+  // банк 6
+  if(TSTBIT(input_event, 25))
+  {
+    if ((!FIO0PIN_bit.P0_10 && bankLevel[5]) || (FIO0PIN_bit.P0_10 && !bankLevel[5]))
+      { // пришел задний фронт
+        CPU_INT32U cr=T3CR;
+        cr -= period_bank[5];
+        
+        if (cr > (bank_pulse[5] - COIN_IMP_SPAN))
+        {
+            pend_bank_counter[5] = 1;
+            pend_bank_timestamp[5] = OSTimeGet();
+        }
+      }
+    else
+      { // пришел передний фронт
+        period_bank[5] = T3CR;
+        pend_bank_counter[5] = 0;
       }
   }
 }
@@ -905,20 +1121,44 @@ void  InitImpInput (void)
     PINMODE0_bit.P0_5 = 0;
     FIO0DIR_bit.P0_5  = 0;
     FIO0MASK_bit.P0_5 = 0;
-  
-    // сигнал печати чека пылесос 1
-    PINSEL0_bit.P0_6 = 0;
-    PINMODE0_bit.P0_6 = 0;
-    FIO0DIR_bit.P0_6  = 0;
-    FIO0MASK_bit.P0_6 = 0;
-    
+      
     // монетоприемник пылесос 2
     PINSEL3_bit.P1_25 = 0;
     PINMODE3_bit.P1_25 = 0;
     FIO1DIR_bit.P1_25  = 0;
     FIO1MASK_bit.P1_25 = 0;
   
-    // сигнал печати чека пылесос 2
+    // банк 1
+    PINSEL1_bit.P0_28 = 0;
+    PINMODE1_bit.P0_28 = 0;
+    FIO0DIR_bit.P0_28  = 0;
+    FIO0MASK_bit.P0_28 = 0;
+
+    // банк 2
+    PINSEL1_bit.P0_27 = 0;
+    PINMODE1_bit.P0_27 = 0;
+    FIO0DIR_bit.P0_27  = 0;
+    FIO0MASK_bit.P0_27 = 0;
+
+    // банк 3
+    PINSEL3_bit.P1_24 = 0;
+    PINMODE3_bit.P1_24 = 0;
+    FIO1DIR_bit.P1_24  = 0;
+    FIO1MASK_bit.P1_24 = 0;
+
+    // банк 4
+    PINSEL3_bit.P1_23 = 0;
+    PINMODE3_bit.P1_23 = 0;
+    FIO1DIR_bit.P1_23  = 0;
+    FIO1MASK_bit.P1_23 = 0;
+
+    // банк 5
+    PINSEL0_bit.P0_6 = 0;
+    PINMODE0_bit.P0_6 = 0;
+    FIO0DIR_bit.P0_6  = 0;
+    FIO0MASK_bit.P0_6 = 0;
+
+    // банк 6
     PINSEL0_bit.P0_10 = 0;
     PINMODE0_bit.P0_10 = 0;
     FIO0DIR_bit.P0_10  = 0;

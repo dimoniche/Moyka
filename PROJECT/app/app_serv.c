@@ -45,10 +45,16 @@ void UserPrintThanksMenu(int post);
 void UserPrintFirstMenu(void);
 void UserPrintErrorMenu(void);
 CPU_INT32U GetChannelsTimeForFree(CPU_INT08U ch);
+
 void LoadAcceptedMoney(void);
 void SetAcceptedMoney(CPU_INT32U money,int post);
 void ClearAcceptedMoney(int post);
 CPU_INT32U GetAcceptedMoney(int post);
+
+void SetAcceptedBankMoney(CPU_INT32U money,int post);
+void ClearAcceptedBankMoney(int post);
+CPU_INT32U GetAcceptedBankMoney(int post);
+
 void InitPass(void);
 int CheckChannelEnabled(CPU_INT08U channel);
 int ChannelBusy(CPU_INT08U ch);
@@ -97,8 +103,9 @@ washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney, waitMoney, wai
 int countSecWait[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U cash_enable[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U enable_signal[COUNT_POST + COUNT_VACUUM];
+CPU_INT32U cash_enable[COUNT_POST];
+CPU_INT32U bank_enable[COUNT_POST];
+CPU_INT32U enable_signal[COUNT_POST];
 
 void DrawMenu(void)
 {
@@ -108,10 +115,10 @@ void DrawMenu(void)
     {
       if((enable_coin[currentPosition] 
          || cash_enable[currentPosition] 
-           || enable_signal[currentPosition])
-             && currentPosition < COUNT_POST) break;
-      else if((enable_coin[currentPosition] 
-           || enable_signal[currentPosition])
+           || bank_enable[currentPosition]
+              || enable_signal[currentPosition])
+                && currentPosition < COUNT_POST) break;
+      else if((enable_coin[currentPosition])
               && currentPosition >= COUNT_POST) break;
     }
 
@@ -188,13 +195,15 @@ void UserAppTask(void *p_arg)
                   break;
               }
 
-              for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+              for(int post = 0; post < COUNT_POST; post++)
               {
                 GetData(&EnableCoinDesc, &enable_coin[post], post, DATA_FLAG_DIRECT_INDEX);  
                 GetData(&EnableValidatorDesc, &cash_enable[post], post, DATA_FLAG_DIRECT_INDEX);
+                GetData(&EnableBankDesc, &bank_enable[post], post, DATA_FLAG_DIRECT_INDEX);
                 GetData(&EnableSignalDesc, &enable_signal[post], post, DATA_FLAG_DIRECT_INDEX);
 
                 accmoney = GetAcceptedMoney(post);
+                accmoney += GetAcceptedBankMoney(post);
 
                 if (accmoney > 0)
                 {
@@ -235,6 +244,22 @@ void UserAppTask(void *p_arg)
                 }
               }
 
+              for(int post = COUNT_POST; post < COUNT_POST + COUNT_VACUUM; post++)
+              {
+                  accmoney = GetAcceptedMoney(post);
+                  
+                  if (accmoney > 0)
+                  {
+                      // дл€ монетоприемников пылесосов - печать чека по таймауту
+                      GetData(&CoinTimeOutDesc, &print_timeout, post, DATA_FLAG_DIRECT_INDEX);
+                   
+                      if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                      {
+                          PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                      }
+                  }
+              }
+                
               // принимаем деньги
               DrawMenu();
 
@@ -320,7 +345,33 @@ void UserAppTask(void *p_arg)
                 wash_State[number_post] = insertMoney;
               }
               break;
-              
+             
+            case EVENT_BANK_INSERTED_POST1:
+            case EVENT_BANK_INSERTED_POST2:
+            case EVENT_BANK_INSERTED_POST3:
+            case EVENT_BANK_INSERTED_POST4:
+            case EVENT_BANK_INSERTED_POST5:
+            case EVENT_BANK_INSERTED_POST6:
+              {
+                CPU_INT32U cpp = 1;
+                CPU_INT32U money, accmoney;
+                int number_post = event - EVENT_BANK_INSERTED_POST1;
+                
+                GetData(&BankPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
+                
+                money = cpp * GetResetbankCount(number_post) + testMoney;
+                
+                accmoney = GetAcceptedBankMoney(number_post);
+                accmoney += money;
+                SetAcceptedBankMoney(accmoney, number_post);
+                money_timestamp[number_post] = OSTimeGet();
+                                
+                if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
+                
+                wash_State[number_post] = insertMoney;
+              }
+              break;
+
             case EVENT_KEY_CANSEL:
               break;
               
@@ -387,13 +438,13 @@ void UserAppTask(void *p_arg)
             case EVENT_STOP_MONEY_POST4:
             case EVENT_STOP_MONEY_POST5:
             case EVENT_STOP_MONEY_POST6:
-            case EVENT_STOP_MONEY_VACUUM1:
-            case EVENT_STOP_MONEY_VACUUM2:
             if (GetMode() == MODE_WORK) //
             {
                 int number_post = event - EVENT_STOP_MONEY_POST1;
 
                 accmoney = GetAcceptedMoney(number_post);
+                accmoney += GetAcceptedBankMoney(number_post);
+                
                 if (accmoney > 0)
                 {
                   wash_State[number_post] = washing;
@@ -407,14 +458,14 @@ void UserAppTask(void *p_arg)
             case EVENT_WAIT_CASH_PRINT_CHECK_POST4:
             case EVENT_WAIT_CASH_PRINT_CHECK_POST5:
             case EVENT_WAIT_CASH_PRINT_CHECK_POST6:
-            case EVENT_WAIT_CASH_PRINT_CHECK_VACUUM1:
-            case EVENT_WAIT_CASH_PRINT_CHECK_VACUUM2:
               if (GetMode() == MODE_WORK) //
               {
                   int number_post = event - EVENT_WAIT_CASH_PRINT_CHECK_POST1;
                   int count_delay = 0;
 
                   accmoney = GetAcceptedMoney(number_post);
+                  accmoney += GetAcceptedBankMoney(number_post);
+
                   if (accmoney > 0)
                   {
                     // запустим задержку печати чека
@@ -442,14 +493,46 @@ void UserAppTask(void *p_arg)
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
               
               // здесь событие старта печати чека - включили насос или пылесос
-              CPU_INT32U accmoney = GetAcceptedMoney(number_post);
+              accmoney = GetAcceptedMoney(number_post);
               
               if (accmoney > 0)
               { 
                   UserPrintPrintBillMenu(number_post);
                   RefreshMenu();
                   
-                  // напечатаем чек
+                  // напечатаем наличный чек
+                  if (IsFiscalConnected())
+                  {
+                    if (PrintFiscalBill(accmoney,number_post) == 0) // здесь добавить с какого поста чек
+                    {
+                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
+                    }
+                  }
+
+                  IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
+                  SetAcceptedMoney(0, number_post);
+                  OSTimeDly(1000);
+                 
+                  // повесим меню "—ѕј—»Ѕќ"                      
+                  if (IsFiscalConnected())
+                  {
+                      UserPrintThanksMenu(number_post);
+                      RefreshMenu();
+                  }
+                  
+                  OSTimeDly(1000);
+                  wash_State[number_post] = waitMoney;
+              }
+              
+              // здесь событие старта печати чека - включили насос или пылесос
+              accmoney = GetAcceptedBankMoney(number_post);
+              
+              if (accmoney > 0)
+              { 
+                  UserPrintPrintBillMenu(number_post);
+                  RefreshMenu();
+                  
+                  // напечатаем безналичный чек
                   if (IsFiscalConnected())
                   {
                     if (PrintFiscalBill(accmoney,number_post) == 0) // здесь добавить с какого поста чек
@@ -476,8 +559,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                //testMoney = 100;
-                //PostUserEvent(EVENT_CASH_INSERTED_POST1);
+                testMoney = 100;
+                PostUserEvent(EVENT_COIN_INSERTED_VACUUM1);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -767,6 +850,24 @@ void LoadAcceptedMoney(void)
         SetData(&AcceptedMoneyCRC16Desc, &crc, i, DATA_FLAG_DIRECT_INDEX);
       }
   }
+  
+  for(int i = 0; i < COUNT_POST; i++)
+  {
+    // считаем cохраненные деньги из FRAM
+    GetData(&AcceptedBankMoneyDesc, &m, i, DATA_FLAG_DIRECT_INDEX);    
+    // считаем crc16 этих денег из FRAM 
+    GetData(&AcceptedBankMoneyCRC16Desc, &crc, i, DATA_FLAG_DIRECT_INDEX);    
+    
+    crct = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
+  
+    if (crct != crc)
+      { // обнул€ем, если crc не сошлась
+        m = 0;
+        crc = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
+        SetData(&AcceptedBankMoneyDesc, &m, i, DATA_FLAG_DIRECT_INDEX);
+        SetData(&AcceptedBankMoneyCRC16Desc, &crc, i, DATA_FLAG_DIRECT_INDEX);
+      }
+  }
 }
 
 // добавить денег
@@ -794,6 +895,34 @@ CPU_INT32U GetAcceptedMoney(int post)
 {
   CPU_INT32U m;
   GetData(&AcceptedMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
+  return m;
+}
+
+// добавить денег
+void SetAcceptedBankMoney(CPU_INT32U money, int post)
+{
+  CPU_INT32U m,crc;
+  m=money;
+  crc = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
+  SetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
+  SetData(&AcceptedBankMoneyCRC16Desc, &crc, post, DATA_FLAG_DIRECT_INDEX);
+}
+
+// очистить счетчик денег
+void ClearAcceptedBankMoney(int post)
+{
+  CPU_INT32U m,crc;
+  m=0;
+  crc = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
+  SetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
+  SetData(&AcceptedBankMoneyCRC16Desc, &crc, post, DATA_FLAG_DIRECT_INDEX);
+}
+
+// очистить счетчик денег
+CPU_INT32U GetAcceptedBankMoney(int post)
+{
+  CPU_INT32U m;
+  GetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
   return m;
 }
 

@@ -14,7 +14,7 @@ Count=0
 Enabled=0
 ShowSource=1
 [DebugChecksum]
-Checksum=-59974582
+Checksum=1092686877
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -155,7 +155,9 @@ Fmt0={W}0:curr_input	4	0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\PROJECT\app\app_serv.c}.258.27" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\PROJECT\app\app_serv.c}.493.19" 0 0 1 "" 0 "" 0
+Count=2
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

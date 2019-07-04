@@ -3,7 +3,7 @@
 
 #include "fiscal.h"
 
-#define EVENT_RECORDS_COUNT  512 // число записей в журнале
+#define EVENT_RECORDS_COUNT  384 // число записей в журнале
 
 #pragma pack(push, 1)
 /// структура записи журнала рабочих событий

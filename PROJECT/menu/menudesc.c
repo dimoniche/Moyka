@@ -675,7 +675,7 @@ const TMenuPanel SetNewPassMenuPanel[] = {arr_SetNewPassMenuArray, NULL, 2, MENU
 const CPU_INT08U str_DeviceMenu_0[] = "   ОБОРУДОВАНИЕ";
 const CPU_INT08U str_DeviceMenu_1[] = "ФР";
 const CPU_INT08U str_DeviceMenu_2[] = "Монетоприемники";
-//const CPU_INT08U str_DeviceMenu_3[] = "Модем";
+const CPU_INT08U str_DeviceMenu_3[] = "Банк.терминалы";
 const CPU_INT08U str_DeviceMenu_4[] = "Купюроприемники";
 const CPU_INT08U str_DeviceMenu_5[] = "Сигнал печати";
 
@@ -707,12 +707,12 @@ const TMenuLine line_DeviceMenu_3 = {
   (void*)&CoinSetupPanel                            // панель для перехода
 };
 
-/*const TMenuLine line_DeviceMenu_4 = {
+const TMenuLine line_DeviceMenu_4 = {
   MENU_LINE_GOTO_MENU,               // тип пункта меню
   0,                              // доп. флаги  
   (void*)str_DeviceMenu_3,       // указатель на текстовую строку или дескриптор
-  (void*)&ModemSetupPanel                            // панель для перехода
-};*/
+  (void*)&BankSetupPanel                            // панель для перехода
+};
 
 const TMenuLine line_DeviceMenu_5 = {
   MENU_LINE_GOTO_MENU,               // тип пункта меню
@@ -721,8 +721,8 @@ const TMenuLine line_DeviceMenu_5 = {
   (void*)&SignalSetupPanel                            // панель для перехода
 };
 
-const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_3, &line_DeviceMenu_5,/*&line_DeviceMenu_4,*/ NULL};
-const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 5, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_DeviceMenuArray[] = {&line_DeviceMenu_0, &line_DeviceMenu_1, &line_DeviceMenu_2, &line_DeviceMenu_4, &line_DeviceMenu_3, &line_DeviceMenu_5, NULL};
+const TMenuPanel DeviceMenuPanel[] = {arr_DeviceMenuArray, NULL, 6, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ НАСТРОЙКА сигналов печати чеков
@@ -895,6 +895,13 @@ const TMenuLine line_CoinMenu_2 = {
   NULL                            // панель для перехода
 };
 
+const TMenuLine line_CoinMenu_4 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&CoinTimeOutDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
 const TMenuLine line_CoinMenu_3 = {
   MENU_LINE_SHOW_DESC,               // тип пункта меню
   0,                              // доп. флаги  
@@ -907,8 +914,8 @@ void OnEnterCoinMenu(void)
     CoinIndex = 0;
 }
 
-const TMenuLineArray arr_CoinMenuArray[] = {&line_CoinMenu_0, &line_CoinMenu_1, &line_CoinMenu_2, &line_CoinMenu_3, NULL};
-const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, OnEnterCoinMenu, 4, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_CoinMenuArray[] = {&line_CoinMenu_0, &line_CoinMenu_1, &line_CoinMenu_2, &line_CoinMenu_4, &line_CoinMenu_3, NULL};
+const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, OnEnterCoinMenu, 5, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ НАСТРОЙКА КУПЮРОПРИЕМНИКОВ
@@ -965,6 +972,55 @@ const TMenuLine line_CashMenu_6 = {
 
 const TMenuLineArray arr_ValidatorMenuArray[] = {&line_CashMenu_0, &line_CashMenu_1, /*&line_CashMenu_2,*/ &line_CashMenu_3, &line_CashMenu_4, &line_CashMenu_5, &line_CashMenu_6, NULL};
 const TMenuPanel ValidatorSetupPanel[] = {arr_ValidatorMenuArray, OnEnterCoinMenu, 6, MENU_PANEL_STANDARD};
+
+/***********************************
+  МЕНЮ НАСТРОЙКА БАНКОВСКИХ ТЕРМИНАЛОВ
+***********************************/
+
+const TMenuLine line_BankMenu_0 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
+  (void*)&BankIndexDesc,        // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_BankMenu_1 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&EnableBankDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_BankMenu_3 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&BankPerPulseDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_BankMenu_4 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&BankPulseLenDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_BankMenu_5 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&BankPauseLenDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_BankMenu_6 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&BankLevelDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLineArray arr_BankMenuArray[] = {&line_BankMenu_0, &line_BankMenu_1, &line_BankMenu_3, &line_BankMenu_4, &line_BankMenu_5, &line_BankMenu_6, NULL};
+const TMenuPanel BankSetupPanel[] = {arr_BankMenuArray, OnEnterCoinMenu, 6, MENU_PANEL_STANDARD};
 
 /***********************************
   ЗАСТАВКА ДЛЯ КЛИЕНТА
