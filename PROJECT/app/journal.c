@@ -144,7 +144,26 @@ void GetEventStr(char* str, char event)
     case JOURNAL_EVENT_MONEY_NOTE_POST6:
       sprintf(str, "Âí.êóïşğà ïîñò 6");
       break;
-      
+   
+    case JOURNAL_EVENT_MONEY_BANK_POST1:
+      sprintf(str, "İë.ïëàòåæ ïîñò 1");
+      break;
+    case JOURNAL_EVENT_MONEY_BANK_POST2:
+      sprintf(str, "İë.ïëàòåæ ïîñò 2");
+      break;
+    case JOURNAL_EVENT_MONEY_BANK_POST3:
+      sprintf(str, "İë.ïëàòåæ ïîñò 3");
+      break;
+    case JOURNAL_EVENT_MONEY_BANK_POST4:
+      sprintf(str, "İë.ïëàòåæ ïîñò 4");
+      break;
+    case JOURNAL_EVENT_MONEY_BANK_POST5:
+      sprintf(str, "İë.ïëàòåæ ïîñò 5");
+      break;
+    case JOURNAL_EVENT_MONEY_BANK_POST6:
+      sprintf(str, "İë.ïëàòåæ ïîñò 6");
+      break;
+
     case JOURNAL_EVENT_MONEY_COIN_POST1:
       sprintf(str, "Âí.ìîíåòû ïîñò 1");
       break;
@@ -204,7 +223,26 @@ void GetEventStr(char* str, char event)
     case JOURNAL_EVENT_PRINT_BILL_VACUUM2:
       sprintf(str, "Ïå÷àòü ÷åêà ïûë.2");
       break;
-      
+     
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1:
+      sprintf(str, "Ïå÷.online ÷åêà ïîñò 1");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST2:
+      sprintf(str, "Ïå÷. online ÷åêà ïîñò 2");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST3:
+      sprintf(str, "Ïå÷.online ÷åêà ïîñò 3");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST4:
+      sprintf(str, "Ïå÷.online ÷åêà ïîñò 4");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST5:
+      sprintf(str, "Ïå÷.online ÷åêà ïîñò 5");
+      break;
+    case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST6:
+      sprintf(str, "Ïå÷.online ÷åêà ïîñò 6");
+      break;
+
     case JOURNAL_EVENT_PRINT_Z:
       sprintf(str, "Ïå÷àòü îò÷åòà î çàêğ.ñì.");
       break;
@@ -365,6 +403,10 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
         {
           sprintf(&str[strlen(str)], "%d rub.", record->data);
         }
+      else if ((record->event >= JOURNAL_EVENT_MONEY_BANK_POST1) && (record->event <= JOURNAL_EVENT_MONEY_BANK_POST6))
+        {
+          sprintf(&str[strlen(str)], "%d rub.", record->data);
+        }
       else if (record->event == JOURNAL_EVENT_START_SESSION)
         {
           sprintf(&str[strlen(str)], "");
@@ -379,7 +421,11 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
         {
           sprintf(&str[strlen(str)], "");
         }
-      if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
+      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
+        {
+          sprintf(&str[strlen(str)], " ");
+        }
+      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1))
         {
           sprintf(&str[strlen(str)], " ");
         }

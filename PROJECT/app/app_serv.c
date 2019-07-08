@@ -366,7 +366,7 @@ void UserAppTask(void *p_arg)
                 SetAcceptedBankMoney(accmoney, number_post);
                 money_timestamp[number_post] = OSTimeGet();
                                 
-                if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
+                if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_BANK_POST1 + number_post, money);
                 
                 wash_State[number_post] = insertMoney;
               }
@@ -488,6 +488,9 @@ void UserAppTask(void *p_arg)
             case EVENT_CASH_PRINT_CHECK_POST6:
             case EVENT_CASH_PRINT_CHECK_VACUUM1:
             case EVENT_CASH_PRINT_CHECK_VACUUM2:
+
+            if (was_critical_error) break;
+
             if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
@@ -503,7 +506,7 @@ void UserAppTask(void *p_arg)
                   // напечатаем наличный чек
                   if (IsFiscalConnected())
                   {
-                    if (PrintFiscalBill(accmoney,number_post) == 0) // здесь добавить с какого поста чек
+                    if (PrintFiscalBill(accmoney, number_post, 0) == 0) // здесь добавить с какого поста чек
                     {
                         SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
                     }
@@ -535,14 +538,14 @@ void UserAppTask(void *p_arg)
                   // напечатаем безналичный чек
                   if (IsFiscalConnected())
                   {
-                    if (PrintFiscalBill(accmoney,number_post) == 0) // здесь добавить с какого поста чек
+                    if (PrintFiscalBill(accmoney,number_post, 1) == 0) // здесь добавить с какого поста чек
                     {
-                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
+                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1 + number_post, GetTimeSec());
                     }
                   }
 
                   IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
-                  SetAcceptedMoney(0, number_post);
+                  SetAcceptedBankMoney(0, number_post);
                   OSTimeDly(1000);
                  
                   // повесим меню "—ѕј—»Ѕќ"                      
@@ -560,7 +563,7 @@ void UserAppTask(void *p_arg)
 
             case EVENT_KEY_F1:
                 testMoney = 100;
-                PostUserEvent(EVENT_COIN_INSERTED_VACUUM1);
+                PostUserEvent(EVENT_BANK_INSERTED_POST1);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -583,10 +586,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                //PostUserEvent(EVENT_STOP_MONEY_POST1);
+                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
             break;
             case EVENT_KEY_F3:
-                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
+                testMoney = 100;
+                PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
 #endif
             default:
@@ -702,7 +706,7 @@ void UserPrintMoneyMenu(int post)
     }
     else if(wash_State[post] == insertMoney)
     {
-      accmoney = GetAcceptedMoney(post);
+      accmoney = GetAcceptedMoney(post) + GetAcceptedBankMoney(post);
 
       sprintf(buf, " ¬несите деньги");
       PrintUserMenuStr(buf, 1);

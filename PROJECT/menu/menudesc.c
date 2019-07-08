@@ -1553,6 +1553,10 @@ void PrintEventJournalRecord(TEventRecord *record)
         {
           sprintf(str_EventData, "%d руб.пост %d", record->data, record->event%6);
         }
+      else if ((record->event >= JOURNAL_EVENT_MONEY_BANK_POST1) && (record->event <= JOURNAL_EVENT_MONEY_BANK_POST6))
+        {
+          sprintf(str_EventData, "%d руб.пост %d", record->data, record->event%6);
+        }
       else if (record->event == JOURNAL_EVENT_START_SESSION)
         {
           sprintf(&str_EventNumber[strlen(str_EventNumber)], "");
@@ -1568,6 +1572,10 @@ void PrintEventJournalRecord(TEventRecord *record)
           sprintf(str_EventData, "");
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
+        {
+          sprintf(str_EventData, " ");
+        }
+      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1))
         {
           sprintf(str_EventData, " ");
         }
