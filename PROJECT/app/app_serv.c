@@ -538,7 +538,7 @@ void UserAppTask(void *p_arg)
                   // напечатаем безналичный чек
                   if (IsFiscalConnected())
                   {
-                    if (PrintFiscalBill(accmoney,number_post, 1) == 0) // здесь добавить с какого поста чек
+                    if (PrintFiscalBill(accmoney,number_post, 0) == 0) // здесь добавить с какого поста чек
                     {
                         SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1 + number_post, GetTimeSec());
                     }
