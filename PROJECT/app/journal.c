@@ -399,7 +399,7 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
       GetEventStrEng(&str[strlen(str)], record->event);
       
       // напечатаем дополнительные поля
-      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_POST6))
+      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_VACUUM2))
         {
           sprintf(&str[strlen(str)], "%d rub.", record->data);
         }

@@ -1563,13 +1563,17 @@ void PrintEventJournalRecord(TEventRecord *record)
   if (record->event)
     { // есть событие
       GetEventStr(str_EventNumber, record->event);
-      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_POST6))
+      if ((record->event >= JOURNAL_EVENT_MONEY_NOTE_POST1) && (record->event <= JOURNAL_EVENT_MONEY_NOTE_POST6))
         {
-          sprintf(str_EventData, "%d руб.пост %d", record->data, record->event%6);
+          sprintf(str_EventData, "%d руб.", record->data);
+        }
+      else if ((record->event >= JOURNAL_EVENT_MONEY_COIN_POST1) && (record->event <= JOURNAL_EVENT_MONEY_COIN_VACUUM2))
+        {
+          sprintf(str_EventData, "%d руб.", record->data);
         }
       else if ((record->event >= JOURNAL_EVENT_MONEY_BANK_POST1) && (record->event <= JOURNAL_EVENT_MONEY_BANK_POST6))
         {
-          sprintf(str_EventData, "%d руб.пост %d", record->data, record->event%6);
+          sprintf(str_EventData, "%d руб.", record->data);
         }
       else if (record->event == JOURNAL_EVENT_START_SESSION)
         {

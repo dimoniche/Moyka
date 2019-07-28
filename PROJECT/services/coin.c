@@ -270,7 +270,7 @@ void CoinTask(void *p_arg)
             {
               if (last_cash_count[i] == GetCashCount(i))
               {
-                  if (labs(OSTimeGet() - last_cash_time[i]) > 500)
+                  if (labs(OSTimeGet() - last_cash_time[i]) > 1000)
                   {
                     PostUserEvent(EVENT_CASH_INSERTED_POST1 + i);
                   }
