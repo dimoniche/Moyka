@@ -63,8 +63,6 @@ typedef struct{
 extern CPU_INT32U PeriodIndex;
 extern TDataDescStruct const DeviceIDDesc;
 
-extern TDataDescStruct const LastEmailSendTime;
-
 extern TDataDescStruct const ServiceNameDesc;
 extern TDataDescStruct const PassDesc;
 extern TDataDescStruct const PriceDesc;
@@ -108,7 +106,6 @@ extern TDataDescStruct const CounterTimeDesc;
 extern TDataDescStruct const CounterChannelRunDesc;
 extern TDataDescStruct const CounterChannelMoneyDesc;
 extern TDataDescStruct const CounterChannelTimeDesc;
-extern TDataDescStruct const ChannelStIndexDesc;
 extern TDataDescStruct const ClearStatCmdDesc;
 extern TDataDescStruct const BillFormatDesc;
 
@@ -129,11 +126,6 @@ extern TDataDescStruct const JournalErrorNumberDescEng;
 extern TDataDescStruct const SendTestEmailDesc;
 extern TDataDescStruct const ModemStatusDesc;
 
-extern TDataDescStruct const BillnomIndexDesc;
-extern TDataDescStruct const BillnomDesc;
-extern TDataDescStruct const BillnomCountersDesc;
-extern TDataDescStruct const BillCounterDesc;
-
 extern TDataDescStruct const CounterLongRunDesc;
 extern TDataDescStruct const CounterLongMoneyDesc;
 extern TDataDescStruct const CounterLongTimeDesc;
@@ -144,11 +136,6 @@ extern TDataDescStruct const CounterChannelRunLongDesc;
 extern TDataDescStruct const CounterChannelMoneyLongDesc;
 extern TDataDescStruct const CounterChannelTimeLongDesc;
 extern TDataDescStruct const ChannelStLongIndexDesc;
-
-extern TDataDescStruct const StatSendHourMinDesc;
-extern TDataDescStruct const IncasSendFlagDesc;
-extern TDataDescStruct const IncasMoneyDesc;
-extern TDataDescStruct const IncasTimeDesc;
 
 extern TDataDescStruct const GatewayDesc;
 extern TDataDescStruct const NetMaskDesc;

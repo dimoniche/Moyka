@@ -52,46 +52,6 @@ const TMenuLineArray arr_StartMenuArray[] = {&line_StartMenu_0, &line_StartMenu_
 const TMenuPanel StartMenuPanel[] = {arr_StartMenuArray, NULL, 4, MENU_PANEL_STATIC};
 
 /***********************************
-  МЕНЮ ИНКАССАЦИЯ
-***********************************/
-const CPU_INT08U str_IncasMenu_0[] = "-------------------";
-const CPU_INT08U str_IncasMenu_1[] = "     ВНИМАНИЕ     ";
-const CPU_INT08U str_IncasMenu_2[] = "    ИНКАССАЦИЯ    ";
-CPU_INT08U str_IncasMenu_3[32];
-
-const TMenuLine line_IncasMenu_0 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_IncasMenu_0,         // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_IncasMenu_1 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_IncasMenu_1,         // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_IncasMenu_2 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_IncasMenu_2,         // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_IncasMenu_3 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_IncasMenu_3,         // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-
-const TMenuLineArray arr_IncasMenuArray[] = {&line_IncasMenu_0, &line_IncasMenu_1, &line_IncasMenu_2, &line_IncasMenu_3, NULL};
-const TMenuPanel IncasMenuPanel[] = {arr_IncasMenuArray, NULL, 4, MENU_PANEL_STATIC};
-
-/***********************************
  МЕНЮ "В ЖУРНАЛЕ ЗАПИСЕЙ НЕТ"
 ***********************************/
 const CPU_INT08U str_JournalEmptyMenu_0[] = "";
@@ -186,9 +146,7 @@ const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 4, MENU_PANEL
 
 const CPU_INT08U str_StatisticsMenu_0[] = "    СТАТИСТИКА";
 const CPU_INT08U str_StatisticsMenu_2[] = "Общая";
-const CPU_INT08U str_StatisticsMenu_3[] = "Счетчики купюр";
 const CPU_INT08U str_StatisticsMenu_4[] = "Очистка статистики";
-
 
 const TMenuLine line_StatisticsMenu_0 = {
   MENU_LINE_STRING,               // тип пункта меню
@@ -204,13 +162,6 @@ const TMenuLine line_StatisticsMenu_2 = {
   (void*)CommStatMenuPanel                           // панель для перехода
 };
 
-const TMenuLine line_StatisticsMenu_3 = {
-  MENU_LINE_GOTO_MENU,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_StatisticsMenu_3,        // указатель на текстовую строку или дескриптор
-  (void*)BillCountersPanel                           // панель для перехода
-};
-
 const TMenuLine line_StatisticsMenu_4 = {
   MENU_LINE_GOTO_MENU,               // тип пункта меню
   0,                              // доп. флаги  
@@ -218,7 +169,7 @@ const TMenuLine line_StatisticsMenu_4 = {
   (void*)ClearStatMenu                           // панель для перехода
 };
 
-const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_2, /*&line_StatisticsMenu_3,*/ &line_StatisticsMenu_4, NULL};
+const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_2, &line_StatisticsMenu_4, NULL};
 const TMenuPanel StatisticsMenuPanel[] = {arr_StatisticsMenuArray, NULL, 3, MENU_PANEL_STANDARD};
 
 
@@ -292,83 +243,6 @@ const TMenuLine line_ClearJournalMenu_2 = {
 
 const TMenuLineArray arr_ClearJournalMenuArray[] = {&line_ClearJournalMenu_0, &line_ClearJournalMenu_1, &line_ClearJournalMenu_2, NULL};
 const TMenuPanel ClearJournalMenuPanel[] = {arr_ClearJournalMenuArray, OnEnterPanelClearStat, 3, MENU_PANEL_STANDARD};
-
-/***********************************
-  МЕНЮ КАНАЛЬНАЯ СТАТИСТИКА
-***********************************/
-const TMenuLine line_ChannelCountersMenu_0 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
-  (void*)&ChannelStIndexDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelCountersMenu_1 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&CounterChannelRunDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelCountersMenu_2 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&CounterChannelMoneyDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChannelCountersMenu_3 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&CounterChannelTimeDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLineArray arr_ChannelCountersArray[] = {&line_ChannelCountersMenu_0, &line_ChannelCountersMenu_1, &line_ChannelCountersMenu_2, &line_ChannelCountersMenu_3, NULL};
-const TMenuPanel ChannelCountersPanel[] = {arr_ChannelCountersArray, NULL, 4, MENU_PANEL_STATIC};
-
-
-/***********************************
-  МЕНЮ СЧЕТЧИКИ КУПЮР
-***********************************/
-const TMenuLine line_BillCountersMenu_0 = {
-  MENU_LINE_SHOW_DESC,                 // тип пункта меню
-  MENU_FIXED_LINE|MENU_INDEX_LINE,                // доп. флаги  
-  (void*)&BillnomIndexDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_BillCountersMenu_1 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&BillnomDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_BillCountersMenu_2 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&BillnomCountersDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_BillCountersMenu_3 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&BillCounterDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-extern CPU_INT32U  BillnomViewIndex;
-
-void OnEnterBillCountersMenu()
-{
-    BillnomViewIndex = 0;
-}
-
-const TMenuLineArray arr_BillCountersArray[] = {&line_BillCountersMenu_0, &line_BillCountersMenu_1, &line_BillCountersMenu_2, &line_BillCountersMenu_3, NULL};
-const TMenuPanel BillCountersPanel[] = {arr_BillCountersArray, OnEnterBillCountersMenu, 4, MENU_PANEL_STATIC};
-
 
 /***********************************
   МЕНЮ ОБЩАЯ СТАТИСТИКА
@@ -447,9 +321,7 @@ const TMenuPanel CommonCountersLongPanel[] = {arr_CommonCountersLongArray, NULL,
 ***********************************/
 
 const CPU_INT08U str_SettingsMenu_0[] = "    НАСТРОйКИ";
-//const CPU_INT08U str_SettingsMenu_1[] = "Посты";
 const CPU_INT08U str_SettingsMenu_2[] = "Оборудование";
-const CPU_INT08U str_SettingsMenu_6[] = "Сеть";
 const CPU_INT08U str_SettingsMenu_3[] = "Установка пароля";
 const CPU_INT08U str_SettingsMenu_4[] = "Установка времени";
 const CPU_INT08U str_SettingsMenu_5[] = "Сброс настроек";
@@ -460,26 +332,12 @@ const TMenuLine line_SettingsMenu_0 = {
   (void*)str_SettingsMenu_0,       // указатель на текстовую строку или дескриптор
   NULL                            // панель для перехода
 };
-/*
-const TMenuLine line_SettingsMenu_1 = {
-  MENU_LINE_GOTO_MENU,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_SettingsMenu_1,       // указатель на текстовую строку или дескриптор
-  (void*)&ChannelMenuPanel                            // панель для перехода
-};
-*/
+
 const TMenuLine line_SettingsMenu_2 = {
   MENU_LINE_GOTO_MENU,               // тип пункта меню
   0,                              // доп. флаги  
   (void*)str_SettingsMenu_2,        // указатель на текстовую строку или дескриптор
   (void*)&DeviceMenuPanel                           // панель для перехода
-};
-
-const TMenuLine line_SettingsMenu_8 = {
-  MENU_LINE_GOTO_MENU,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_SettingsMenu_6,        // указатель на текстовую строку или дескриптор
-  (void*)&NetworkMenuPanel                           // панель для перехода
 };
 
 const TMenuLine line_SettingsMenu_3 = {
@@ -503,15 +361,7 @@ const TMenuLine line_SettingsMenu_6 = {
   (void*)&ResetSettingsMenuPanel                           // панель для перехода
 };
 
-/*
-const TMenuLine line_SettingsMenu_7 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)&StartButtonNameDesc,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-*/
-const TMenuLineArray arr_SettingsMenuArray[] = {&line_SettingsMenu_0, &line_SettingsMenu_2, &line_SettingsMenu_5, &line_SettingsMenu_3, &line_SettingsMenu_6, /*&line_SettingsMenu_8,*/ NULL};
+const TMenuLineArray arr_SettingsMenuArray[] = {&line_SettingsMenu_0, &line_SettingsMenu_2, &line_SettingsMenu_5, &line_SettingsMenu_3, &line_SettingsMenu_6, NULL};
 const TMenuPanel SettingsMenuPanel[] = {arr_SettingsMenuArray, NULL, 5, MENU_PANEL_STANDARD};
 
 /***********************************
@@ -1248,45 +1098,6 @@ const TMenuLineArray JournalIsResetMenuArray[] = {&line__JournalIsResetMenu_2, &
 const TMenuPanel JournalIsReset[] = {JournalIsResetMenuArray, NULL, 4, MENU_PANEL_STATIC};
 
 /***********************************
-  ПАНЕЛЬ ВНЕСЕНИЯ ДЕНЕГ
-***********************************/
-
-const CPU_INT08U str_GetMoney_0[] = " Внесите деньги";
-
-const TMenuLine line_GetMoneyMenu_0 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_GetMoney_0,        // указатель на текстовую строку или дескриптор
-  NULL                           // панель для перехода
-};
-
-const TMenuLine line_GetMoneyMenu_1 = {
-  MENU_LINE_SHOW_DESC,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)&AcceptedMoneyDesc,        // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_GetMoneyMenu_2 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_GetMoney_0,        // указатель на текстовую строку или дескриптор
-  NULL                           // панель для перехода
-};
-
-const TMenuLine line_GetMoneyMenu_3 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_GetMoney_0,        // указатель на текстовую строку или дескриптор
-  NULL                           // панель для перехода
-};
-
-
-const TMenuLineArray GetMoneyMenuArray[] = {&line_GetMoneyMenu_0, &line_GetMoneyMenu_1, &line_GetMoneyMenu_2, &line_GetMoneyMenu_3, NULL};
-const TMenuPanel GetMoneyMenuPanel[] = {GetMoneyMenuArray, NULL, 4, MENU_PANEL_STATIC};
-
-
-/***********************************
   МЕНЮ ВЫБОР ЖУРНАЛА ДЛЯ ПРОСМОТРА
 ***********************************/
 const CPU_INT08U str_SelectJournalMenu_0[] = "ПРОСМОТР ЖУРНАЛОВ";
@@ -1718,36 +1529,6 @@ const TMenuLine line_StatMenu_2 = {
 
 const TMenuLineArray arr_StatMenuArray[] = {&line_StatMenu_0, &line_StatMenu_1, &line_StatMenu_2, NULL};
 const TMenuPanel CommStatMenuPanel[] = {arr_StatMenuArray, NULL, 3, MENU_PANEL_STANDARD};
-
-
-/***********************************
-  МЕНЮ Канальная статистика статистика
-***********************************/
-const CPU_INT08U str_ChanStatMenu_0[] = " СТАТ-КА ПО ПОСТАМ";
-
-const TMenuLine line_ChanStatMenu_0 = {
-  MENU_LINE_STRING,               // тип пункта меню
-  MENU_FIXED_LINE,                // доп. флаги  
-  (void*)str_ChanStatMenu_0,       // указатель на текстовую строку или дескриптор
-  NULL                            // панель для перехода
-};
-
-const TMenuLine line_ChanStatMenu_1 = {
-  MENU_LINE_GOTO_MENU,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_CommonStatMenu_1,       // указатель на текстовую строку или дескриптор
-  (void*)ChannelCountersPanel                            // панель для перехода
-};
-
-const TMenuLine line_ChanStatMenu_2 = {
-  MENU_LINE_GOTO_MENU,               // тип пункта меню
-  0,                              // доп. флаги  
-  (void*)str_CommonStatMenu_2,        // указатель на текстовую строку или дескриптор
-  (void*)ChannelCountersLongPanel                           // панель для перехода
-};
-
-const TMenuLineArray arr_ChanStatMenuArray[] = {&line_ChanStatMenu_0, &line_ChanStatMenu_1, &line_ChanStatMenu_2, NULL};
-const TMenuPanel ChanStatMenuPanel[] = {arr_ChanStatMenuArray, NULL, 3, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ КАНАЛЬНАЯ СТАТИСТИКА ДЛИННЫЕ СЧЕТЧИКИ

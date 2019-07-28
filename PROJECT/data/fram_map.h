@@ -51,12 +51,6 @@ typedef struct
   // длинные счетчики с CRC16 
   TCountersLong CountersLong;
 
-  CPU_INT32U LastEmailTime;
-
-  CPU_INT32U IncasEmailFlag;
-  CPU_INT32U IncasMoney;
-  CPU_INT32U IncasTime;
-
   CPU_INT32U StartButtonName;
 #endif
   

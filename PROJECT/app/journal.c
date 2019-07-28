@@ -509,38 +509,8 @@ void CheckLongCounters(void)
     {
         memset(&long_ctrs, 0, sizeof(TCountersLong));
         long_ctrs.crc = CRC16((unsigned char*)&long_ctrs, offsetof(TCountersLong, crc));
-        WriteArrayFram(offsetof(TFramMap, CountersLong), sizeof(TCountersLong), (unsigned char*)&long_ctrs);    
-        /// обычные счетчики тоже очистим
-        ClearBillnomCounter();
+        WriteArrayFram(offsetof(TFramMap, CountersLong), sizeof(TCountersLong), (unsigned char*)&long_ctrs);
     }
-}
-
-/// инкремент счетчика купюр по номиналам
-void IncBillnomCounter(CPU_INT32U index)
-{
-    CPU_INT32U counter;
-    if (index >= 24) return;
-    ReadArrayFram(offsetof(TFramMap, Counters.CounterBillNominals)+sizeof(CPU_INT32U)*index, sizeof(CPU_INT32U), (unsigned char*)&counter);
-    counter++;
-    WriteArrayFram(offsetof(TFramMap, Counters.CounterBillNominals)+sizeof(CPU_INT32U)*index, sizeof(CPU_INT32U), (unsigned char*)&counter);
-    
-    ReadArrayFram(offsetof(TFramMap, Counters.BillsCount), sizeof(CPU_INT32U), (unsigned char*)&counter);
-    counter++;
-    WriteArrayFram(offsetof(TFramMap, Counters.BillsCount), sizeof(CPU_INT32U), (unsigned char*)&counter);
-}
-
-/// очистка счетчиков купюр
-void ClearBillnomCounter(void)
-{
-    CPU_INT32U counter = 0;
-    CPU_INT32U i;
-    
-    for (i = 0; i < 24; i++)
-    {
-        WriteArrayFram(offsetof(TFramMap, Counters.CounterBillNominals)+sizeof(CPU_INT32U)*i, sizeof(CPU_INT32U), (unsigned char*)&counter);    
-    }
-    
-    WriteArrayFram(offsetof(TFramMap, Counters.BillsCount), sizeof(CPU_INT32U), (unsigned char*)&counter);
 }
 
 // сервер ошибок (занесение ошибок в журнал)

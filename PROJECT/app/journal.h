@@ -93,11 +93,7 @@ typedef struct{
   CPU_INT32U  CounterTime;
   // общее Сумма денег   
   CPU_INT32U  CounterMoney;
-  
-  // счетчики купюр в купюрнике по номиналам
-  CPU_INT32U  CounterBillNominals[24];
-  // общий счетчик купюр (всего в кассете)
-  CPU_INT32U  BillsCount;
+
 }TCounters;
 
 
@@ -110,9 +106,7 @@ typedef struct{
   CPU_INT16U  crc;
 }TCountersLong;
 
-
 extern CPU_INT32U GetShortMoney();
-extern void IncBillnomCounter(CPU_INT32U index);
 extern void CheckLongCounters(void);
 extern void SaveEventRecord(CPU_INT08U channel, CPU_INT08U event, CPU_INT16U data);
 extern void SetErrorFlag(CPU_INT08U error);
@@ -128,6 +122,5 @@ extern int TstCriticalValidatorErrors(void);
 extern void ClrValidatorErrors(void);
 extern void PrintEventJournalRecordEng(char* str, TEventRecord *record);
 extern void GetEventStrEng(char* str, char event);
-extern void ClearBillnomCounter(void);
 
 #endif //#ifndef _JOURNAL_H_
