@@ -40,6 +40,41 @@ TDataDescStruct const LastEmailSendTime = {
 };
 
 /*************************************
+  Длина импульса входа монетоприемника, мс
+*************************************/
+TRangeValueULONG const CoinPulseLenRange = {20, 250};
+CPU_INT08U const CoinPulseLenName[] = "Длина имп.,мс";
+
+void OnChangeCoinPulseLen()
+{
+    CPU_INT32U pulse, pause;
+    for(int post = 0; post < COUNT_POST; post++)
+    {
+      GetData(&CoinPulseLenDesc, &pulse, post, DATA_FLAG_DIRECT_INDEX);
+      GetData(&CoinPauseLenDesc, &pause, post, DATA_FLAG_DIRECT_INDEX);
+      SetCoinPulseParam(pulse, pause, post);
+    }
+}
+
+TDataDescStruct const CoinPulseLenDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CoinIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, coin_pulse_len),            // указатель на переменную или адрес FRAM
+  (void*)&CoinPulseLenRange,     // указатель на границы параметра
+  OnChangeCoinPulseLen,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  CoinPulseLenName,       // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  50                           
+};
+
+/*************************************
   Длина импульса входа купюрника, мс
 *************************************/
 TRangeValueULONG const CashPulseLenRange = {20, 250};
@@ -109,6 +144,29 @@ TDataDescStruct const BankPulseLenDesc = {
   50                           
 };
 
+/*************************************
+  Длина паузы входа монетника, мс
+*************************************/
+TRangeValueULONG const CoinPauseLenRange = {20, 250};
+CPU_INT08U const CoinPauseLenName[] = "Пауза имп.,мс";
+
+TDataDescStruct const CoinPauseLenDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,             // размер массива
+  &CoinIndexDesc,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, coin_pause_len),            // указатель на переменную или адрес FRAM
+  (void*)&CoinPauseLenRange,     // указатель на границы параметра
+  OnChangeCoinPulseLen,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  CoinPauseLenName,       // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  20                           
+};
 /*************************************
   Длина паузы входа купюрника, мс
 *************************************/
@@ -2751,7 +2809,10 @@ const TDataDescArrayStruct AllDataArray[] =
 
     {&CashPulseLenDesc, "CashPulseLenDesc"},
     {&CashPauseLenDesc, "CashPauseLenDesc"},
-    
+  
+    {&CoinPulseLenDesc, "CoinPulseLenDesc"},
+    {&CoinPauseLenDesc, "CoinPauseLenDesc"},
+  
     {&TaxSystemDesc, "TaxSystemDesc"},
     {&TaxFormatDesc, "TaxFormatDesc"},
     {&SubjSellDesc, "SubjSellDesc"},

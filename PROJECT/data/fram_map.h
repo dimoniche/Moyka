@@ -21,6 +21,9 @@ typedef struct
   CPU_INT32U  enableSignalPrint[COUNT_POST];
   CPU_INT32U  signal_pulse_len[COUNT_POST];
 
+  CPU_INT32U  coin_pulse_len[COUNT_POST + COUNT_VACUUM];
+  CPU_INT32U  coin_pause_len[COUNT_POST + COUNT_VACUUM];
+
   CPU_INT32U  cash_pulse_len[COUNT_POST];
   CPU_INT32U  cash_pause_len[COUNT_POST];
 

@@ -902,6 +902,20 @@ const TMenuLine line_CoinMenu_4 = {
   NULL                            // панель для перехода
 };
 
+const TMenuLine line_CoinMenu_5 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&CoinPulseLenDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_CoinMenu_6 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&CoinPauseLenDesc,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
 const TMenuLine line_CoinMenu_3 = {
   MENU_LINE_SHOW_DESC,               // тип пункта меню
   0,                              // доп. флаги  
@@ -914,8 +928,8 @@ void OnEnterCoinMenu(void)
     CoinIndex = 0;
 }
 
-const TMenuLineArray arr_CoinMenuArray[] = {&line_CoinMenu_0, &line_CoinMenu_1, &line_CoinMenu_2, &line_CoinMenu_4, &line_CoinMenu_3, NULL};
-const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, OnEnterCoinMenu, 5, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_CoinMenuArray[] = {&line_CoinMenu_0, &line_CoinMenu_1, &line_CoinMenu_2, &line_CoinMenu_4, &line_CoinMenu_5, &line_CoinMenu_6, &line_CoinMenu_3, NULL};
+const TMenuPanel CoinSetupPanel[] = {arr_CoinMenuArray, OnEnterCoinMenu, 7, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ НАСТРОЙКА КУПЮРОПРИЕМНИКОВ

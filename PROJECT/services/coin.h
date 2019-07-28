@@ -19,6 +19,7 @@ extern CPU_INT32U GetResetCashCount(int index);
 extern CPU_INT32U GetbankCount(int index);
 extern CPU_INT32U GetResetbankCount(int index);
 
+extern void SetCoinPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post);
 extern void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post);
 extern void SetBankPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post);
 extern void SetSignalPulseParam(CPU_INT32U pulse, CPU_INT32U post);

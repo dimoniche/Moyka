@@ -15,6 +15,11 @@ CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U  BankImpCounter[COUNT_POST + COUNT_VACUUM];
 
+static CPU_INT32U coin_pulse[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U coin_pause[COUNT_POST + COUNT_VACUUM];
+static char pend_coin_counter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U pend_coin_timestamp[COUNT_POST + COUNT_VACUUM];
+
 static CPU_INT32U cash_pulse[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U cash_pause[COUNT_POST + COUNT_VACUUM];
 static char pend_cash_counter[COUNT_POST + COUNT_VACUUM];
@@ -36,6 +41,17 @@ CPU_INT32U SignalLevel[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U bankLevel[COUNT_POST + COUNT_VACUUM];
 
 void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
+{
+  #if OS_CRITICAL_METHOD == 3
+  OS_CPU_SR  cpu_sr = 0;
+  #endif
+  OS_ENTER_CRITICAL();
+  coin_pulse[post] = pulse * 1;
+  coin_pause[post] = pause;
+  OS_EXIT_CRITICAL();
+}
+
+void SetCoinPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
@@ -88,10 +104,12 @@ void SetLevelParam(CPU_INT32U level1, CPU_INT32U level2, CPU_INT32U level3, CPU_
 void CoinTask(void *p_arg)
 {
   CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
-  
   CPU_INT32U cash_enable[COUNT_POST];
   CPU_INT32U enable_signal[COUNT_POST];
   CPU_INT32U bank_enable[COUNT_POST];
+
+  CPU_INT32U last_coin_count[COUNT_POST];
+  CPU_INT32U last_coin_time[COUNT_POST];
 
   CPU_INT32U last_cash_count[COUNT_POST];
   CPU_INT32U last_cash_time[COUNT_POST];
@@ -128,18 +146,45 @@ void CoinTask(void *p_arg)
 
 		for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
 		{
-			if (enable_coin[i])
-			{
-				if (GetCoinCount(i))
-				{
-					PostUserEvent(EVENT_COIN_INSERTED_POST1 + i);
-				}
-			}
-			else
-			{
+            if (enable_coin[i])
+            {
+              OS_ENTER_CRITICAL();
+              if (pend_coin_counter[i])
+              {
+                // импульсы инкрементируем только после выдержки паузы
+                if (OSTimeGet() - pend_coin_timestamp[i] > coin_pause[i])
+                {
+                  pend_coin_counter[i] = 0;
+                  CoinImpCounter[i]++;
+                }
+              }
+              OS_EXIT_CRITICAL();
+                  
+              if (GetCoinCount(i))
+              {
+                if (last_coin_count[i] == GetCoinCount(i))
+                {
+                    if (labs(OSTimeGet() - last_coin_time[i]) > 500)
+                    {
+                      PostUserEvent(EVENT_COIN_INSERTED_POST1 + i);
+                    }
+                }
+                else
+                {
+                    last_coin_count[i] = GetCoinCount(i);
+                    last_coin_time[i] = OSTimeGet();
+                }
+              }
+              else
+              {
+                last_coin_time[i] = OSTimeGet();
+              }
+            }
+            else
+            {
 				CoinDisable();
 				GetResetCoinCount(i);
-			}
+            }
 
             if(i >= COUNT_POST) continue;
             // только монетоприемников 8 - остальных каналов 6
@@ -524,14 +569,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO1PIN_bit.P1_21 && coinLevel[0]) || (FIO1PIN_bit.P1_21 && !coinLevel[0]))
       { // пришел задний фронт
-        if ((T3CR-period[0]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[0]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[0];
+        
+        if (cr > (coin_pulse[0] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[0] = 1;
+            pend_coin_timestamp[0] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[0] = T3CR;
+        pend_coin_counter[0] = 0;
       }
   }
   
@@ -579,14 +629,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO1PIN_bit.P1_18 && coinLevel[1]) || (FIO1PIN_bit.P1_18 && !coinLevel[1]))
       { // пришел задний фронт
-        if ((T3CR-period[1]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[1]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[1];
+        
+        if (cr > (coin_pulse[1] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[1] = 1;
+            pend_coin_timestamp[1] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[1] = T3CR;
+        pend_coin_counter[1] = 0;
       }
   }
   
@@ -634,14 +689,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO3PIN_bit.P3_26 && coinLevel[2]) || (FIO3PIN_bit.P3_26 && !coinLevel[2]))
       { // пришел задний фронт
-        if ((T3CR-period[2]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[2]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[2];
+        
+        if (cr > (coin_pulse[2] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[2] = 1;
+            pend_coin_timestamp[2] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[2] = T3CR;
+        pend_coin_counter[2] = 0;
       }
   }
   
@@ -689,14 +749,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO0PIN_bit.P0_25 && coinLevel[3]) || (FIO0PIN_bit.P0_25 && !coinLevel[3]))
       { // пришел задний фронт
-        if ((T3CR-period[3]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[3]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[3];
+        
+        if (cr > (coin_pulse[3] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[3] = 1;
+            pend_coin_timestamp[3] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[3] = T3CR;
+        pend_coin_counter[3] = 0;
       }
   }
   
@@ -744,14 +809,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO2PIN_bit.P2_2 && coinLevel[4]) || (FIO2PIN_bit.P2_2 && !coinLevel[4]))
       { // пришел задний фронт
-        if ((T3CR-period[4]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[4]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[4];
+        
+        if (cr > (coin_pulse[4] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[4] = 1;
+            pend_coin_timestamp[4] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[4] = T3CR;
+        pend_coin_counter[4] = 0;
       }
   }
   
@@ -799,14 +869,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO0PIN_bit.P0_8 && coinLevel[5]) || (FIO0PIN_bit.P0_8 && !coinLevel[5]))
       { // пришел задний фронт
-        if ((T3CR-period[5]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[5]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[5];
+        
+        if (cr > (coin_pulse[5] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[5] = 1;
+            pend_coin_timestamp[5] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[5] = T3CR;
+        pend_coin_counter[5] = 0;
       }
   }
   
@@ -832,14 +907,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO0PIN_bit.P0_5 && coinLevel[6]) || (FIO0PIN_bit.P0_5 && !coinLevel[6]))
       { // пришел задний фронт
-        if ((T3CR-period[6]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[6]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[6];
+        
+        if (cr > (coin_pulse[6] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[6] = 1;
+            pend_coin_timestamp[6] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[6] = T3CR;
+        pend_coin_counter[6] = 0;
       }
   }
 
@@ -848,14 +928,19 @@ void InputCapture_ISR(void)
   {
     if ((!FIO1PIN_bit.P1_25 && coinLevel[7]) || (FIO1PIN_bit.P1_25 && !coinLevel[7]))
       { // пришел задний фронт
-        if ((T3CR-period[7]) > COIN_IMP_MIN_LEN)
-          {
-              CoinImpCounter[7]++;
-          }
+        CPU_INT32U cr=T3CR;
+        cr -= period[7];
+        
+        if (cr > (coin_pulse[7] - COIN_IMP_SPAN))
+        {
+            pend_coin_counter[7] = 1;
+            pend_coin_timestamp[7] = OSTimeGet();
+        }
       }
     else
       { // пришел передний фронт
         period[7] = T3CR;
+        pend_coin_counter[7] = 0;
       }
   }
   
