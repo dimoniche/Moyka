@@ -1425,17 +1425,13 @@ void PrintEventJournalRecord(TEventRecord *record)
           if (record->data == MODE_WORK) sprintf(str_EventData, "работа");
           else sprintf(str_EventData, "настройка");
         }
-      else if (record->event == JOURNAL_EVENT_INCASSATION)
+      else if (record->event == JOURNAL_EVENT_WASHING)
         {
-            sprintf(str_EventData, "%u руб.", record->data);
+            sprintf(str_EventData, "Пост %d", record->data + 1);
         }
       else if (record->event == JOURNAL_EVENT_PASS_FAIL)
         {
             sprintf(str_EventData, "%u", record->data);
-        }
-      else if ((record->event == JOURNAL_EVENT_EMAIL_OK) || (record->event == JOURNAL_EVENT_EMAIL_FAIL))
-        {
-            sprintf(str_EventData, "");
         }
       else
       {

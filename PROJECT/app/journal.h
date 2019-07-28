@@ -62,10 +62,10 @@ typedef struct{
     #define JOURNAL_EVENT_PRINT_X          40  // печать x-отчета
     #define JOURNAL_EVENT_PRINT_BUF        41  // печать x-отчета
     #define JOURNAL_EVENT_CHANGE_MODE      42  // смена режима
-    #define JOURNAL_EVENT_INCASSATION      43  // инкассация 
+    #define JOURNAL_EVENT_WASHING          43  // запуск мойки
     #define JOURNAL_EVENT_PASS_FAIL        44  // неверный ввод пароля
-    #define JOURNAL_EVENT_EMAIL_OK         45  // правильно отправлен email
-    #define JOURNAL_EVENT_EMAIL_FAIL       46  // ошибка при отправке email
+    #define JOURNAL_EVENT_EMPTY1           45  // 
+    #define JOURNAL_EVENT_EMPTY2           46  // 
 
     // ошибка связи с фискальником
     #define ERROR_FR_CONN                  47

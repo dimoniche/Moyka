@@ -390,13 +390,18 @@ void InitCoin(void)
     CashImpCounter[i] = 0;
     BankImpCounter[i] = 0;
     
+    coin_pulse[i] = 50;
+    coin_pause[i] = 20;
+    pend_coin_counter[i] = 0;
+    pend_coin_timestamp[i] = 0;
+    
     cash_pulse[i] = 50;
-    cash_pause[i] = 50;
+    cash_pause[i] = 20;
     pend_cash_counter[i] = 0;
     pend_cash_timestamp[i] = 0;
 
     bank_pulse[i] = 50;
-    bank_pause[i] = 50;
+    bank_pause[i] = 20;
     pend_bank_counter[i] = 0;
     pend_bank_timestamp[i] = 0;
 
@@ -1073,6 +1078,192 @@ void InputCapture_ISR(void)
 
 extern CPU_INT32U  BSP_CPU_PclkFreq (CPU_INT08U  pclk);
 
+void InitInputPorts()
+{
+    // купюроприемник 1
+    PINSEL3_bit.P1_20 = 0;
+    if(cashLevel[0])PINMODE3_bit.P1_20 = 3;
+    else PINMODE3_bit.P1_20 = 0;
+    FIO1DIR_bit.P1_20  = 0;
+    FIO1MASK_bit.P1_20 = 0;
+    
+    // монетоприемник 1
+    PINSEL3_bit.P1_21 = 0;
+    if(coinLevel[0])PINMODE3_bit.P1_21 = 3;
+    else PINMODE3_bit.P1_21 = 0;
+    FIO1DIR_bit.P1_21  = 0;
+    FIO1MASK_bit.P1_21 = 0;
+  
+    // сигнал печати чека пост 1
+    PINSEL9_bit.P4_28 = 0;
+    if(SignalLevel[0])PINMODE9_bit.P4_28 = 3;
+    else PINMODE9_bit.P4_28 = 0;
+    FIO4DIR_bit.P4_28  = 0;
+    FIO4MASK_bit.P4_28 = 0;
+
+    // купюроприемник 2
+    PINSEL3_bit.P1_19 = 0;
+    if(cashLevel[1])PINMODE3_bit.P1_19 = 3;
+    else PINMODE3_bit.P1_19 = 0;
+    FIO1DIR_bit.P1_19  = 0;
+    FIO1MASK_bit.P1_19 = 0;
+    
+    // монетоприемник 2
+    PINSEL3_bit.P1_18 = 0;
+    if(coinLevel[1])PINMODE3_bit.P1_18 = 3;
+    else PINMODE3_bit.P1_18 = 0;
+    FIO1DIR_bit.P1_18  = 0;
+    FIO1MASK_bit.P1_18 = 0;
+  
+    // сигнал печати чека пост 2
+    PINSEL0_bit.P0_4 = 0;
+    if(SignalLevel[1])PINMODE0_bit.P0_4 = 3;
+    else PINMODE0_bit.P0_4 = 0;
+    FIO0DIR_bit.P0_4  = 0;
+    FIO0MASK_bit.P0_4 = 0;
+    
+    // купюроприемник 3
+    PINSEL7_bit.P3_25 = 0;
+    if(cashLevel[2])PINMODE7_bit.P3_25 = 3;
+    else PINMODE7_bit.P3_25 = 0;
+    FIO3DIR_bit.P3_25  = 0;
+    FIO3MASK_bit.P3_25 = 0;
+    
+    // монетоприемник 3
+    PINSEL7_bit.P3_26 = 0;
+    if(coinLevel[2])PINMODE7_bit.P3_26 = 3;
+    else PINMODE7_bit.P3_26 = 0;
+    FIO3DIR_bit.P3_26  = 0;
+    FIO3MASK_bit.P3_26 = 0;
+  
+    // сигнал печати чека пост 3
+    PINSEL3_bit.P1_28 = 0;
+    if(SignalLevel[2])PINMODE3_bit.P1_28 = 3;
+    else PINMODE3_bit.P1_28 = 0;
+    FIO1DIR_bit.P1_28  = 0;
+    FIO1MASK_bit.P1_28 = 0;
+    
+    // купюроприемник 4
+    PINSEL1_bit.P0_26 = 0;
+    if(cashLevel[3])PINMODE1_bit.P0_26 = 3;
+    else PINMODE1_bit.P0_26 = 0;
+    FIO0DIR_bit.P0_26  = 0;
+    FIO0MASK_bit.P0_26 = 0;
+    
+    // монетоприемник 4
+    PINSEL1_bit.P0_25 = 0;
+    if(coinLevel[3])PINMODE1_bit.P0_25 = 3;
+    else PINMODE1_bit.P0_25 = 0;
+    FIO0DIR_bit.P0_25  = 0;
+    FIO0MASK_bit.P0_25 = 0;
+  
+    // сигнал печати чека пост 4
+    PINSEL3_bit.P1_27 = 0;
+    PINMODE3_bit.P1_27 = 0;
+    if(SignalLevel[3])PINMODE3_bit.P1_27 = 3;
+    else PINMODE3_bit.P1_27 = 0;
+    FIO1DIR_bit.P1_27  = 0;
+    FIO1MASK_bit.P1_27 = 0;
+    
+    // купюроприемник 5
+    PINSEL0_bit.P0_9 = 0;
+    if(cashLevel[4])PINMODE0_bit.P0_9 = 3;
+    else PINMODE0_bit.P0_9 = 0;
+    FIO0DIR_bit.P0_9  = 0;
+    FIO0MASK_bit.P0_9 = 0;
+    
+    // монетоприемник 5
+    PINSEL4_bit.P2_2 = 0;
+    if(coinLevel[4])PINMODE3_bit.P1_21 = 3;
+    else PINMODE4_bit.P2_2 = 0;
+    FIO2DIR_bit.P2_2  = 0;
+    FIO2MASK_bit.P2_2 = 0;
+  
+    // сигнал печати чека пост 5
+    PINSEL3_bit.P1_26 = 0;
+    if(SignalLevel[4])PINMODE3_bit.P1_26 = 3;
+    else PINMODE3_bit.P1_26 = 0;
+    FIO1DIR_bit.P1_26  = 0;
+    FIO1MASK_bit.P1_26 = 0;
+    
+    // купюроприемник 6
+    PINSEL0_bit.P0_7 = 0;
+    if(cashLevel[5])PINMODE0_bit.P0_7 = 3;
+    else PINMODE0_bit.P0_7 = 0;
+    FIO0DIR_bit.P0_7  = 0;
+    FIO0MASK_bit.P0_7 = 0;
+    
+    // монетоприемник 6
+    PINSEL0_bit.P0_8 = 0;
+    if(coinLevel[5])PINMODE0_bit.P0_8 = 3;
+    else PINMODE0_bit.P0_8 = 0;
+    FIO0DIR_bit.P0_8  = 0;
+    FIO0MASK_bit.P0_8 = 0;
+  
+    // сигнал печати чека пост 6
+    PINSEL0_bit.P0_0 = 0;
+    if(SignalLevel[5])PINMODE0_bit.P0_0 = 3;
+    else PINMODE0_bit.P0_0 = 0;
+    FIO0DIR_bit.P0_0  = 0;
+    FIO0MASK_bit.P0_0 = 0;
+
+    // монетоприемник пылесос 1
+    PINSEL0_bit.P0_5 = 0;
+    if(coinLevel[6])PINMODE0_bit.P0_5 = 3;
+    else PINMODE0_bit.P0_5 = 0;
+    FIO0DIR_bit.P0_5  = 0;
+    FIO0MASK_bit.P0_5 = 0;
+      
+    // монетоприемник пылесос 2
+    PINSEL3_bit.P1_25 = 0;
+    if(coinLevel[7])PINMODE3_bit.P1_25 = 3;
+    else PINMODE3_bit.P1_25 = 0;
+    FIO1DIR_bit.P1_25  = 0;
+    FIO1MASK_bit.P1_25 = 0;
+  
+    // банк 1
+    PINSEL1_bit.P0_28 = 0;
+    if(bankLevel[0])PINMODE1_bit.P0_28 = 3;
+    else PINMODE1_bit.P0_28 = 0;
+    FIO0DIR_bit.P0_28  = 0;
+    FIO0MASK_bit.P0_28 = 0;
+
+    // банк 2
+    PINSEL1_bit.P0_27 = 0;
+    if(bankLevel[1])PINMODE1_bit.P0_27 = 3;
+    else PINMODE1_bit.P0_27 = 0;
+    FIO0DIR_bit.P0_27  = 0;
+    FIO0MASK_bit.P0_27 = 0;
+
+    // банк 3
+    PINSEL3_bit.P1_24 = 0;
+    if(bankLevel[2])PINMODE1_bit.P0_24 = 3;
+    else PINMODE1_bit.P0_24 = 0;
+    FIO1DIR_bit.P1_24  = 0;
+    FIO1MASK_bit.P1_24 = 0;
+
+    // банк 4
+    PINSEL3_bit.P1_23 = 0;
+    if(bankLevel[3])PINMODE1_bit.P0_23 = 3;
+    else PINMODE1_bit.P0_23 = 0;
+    FIO1DIR_bit.P1_23  = 0;
+    FIO1MASK_bit.P1_23 = 0;
+
+    // банк 5
+    PINSEL0_bit.P0_6 = 0;
+    if(bankLevel[4])PINMODE0_bit.P0_6 = 3;
+    else PINMODE0_bit.P0_6 = 0;
+    FIO0DIR_bit.P0_6  = 0;
+    FIO0MASK_bit.P0_6 = 0;
+
+    // банк 6
+    PINSEL0_bit.P0_10 = 0;
+    if(bankLevel[5])PINMODE0_bit.P0_10 = 3;
+    else PINMODE0_bit.P0_10 = 0;
+    FIO0DIR_bit.P0_10  = 0;
+    FIO0MASK_bit.P0_10 = 0;
+}
+
 // инициализация импульсных входов
 void  InitImpInput (void)
 {
@@ -1085,170 +1276,17 @@ void  InitImpInput (void)
     OS_CPU_SR  cpu_sr = 0;
     #endif
 
+    OnChangeCoinPulseLen();
     OnChangeCashPulseLen();
     OnChangeSinalPulseLen();
-    OnChangeLevel();
+    OnChangeBankPulseLen();
+    OnChangeLevelWithoutInit();
      
     OS_ENTER_CRITICAL();
     
     // назначим все ножки
-    
-    // купюроприемник 1
-    PINSEL3_bit.P1_20 = 0;
-    PINMODE3_bit.P1_20 = 0;
-    FIO1DIR_bit.P1_20  = 0;
-    FIO1MASK_bit.P1_20 = 0;
-    
-    // монетоприемник 1
-    PINSEL3_bit.P1_21 = 0;
-    PINMODE3_bit.P1_21 = 0;
-    FIO1DIR_bit.P1_21  = 0;
-    FIO1MASK_bit.P1_21 = 0;
-  
-    // сигнал печати чека пост 1
-    PINSEL9_bit.P4_28 = 0;
-    PINMODE9_bit.P4_28 = 0;
-    FIO4DIR_bit.P4_28  = 0;
-    FIO4MASK_bit.P4_28 = 0;
-
-    // купюроприемник 2
-    PINSEL3_bit.P1_19 = 0;
-    PINMODE3_bit.P1_19 = 0;
-    FIO1DIR_bit.P1_19  = 0;
-    FIO1MASK_bit.P1_19 = 0;
-    
-    // монетоприемник 2
-    PINSEL3_bit.P1_18 = 0;
-    PINMODE3_bit.P1_18 = 0;
-    FIO1DIR_bit.P1_18  = 0;
-    FIO1MASK_bit.P1_18 = 0;
-  
-    // сигнал печати чека пост 2
-    PINSEL0_bit.P0_4 = 0;
-    PINMODE0_bit.P0_4 = 0;
-    FIO0DIR_bit.P0_4  = 0;
-    FIO0MASK_bit.P0_4 = 0;
-    
-    // купюроприемник 3
-    PINSEL7_bit.P3_25 = 0;
-    PINMODE7_bit.P3_25 = 0;
-    FIO3DIR_bit.P3_25  = 0;
-    FIO3MASK_bit.P3_25 = 0;
-    
-    // монетоприемник 3
-    PINSEL7_bit.P3_26 = 0;
-    PINMODE7_bit.P3_26 = 0;
-    FIO3DIR_bit.P3_26  = 0;
-    FIO3MASK_bit.P3_26 = 0;
-  
-    // сигнал печати чека пост 3
-    PINSEL3_bit.P1_28 = 0;
-    PINMODE3_bit.P1_28 = 0;
-    FIO1DIR_bit.P1_28  = 0;
-    FIO1MASK_bit.P1_28 = 0;
-    
-    // купюроприемник 4
-    PINSEL1_bit.P0_26 = 0;
-    PINMODE1_bit.P0_26 = 0;
-    FIO0DIR_bit.P0_26  = 0;
-    FIO0MASK_bit.P0_26 = 0;
-    
-    // монетоприемник 4
-    PINSEL1_bit.P0_25 = 0;
-    PINMODE1_bit.P0_25 = 0;
-    FIO0DIR_bit.P0_25  = 0;
-    FIO0MASK_bit.P0_25 = 0;
-  
-    // сигнал печати чека пост 4
-    PINSEL3_bit.P1_27 = 0;
-    PINMODE3_bit.P1_27 = 0;
-    FIO1DIR_bit.P1_27  = 0;
-    FIO1MASK_bit.P1_27 = 0;
-    
-    // купюроприемник 5
-    PINSEL0_bit.P0_9 = 0;
-    PINMODE0_bit.P0_9 = 0;
-    FIO0DIR_bit.P0_9  = 0;
-    FIO0MASK_bit.P0_9 = 0;
-    
-    // монетоприемник 5
-    PINSEL4_bit.P2_2 = 0;
-    PINMODE4_bit.P2_2 = 0;
-    FIO2DIR_bit.P2_2  = 0;
-    FIO2MASK_bit.P2_2 = 0;
-  
-    // сигнал печати чека пост 5
-    PINSEL3_bit.P1_26 = 0;
-    PINMODE3_bit.P1_26 = 0;
-    FIO1DIR_bit.P1_26  = 0;
-    FIO1MASK_bit.P1_26 = 0;
-    
-    // купюроприемник 6
-    PINSEL0_bit.P0_7 = 0;
-    PINMODE0_bit.P0_7 = 0;
-    FIO0DIR_bit.P0_7  = 0;
-    FIO0MASK_bit.P0_7 = 0;
-    
-    // монетоприемник 6
-    PINSEL0_bit.P0_8 = 0;
-    PINMODE0_bit.P0_8 = 0;
-    FIO0DIR_bit.P0_8  = 0;
-    FIO0MASK_bit.P0_8 = 0;
-  
-    // сигнал печати чека пост 6
-    PINSEL0_bit.P0_0 = 0;
-    PINMODE0_bit.P0_0 = 0;
-    FIO0DIR_bit.P0_0  = 0;
-    FIO0MASK_bit.P0_0 = 0;
-
-    // монетоприемник пылесос 1
-    PINSEL0_bit.P0_5 = 0;
-    PINMODE0_bit.P0_5 = 0;
-    FIO0DIR_bit.P0_5  = 0;
-    FIO0MASK_bit.P0_5 = 0;
-      
-    // монетоприемник пылесос 2
-    PINSEL3_bit.P1_25 = 0;
-    PINMODE3_bit.P1_25 = 0;
-    FIO1DIR_bit.P1_25  = 0;
-    FIO1MASK_bit.P1_25 = 0;
-  
-    // банк 1
-    PINSEL1_bit.P0_28 = 0;
-    PINMODE1_bit.P0_28 = 0;
-    FIO0DIR_bit.P0_28  = 0;
-    FIO0MASK_bit.P0_28 = 0;
-
-    // банк 2
-    PINSEL1_bit.P0_27 = 0;
-    PINMODE1_bit.P0_27 = 0;
-    FIO0DIR_bit.P0_27  = 0;
-    FIO0MASK_bit.P0_27 = 0;
-
-    // банк 3
-    PINSEL3_bit.P1_24 = 0;
-    PINMODE3_bit.P1_24 = 0;
-    FIO1DIR_bit.P1_24  = 0;
-    FIO1MASK_bit.P1_24 = 0;
-
-    // банк 4
-    PINSEL3_bit.P1_23 = 0;
-    PINMODE3_bit.P1_23 = 0;
-    FIO1DIR_bit.P1_23  = 0;
-    FIO1MASK_bit.P1_23 = 0;
-
-    // банк 5
-    PINSEL0_bit.P0_6 = 0;
-    PINMODE0_bit.P0_6 = 0;
-    FIO0DIR_bit.P0_6  = 0;
-    FIO0MASK_bit.P0_6 = 0;
-
-    // банк 6
-    PINSEL0_bit.P0_10 = 0;
-    PINMODE0_bit.P0_10 = 0;
-    FIO0DIR_bit.P0_10  = 0;
-    FIO0MASK_bit.P0_10 = 0;
-    
+    InitInputPorts();
+ 
     PCONP_bit.PCTIM3 = 1;
     PCLKSEL1_bit.PCLK_TIMER3 = 2;
 

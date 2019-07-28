@@ -153,6 +153,7 @@ extern TDataDescStruct const CashPauseLenDesc;
 extern void OnChangeCashPulseLen();
 extern void OnChangeSinalPulseLen();
 extern void OnChangeLevel();
+extern void OnChangeLevelWithoutInit();
 
 extern TDataDescStruct const CoinPulseLenDesc;
 extern TDataDescStruct const CoinPauseLenDesc;
@@ -186,5 +187,7 @@ extern TDataDescStruct const BankPauseLenDesc;
 extern TDataDescStruct const BankLevelDesc;
 
 extern TDataDescStruct const CoinTimeOutDesc;
+
+extern void OnChangeBankPulseLen();
 
 #endif //#ifndef _DATADESC_H_

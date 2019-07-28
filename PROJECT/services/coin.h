@@ -12,6 +12,7 @@ extern CPU_INT32U GetCoinCount(int index);
 extern CPU_INT32U GetResetCoinCount(int index);
 extern void CoinDisable(void);
 extern void CoinEnable(void);
+extern void InitInputPorts();
 
 extern CPU_INT32U GetCashCount(int index);
 extern CPU_INT32U GetResetCashCount(int index);

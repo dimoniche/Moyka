@@ -255,17 +255,11 @@ void GetEventStr(char* str, char event)
     case JOURNAL_EVENT_CHANGE_MODE:
       sprintf(str, "Смена режима");
       break;
-    case JOURNAL_EVENT_INCASSATION:
-      sprintf(str, "Инкассация");
+    case JOURNAL_EVENT_WASHING:
+      sprintf(str, "Мойка");
       break;  
     case JOURNAL_EVENT_PASS_FAIL:
       sprintf(str, "Неверный пароль");
-      break;  
-    case JOURNAL_EVENT_EMAIL_FAIL:
-      sprintf(str, "Ошибка отпр.e-mail");
-      break;  
-    case JOURNAL_EVENT_EMAIL_OK:
-      sprintf(str, "E-mail отпр.успешно");
       break;  
     default:
       sprintf(str, "нет");
@@ -367,18 +361,12 @@ void GetEventStrEng(char* str, char event)
     case JOURNAL_EVENT_CHANGE_MODE:
       sprintf(str, " |  Smena rejima ");
       break;
-    case JOURNAL_EVENT_INCASSATION:
-      sprintf(str, " |  Incassaciya ");
+    case JOURNAL_EVENT_WASHING:
+      sprintf(str, " |  Moyka ");
       break;  
     case JOURNAL_EVENT_PASS_FAIL:
       sprintf(str, " |  Neverniy parol' ");
-      break;  
-    case JOURNAL_EVENT_EMAIL_FAIL:
-      sprintf(str, " |  Oshibka otpravki e-mail ");
-      break;  
-    case JOURNAL_EVENT_EMAIL_OK:
-      sprintf(str, " |  E-mail otpravleno uspeshno ");
-      break;  
+      break;
     default:
       sprintf(str, " |  Net sobytiya ");
       break;
@@ -446,18 +434,15 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
           if (record->data == MODE_WORK) sprintf(&str[strlen(str)], "rabota");
           else sprintf(&str[strlen(str)], "nastroika");
       }
-      else if (record->event == JOURNAL_EVENT_INCASSATION)
+      else if (record->event == JOURNAL_EVENT_WASHING)
       {
-          sprintf(&str[strlen(str)], "%u rub.", record->data);
+          sprintf(&str[strlen(str)], "%u post.", record->data + 1);
       }
       else if (record->event == JOURNAL_EVENT_PASS_FAIL)
       {
           sprintf(&str[strlen(str)], "%u", record->data);
       }
-      else if ((record->event == JOURNAL_EVENT_EMAIL_OK) || (record->event == JOURNAL_EVENT_EMAIL_FAIL))
-      {
-          sprintf(&str[strlen(str)], "");
-      }
+
       sprintf(&str[strlen(str)], "\r\n");
     }
   else

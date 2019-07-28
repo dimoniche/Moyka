@@ -447,7 +447,8 @@ void UserAppTask(void *p_arg)
                 
                 if (accmoney > 0)
                 {
-                  wash_State[number_post] = washing;
+                    wash_State[number_post] = washing;
+                    SaveEventRecord(0, JOURNAL_EVENT_WASHING, number_post);
                 }
             }
             break;

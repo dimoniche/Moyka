@@ -884,6 +884,31 @@ void OnChangeLevel()
 
       SetLevelParam(level1, level2, level3, level4, post);
     }
+    
+    #if OS_CRITICAL_METHOD == 3
+    OS_CPU_SR  cpu_sr = 0;
+    #endif
+    OS_ENTER_CRITICAL();
+    InitInputPorts();
+    OS_EXIT_CRITICAL();
+}
+
+void OnChangeLevelWithoutInit()
+{
+    CPU_INT32U level1, level2, level3, level4;
+    for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+    {
+      if(post < COUNT_POST)
+      {
+        GetData(&CashLevelDesc, &level1, post, DATA_FLAG_DIRECT_INDEX);
+        GetData(&BankLevelDesc, &level2, post, DATA_FLAG_DIRECT_INDEX);
+        GetData(&SignalStopMoneyLevelDesc, &level3, post, DATA_FLAG_DIRECT_INDEX);
+      }
+      
+      GetData(&CoinLevelDesc, &level4, post, DATA_FLAG_DIRECT_INDEX);
+
+      SetLevelParam(level1, level2, level3, level4, post);
+    }
 }
 
 /*************************************
