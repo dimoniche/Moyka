@@ -539,7 +539,7 @@ void UserAppTask(void *p_arg)
                   // напечатаем безналичный чек
                   if (IsFiscalConnected())
                   {
-                    if (PrintFiscalBill(accmoney,number_post, 0) == 0) // здесь добавить с какого поста чек
+                    if (PrintFiscalBill(accmoney,number_post, 1) == 0) // здесь добавить с какого поста чек
                     {
                         SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1 + number_post, GetTimeSec());
                     }
@@ -563,8 +563,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                //testMoney = 100;
-                //PostUserEvent(EVENT_BANK_INSERTED_POST1);
+                testMoney = 100;
+                PostUserEvent(EVENT_BANK_INSERTED_POST1);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -587,11 +587,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                //PostUserEvent(EVENT_COIN_INSERTED_POST1);
+                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1);
             break;
             case EVENT_KEY_F3:
-                //testMoney = 100;
-                //PostUserEvent(EVENT_CASH_INSERTED_POST1);
+                testMoney = 100;
+                PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
 #endif
             default:

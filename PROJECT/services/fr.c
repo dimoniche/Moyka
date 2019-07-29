@@ -710,6 +710,8 @@ repeat_sell1:
             {
                 if (service_name[i] == 0) ok = 1;
             }
+            sprintf(service_name, "%s пост %d", service_name, post + 1);
+            
             if (!ok)
             {
                 CPU_INT32U serv_index;
@@ -802,6 +804,8 @@ repeat_sell2:
             {
                 if (service_name[i] == 0) ok = 1;
             }
+            sprintf(service_name, "%s пост %d", service_name, post + 1);
+
             if (!ok)
             {
                 CPU_INT32U serv_index;
