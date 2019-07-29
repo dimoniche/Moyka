@@ -1665,15 +1665,24 @@ TDataDescStruct const JournalErrorNumberDescEng = {
 TRangeValueULONG const EventJournalIndexRange = {0, 0xffffffff};
 CPU_INT08U const EventJournalIndexName[] = "Запись #";
 CPU_INT32U EventJournalIndex = 0;
+CPU_INT32U last_Index = 0;
 
 void OnChangeEventJournalIndex(void)
 {
   TEventRecord record;
-
-  if (EventJournalIndex == 0xffffffff) EventJournalIndex = JOURNAL_EVENTS_COUNT - 1;
-  else if (EventJournalIndex > JOURNAL_EVENTS_COUNT - 1) EventJournalIndex = 0;
+  
+  if (EventJournalIndex == 0xffffffff) EventJournalIndex = EVENT_RECORDS_COUNT - 1;
+  else if (EventJournalIndex > EVENT_RECORDS_COUNT - 1) EventJournalIndex = 0;
 
   GetEventRecord(&record, EventJournalIndex);
+  
+  if(record.time == 0) 
+  {
+    EventJournalIndex = last_Index;
+    return;
+  }
+  
+  last_Index = EventJournalIndex;
   PrintEventJournalRecord(&record);
 }
 

@@ -563,8 +563,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                testMoney = 100;
-                PostUserEvent(EVENT_BANK_INSERTED_POST1);
+                //testMoney = 100;
+                //PostUserEvent(EVENT_BANK_INSERTED_POST1);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -587,11 +587,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
+                //PostUserEvent(EVENT_COIN_INSERTED_POST1);
             break;
             case EVENT_KEY_F3:
-                testMoney = 100;
-                PostUserEvent(EVENT_CASH_INSERTED_POST1);
+                //testMoney = 100;
+                //PostUserEvent(EVENT_CASH_INSERTED_POST1);
             break;
 #endif
             default:
