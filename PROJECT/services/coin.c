@@ -436,11 +436,11 @@ CPU_INT32U input_register()
   {
      SETBIT(input, 2);
   }
-  if (FIO1PIN_bit.P1_19)
+  if (FIO1PIN_bit.P1_18)
   {
      SETBIT(input, 3);
   }
-  if (FIO1PIN_bit.P1_18)
+  if (FIO1PIN_bit.P1_19)
   {
      SETBIT(input, 4);
   }  
@@ -448,11 +448,11 @@ CPU_INT32U input_register()
   {
      SETBIT(input, 5);
   }
-  if (FIO3PIN_bit.P3_25)
+  if (FIO3PIN_bit.P3_26)
   {
      SETBIT(input, 6);
   }
-  if (FIO3PIN_bit.P3_26)
+  if (FIO3PIN_bit.P3_25)
   {
      SETBIT(input, 7);
   }
@@ -611,7 +611,7 @@ void InputCapture_ISR(void)
   // купюроприемник 2
   if(TSTBIT(input_event, 3))
   {
-    if ((!FIO1PIN_bit.P1_19 && cashLevel[1]) || (FIO1PIN_bit.P1_19 && !cashLevel[1]))
+    if ((!FIO1PIN_bit.P1_18 && cashLevel[1]) || (FIO1PIN_bit.P1_18 && !cashLevel[1]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[1];
@@ -632,7 +632,7 @@ void InputCapture_ISR(void)
   // монетоприемник 2
   if(TSTBIT(input_event, 4))
   {
-    if ((!FIO1PIN_bit.P1_18 && coinLevel[1]) || (FIO1PIN_bit.P1_18 && !coinLevel[1]))
+    if ((!FIO1PIN_bit.P1_19 && coinLevel[1]) || (FIO1PIN_bit.P1_19 && !coinLevel[1]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period[1];
@@ -671,7 +671,7 @@ void InputCapture_ISR(void)
   // купюроприемник 3
   if(TSTBIT(input_event, 6))
   {
-    if ((!FIO3PIN_bit.P3_25 && cashLevel[2]) || (FIO3PIN_bit.P3_25 && !cashLevel[2]))
+    if ((!FIO3PIN_bit.P3_26 && cashLevel[2]) || (FIO3PIN_bit.P3_26 && !cashLevel[2]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_cash[2];
@@ -692,7 +692,7 @@ void InputCapture_ISR(void)
   // монетоприемник 3
   if(TSTBIT(input_event, 7))
   {
-    if ((!FIO3PIN_bit.P3_26 && coinLevel[2]) || (FIO3PIN_bit.P3_26 && !coinLevel[2]))
+    if ((!FIO3PIN_bit.P3_25 && coinLevel[2]) || (FIO3PIN_bit.P3_25 && !coinLevel[2]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period[2];
@@ -1096,50 +1096,50 @@ void InitInputPorts()
   
     // сигнал печати чека пост 1
     PINSEL9_bit.P4_28 = 0;
-    if(SignalLevel[0])PINMODE9_bit.P4_28 = 3;
-    else PINMODE9_bit.P4_28 = 0;
+    /*if(SignalLevel[0])PINMODE9_bit.P4_28 = 3;
+    else*/ PINMODE9_bit.P4_28 = 0;
     FIO4DIR_bit.P4_28  = 0;
     FIO4MASK_bit.P4_28 = 0;
 
     // купюроприемник 2
-    PINSEL3_bit.P1_19 = 0;
-    if(cashLevel[1])PINMODE3_bit.P1_19 = 3;
-    else PINMODE3_bit.P1_19 = 0;
-    FIO1DIR_bit.P1_19  = 0;
-    FIO1MASK_bit.P1_19 = 0;
-    
-    // монетоприемник 2
     PINSEL3_bit.P1_18 = 0;
-    if(coinLevel[1])PINMODE3_bit.P1_18 = 3;
+    if(cashLevel[1])PINMODE3_bit.P1_18 = 3;
     else PINMODE3_bit.P1_18 = 0;
     FIO1DIR_bit.P1_18  = 0;
     FIO1MASK_bit.P1_18 = 0;
+    
+    // монетоприемник 2
+    PINSEL3_bit.P1_19 = 0;
+    if(coinLevel[1])PINMODE3_bit.P1_19 = 3;
+    else PINMODE3_bit.P1_19 = 0;
+    FIO1DIR_bit.P1_19  = 0;
+    FIO1MASK_bit.P1_19 = 0;
   
     // сигнал печати чека пост 2
     PINSEL0_bit.P0_4 = 0;
-    if(SignalLevel[1])PINMODE0_bit.P0_4 = 3;
-    else PINMODE0_bit.P0_4 = 0;
+    /*if(SignalLevel[1])PINMODE0_bit.P0_4 = 3;
+    else*/ PINMODE0_bit.P0_4 = 0;
     FIO0DIR_bit.P0_4  = 0;
     FIO0MASK_bit.P0_4 = 0;
     
     // купюроприемник 3
-    PINSEL7_bit.P3_25 = 0;
-    if(cashLevel[2])PINMODE7_bit.P3_25 = 3;
-    else PINMODE7_bit.P3_25 = 0;
-    FIO3DIR_bit.P3_25  = 0;
-    FIO3MASK_bit.P3_25 = 0;
-    
-    // монетоприемник 3
     PINSEL7_bit.P3_26 = 0;
-    if(coinLevel[2])PINMODE7_bit.P3_26 = 3;
+    if(cashLevel[2])PINMODE7_bit.P3_26 = 3;
     else PINMODE7_bit.P3_26 = 0;
     FIO3DIR_bit.P3_26  = 0;
     FIO3MASK_bit.P3_26 = 0;
+    
+    // монетоприемник 3
+    PINSEL7_bit.P3_25 = 0;
+    if(coinLevel[2])PINMODE7_bit.P3_25 = 3;
+    else PINMODE7_bit.P3_25 = 0;
+    FIO3DIR_bit.P3_25  = 0;
+    FIO3MASK_bit.P3_25 = 0;
   
     // сигнал печати чека пост 3
     PINSEL3_bit.P1_28 = 0;
-    if(SignalLevel[2])PINMODE3_bit.P1_28 = 3;
-    else PINMODE3_bit.P1_28 = 0;
+    /*if(SignalLevel[2])PINMODE3_bit.P1_28 = 3;
+    else*/ PINMODE3_bit.P1_28 = 0;
     FIO1DIR_bit.P1_28  = 0;
     FIO1MASK_bit.P1_28 = 0;
     
@@ -1160,8 +1160,8 @@ void InitInputPorts()
     // сигнал печати чека пост 4
     PINSEL3_bit.P1_27 = 0;
     PINMODE3_bit.P1_27 = 0;
-    if(SignalLevel[3])PINMODE3_bit.P1_27 = 3;
-    else PINMODE3_bit.P1_27 = 0;
+    /*if(SignalLevel[3])PINMODE3_bit.P1_27 = 3;
+    else*/ PINMODE3_bit.P1_27 = 0;
     FIO1DIR_bit.P1_27  = 0;
     FIO1MASK_bit.P1_27 = 0;
     
@@ -1181,8 +1181,8 @@ void InitInputPorts()
   
     // сигнал печати чека пост 5
     PINSEL3_bit.P1_26 = 0;
-    if(SignalLevel[4])PINMODE3_bit.P1_26 = 3;
-    else PINMODE3_bit.P1_26 = 0;
+    /*if(SignalLevel[4])PINMODE3_bit.P1_26 = 3;
+    else*/ PINMODE3_bit.P1_26 = 0;
     FIO1DIR_bit.P1_26  = 0;
     FIO1MASK_bit.P1_26 = 0;
     
@@ -1202,8 +1202,8 @@ void InitInputPorts()
   
     // сигнал печати чека пост 6
     PINSEL0_bit.P0_0 = 0;
-    if(SignalLevel[5])PINMODE0_bit.P0_0 = 3;
-    else PINMODE0_bit.P0_0 = 0;
+    /*if(SignalLevel[5])PINMODE0_bit.P0_0 = 3;
+    else*/ PINMODE0_bit.P0_0 = 0;
     FIO0DIR_bit.P0_0  = 0;
     FIO0MASK_bit.P0_0 = 0;
 

@@ -891,7 +891,8 @@ int FiscCloseBillV2Online(CPU_INT32U pass, CPU_INT64U *cash, CPU_INT08U taxsys, 
 
   fisc_buf[0] = 0x45;
   memcpy(&fisc_buf[1], (CPU_INT08U*)&pass, 4);
-  memcpy(&fisc_buf[5], 0, 5);
+  
+  memset(&fisc_buf[5], 0, 5);
   
   memcpy(&fisc_buf[10], cash, 5); // online платеж
   
