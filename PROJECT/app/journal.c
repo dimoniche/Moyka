@@ -225,22 +225,22 @@ void GetEventStr(char* str, char event)
       break;
      
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1:
-      sprintf(str, "Печ.online чека пост 1");
+      sprintf(str, "Печ.эл.чека пост 1");
       break;
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST2:
-      sprintf(str, "Печ. online чека пост 2");
+      sprintf(str, "Печ.эл.чека пост 2");
       break;
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST3:
-      sprintf(str, "Печ.online чека пост 3");
+      sprintf(str, "Печ.эл.чека пост 3");
       break;
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST4:
-      sprintf(str, "Печ.online чека пост 4");
+      sprintf(str, "Печ.эл.чека пост 4");
       break;
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST5:
-      sprintf(str, "Печ.online чека пост 5");
+      sprintf(str, "Печ.эл.чека пост 5");
       break;
     case JOURNAL_EVENT_PRINT_BILL_ONLINE_POST6:
-      sprintf(str, "Печ.online чека пост 6");
+      sprintf(str, "Печ.эл.чека пост 6");
       break;
 
     case JOURNAL_EVENT_PRINT_Z:

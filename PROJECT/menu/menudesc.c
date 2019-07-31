@@ -1402,11 +1402,11 @@ void PrintEventJournalRecord(TEventRecord *record)
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
         {
-          sprintf(str_EventData, " ");
+          sprintf(str_EventData, "");
         }
-      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1))
+      else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST6))
         {
-          sprintf(str_EventData, " ");
+          sprintf(str_EventData, "");
         }
       else if (record->event == JOURNAL_EVENT_PRINT_Z)
         {

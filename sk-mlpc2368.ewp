@@ -3218,22 +3218,6 @@
           <name>$PROJ_DIR$\PROJECT\drivers\lcd\lcd.h</name>
         </file>
       </group>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\drivers\uart.c</name>
-        <excluded>
-          <configuration>Flash Post</configuration>
-          <configuration>Flash Central</configuration>
-          <configuration>Flash Positive</configuration>
-        </excluded>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\PROJECT\drivers\uart.h</name>
-        <excluded>
-          <configuration>Flash Post</configuration>
-          <configuration>Flash Central</configuration>
-          <configuration>Flash Positive</configuration>
-        </excluded>
-      </file>
     </group>
     <group>
       <name>libs</name>

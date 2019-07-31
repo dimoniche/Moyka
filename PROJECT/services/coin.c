@@ -1174,7 +1174,7 @@ void InitInputPorts()
     
     // монетоприемник 5
     PINSEL4_bit.P2_2 = 0;
-    if(coinLevel[4])PINMODE3_bit.P1_21 = 3;
+    if(coinLevel[4])PINMODE4_bit.P2_2 = 3;
     else PINMODE4_bit.P2_2 = 0;
     FIO2DIR_bit.P2_2  = 0;
     FIO2MASK_bit.P2_2 = 0;
@@ -1237,15 +1237,15 @@ void InitInputPorts()
 
     // банк 3
     PINSEL3_bit.P1_24 = 0;
-    if(bankLevel[2])PINMODE1_bit.P0_24 = 3;
-    else PINMODE1_bit.P0_24 = 0;
+    if(bankLevel[2])PINMODE3_bit.P1_24 = 3;
+    else PINMODE3_bit.P1_24 = 0;
     FIO1DIR_bit.P1_24  = 0;
     FIO1MASK_bit.P1_24 = 0;
 
     // банк 4
     PINSEL3_bit.P1_23 = 0;
-    if(bankLevel[3])PINMODE1_bit.P0_23 = 3;
-    else PINMODE1_bit.P0_23 = 0;
+    if(bankLevel[3])PINMODE3_bit.P1_23 = 3;
+    else PINMODE3_bit.P1_23 = 0;
     FIO1DIR_bit.P1_23  = 0;
     FIO1MASK_bit.P1_23 = 0;
 

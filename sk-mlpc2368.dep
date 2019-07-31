@@ -2,7 +2,7 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>2899151881</fileChecksum>
+  <fileChecksum>2767443068</fileChecksum>
   <configuration>
     <name>Flash Central</name>
     <outputs>
@@ -3607,6 +3607,10 @@
         </tool>
       </inputs>
     </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
   </configuration>
   <configuration>
     <name>Flash Post</name>
@@ -5456,6 +5460,10 @@
         </tool>
       </inputs>
     </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
   </configuration>
 </project>
 

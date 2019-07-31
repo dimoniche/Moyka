@@ -111,6 +111,11 @@ void DrawMenu(void)
 {
   if((SystemTime%2))
   {
+    if(currentPosition >= COUNT_POST + COUNT_VACUUM)
+    {
+      currentPosition = 0;
+    }
+
     for( ;currentPosition < COUNT_POST + COUNT_VACUUM; currentPosition++)
     {
       if((enable_coin[currentPosition] 
@@ -121,10 +126,15 @@ void DrawMenu(void)
       else if((enable_coin[currentPosition])
               && currentPosition >= COUNT_POST) break;
     }
+    
+    if(currentPosition >= COUNT_POST + COUNT_VACUUM)
+    {
+      currentPosition = 0;
+      return;
+    }
 
-    if(currentPosition >= COUNT_POST + COUNT_VACUUM) currentPosition = 0;
-
-    UserPrintMoneyMenu(currentPosition++);    
+    UserPrintMoneyMenu(currentPosition);
+    currentPosition++;
   }
 }
 
@@ -195,12 +205,16 @@ void UserAppTask(void *p_arg)
                   break;
               }
 
-              for(int post = 0; post < COUNT_POST; post++)
+              for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
                 GetData(&EnableCoinDesc, &enable_coin[post], post, DATA_FLAG_DIRECT_INDEX);  
-                GetData(&EnableValidatorDesc, &cash_enable[post], post, DATA_FLAG_DIRECT_INDEX);
-                GetData(&EnableBankDesc, &bank_enable[post], post, DATA_FLAG_DIRECT_INDEX);
-                GetData(&EnableSignalDesc, &enable_signal[post], post, DATA_FLAG_DIRECT_INDEX);
+                
+                if(post < COUNT_POST)
+                {
+                  GetData(&EnableValidatorDesc, &cash_enable[post], post, DATA_FLAG_DIRECT_INDEX);
+                  GetData(&EnableBankDesc, &bank_enable[post], post, DATA_FLAG_DIRECT_INDEX);
+                  GetData(&EnableSignalDesc, &enable_signal[post], post, DATA_FLAG_DIRECT_INDEX);
+                }
 
                 accmoney = GetAcceptedMoney(post);
                 accmoney += GetAcceptedBankMoney(post);
@@ -448,7 +462,7 @@ void UserAppTask(void *p_arg)
                 if (accmoney > 0)
                 {
                     wash_State[number_post] = washing;
-                    SaveEventRecord(0, JOURNAL_EVENT_WASHING, number_post);
+                    SaveEventRecord(number_post, JOURNAL_EVENT_WASHING, number_post);
                 }
             }
             break;
@@ -563,8 +577,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                testMoney = 100;
-                PostUserEvent(EVENT_BANK_INSERTED_POST1);
+                //testMoney = 100;
+                //PostUserEvent(EVENT_BANK_INSERTED_POST4);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -587,11 +601,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1);
+                //PostUserEvent(EVENT_STOP_MONEY_POST4);
             break;
             case EVENT_KEY_F3:
-                testMoney = 100;
-                PostUserEvent(EVENT_CASH_INSERTED_POST1);
+                //testMoney = 100;
+                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST4);
             break;
 #endif
             default:
