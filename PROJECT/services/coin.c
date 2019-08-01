@@ -524,7 +524,7 @@ CPU_INT32U input_register()
   {
      SETBIT(input, 24);
   }
-  if (FIO0PIN_bit.P0_10)
+  if (FIO0PIN_bit.P0_1)
   {
      SETBIT(input, 25);
   }
@@ -1057,7 +1057,7 @@ void InputCapture_ISR(void)
   // банк 6
   if(TSTBIT(input_event, 25))
   {
-    if ((!FIO0PIN_bit.P0_10 && bankLevel[5]) || (FIO0PIN_bit.P0_10 && !bankLevel[5]))
+    if ((!FIO0PIN_bit.P0_1 && bankLevel[5]) || (FIO0PIN_bit.P0_1 && !bankLevel[5]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_bank[5];
@@ -1257,11 +1257,11 @@ void InitInputPorts()
     FIO0MASK_bit.P0_6 = 0;
 
     // банк 6
-    PINSEL0_bit.P0_10 = 0;
-    if(bankLevel[5])PINMODE0_bit.P0_10 = 3;
-    else PINMODE0_bit.P0_10 = 0;
-    FIO0DIR_bit.P0_10  = 0;
-    FIO0MASK_bit.P0_10 = 0;
+    PINSEL0_bit.P0_1 = 0;
+    if(bankLevel[5])PINMODE0_bit.P0_1 = 3;
+    else PINMODE0_bit.P0_1 = 0;
+    FIO0DIR_bit.P0_1  = 0;
+    FIO0MASK_bit.P0_1 = 0;
 }
 
 // инициализация импульсных входов

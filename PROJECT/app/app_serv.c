@@ -106,6 +106,7 @@ CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U cash_enable[COUNT_POST];
 CPU_INT32U bank_enable[COUNT_POST];
 CPU_INT32U enable_signal[COUNT_POST];
+CPU_INT32U fiscal_enable;
 
 void DrawMenu(void)
 {
@@ -144,7 +145,6 @@ void DrawMenu(void)
 void UserAppTask(void *p_arg)
 {
   CPU_INT32U print_timeout;
-  CPU_INT32U accmoney;
   int event;
   
 #ifdef BOARD_CENTRAL_CFG
@@ -180,12 +180,21 @@ void UserAppTask(void *p_arg)
               }
             break;
             case EVENT_SEC:
+            {
+              CPU_INT32U accmoney = 0;
 
               // рабочий сервер - счетчики, состояния и т.п.
               WorkServer();
 
-              // проверим фискальник, если он отвалился
-              if ((++fr_conn_ctr % 10) == 0)
+              GetData(&EnableFiscalDesc, &fiscal_enable, 0, DATA_FLAG_SYSTEM_INDEX);
+
+              if(!fiscal_enable)
+              {
+                  FiscalConnState = FISCAL_NOCONN;
+              }
+
+              // проверим фискальник, если он отвалился или отключался
+              if ((++fr_conn_ctr % 5) == 0)
               {
                  if ((FiscalConnState == FISCAL_NOCONN) || (TstCriticalFiscalError()))
                  {
@@ -297,8 +306,8 @@ void UserAppTask(void *p_arg)
                   was_critical_error = 0;
                   break;
               }
-
-              break;
+            }
+            break;
               
             case EVENT_MODE_CHANGE:
               ReInitMenu();
@@ -315,7 +324,7 @@ void UserAppTask(void *p_arg)
             case EVENT_COIN_INSERTED_VACUUM2:
               {
                 CPU_INT32U cpp = 1;
-                CPU_INT32U money, accmoney;
+                CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_COIN_INSERTED_POST1;
                 
                 GetData(&CoinPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
@@ -342,7 +351,7 @@ void UserAppTask(void *p_arg)
             case EVENT_CASH_INSERTED_POST6:
               {
                 CPU_INT32U cpp = 1;
-                CPU_INT32U money, accmoney;
+                CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_CASH_INSERTED_POST1;
                 
                 GetData(&CashPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
@@ -368,7 +377,7 @@ void UserAppTask(void *p_arg)
             case EVENT_BANK_INSERTED_POST6:
               {
                 CPU_INT32U cpp = 1;
-                CPU_INT32U money, accmoney;
+                CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_BANK_INSERTED_POST1;
                 
                 GetData(&BankPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
@@ -455,11 +464,12 @@ void UserAppTask(void *p_arg)
             if (GetMode() == MODE_WORK) //
             {
                 int number_post = event - EVENT_STOP_MONEY_POST1;
+                CPU_INT32U accmoney = 0;
 
                 accmoney = GetAcceptedMoney(number_post);
                 accmoney += GetAcceptedBankMoney(number_post);
                 
-                if (accmoney > 0)
+                if ((accmoney > 0) && (wash_State[number_post] != washing) && (wash_State[number_post] != printCheck))
                 {
                     wash_State[number_post] = washing;
                     SaveEventRecord(number_post, JOURNAL_EVENT_WASHING, number_post);
@@ -477,6 +487,7 @@ void UserAppTask(void *p_arg)
               {
                   int number_post = event - EVENT_WAIT_CASH_PRINT_CHECK_POST1;
                   int count_delay = 0;
+                  CPU_INT32U accmoney = 0;
 
                   accmoney = GetAcceptedMoney(number_post);
                   accmoney += GetAcceptedBankMoney(number_post);
@@ -509,6 +520,7 @@ void UserAppTask(void *p_arg)
             if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
+              CPU_INT32U accmoney = 0;
               
               // здесь событие старта печати чека - включили насос или пылесос
               accmoney = GetAcceptedMoney(number_post);
@@ -578,7 +590,7 @@ void UserAppTask(void *p_arg)
 
             case EVENT_KEY_F1:
                 //testMoney = 100;
-                //PostUserEvent(EVENT_BANK_INSERTED_POST4);
+                //PostUserEvent(EVENT_BANK_INSERTED_POST2);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -601,11 +613,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                //PostUserEvent(EVENT_STOP_MONEY_POST4);
+                //PostUserEvent(EVENT_STOP_MONEY_POST2);
             break;
             case EVENT_KEY_F3:
                 //testMoney = 100;
-                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST4);
+                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST2);
             break;
 #endif
             default:
