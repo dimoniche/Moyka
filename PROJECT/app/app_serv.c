@@ -22,15 +22,12 @@
 CPU_INT32U SystemTime;
 CPU_INT32U money_timestamp[COUNT_POST + COUNT_VACUUM];
 
-CPU_INT08U ChannelsState[COUNT_POST + COUNT_VACUUM];
+//CPU_INT08U ChannelsState[COUNT_POST + COUNT_VACUUM];
   #define CHANNEL_STATE_FREE            0
   #define CHANNEL_STATE_BUSY            1
   #define CHANNEL_STATE_DISABLED        2
-CPU_INT32U ChannelsCounters[COUNT_POST + COUNT_VACUUM];
+//CPU_INT32U ChannelsCounters[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U ChannelsPayedTime[COUNT_POST + COUNT_VACUUM];
-
-CPU_INT32U incas_bill_nom_counter[24];
-CPU_INT32U incas_common_bill_counter;
 
 #define USER_QUERY_LEN  64
 
@@ -86,8 +83,7 @@ void AddOutPulses(int count, int len_ms)
 
 #endif
 
-int drawPostInfo[COUNT_POST + COUNT_VACUUM] = {0,0,0,0,0,0,0,0};
-int currentPosition = 0;
+static int currentPosition = 0;
 
 typedef enum {
   
@@ -98,15 +94,14 @@ typedef enum {
     
 } washStateEnum;
 
-washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney};
+static washStateEnum wash_State[COUNT_POST + COUNT_VACUUM] = {waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney, waitMoney};
 
-int countSecWait[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U cash_enable[COUNT_POST];
-CPU_INT32U bank_enable[COUNT_POST];
-CPU_INT32U enable_signal[COUNT_POST];
-CPU_INT32U fiscal_enable;
+static int countSecWait[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
+static CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U cash_enable[COUNT_POST];
+static CPU_INT32U bank_enable[COUNT_POST];
+static CPU_INT32U enable_signal[COUNT_POST];
+static CPU_INT32U fiscal_enable;
 
 void DrawMenu(void)
 {
@@ -230,9 +225,6 @@ void UserAppTask(void *p_arg)
 
                 if (accmoney > 0)
                 {
-                    // есть принятые деньги
-                    drawPostInfo[post] = 1;
-
                     if(wash_State[post] != washing)
                     {
                       // печать по внешнему сигналу, ждем таймаут отмены, но не в режиме мойки
@@ -252,10 +244,6 @@ void UserAppTask(void *p_arg)
                       // в режиме мойки продлеваем ожидание
                       money_timestamp[post] = OSTimeGet();
                     }
-                }
-                else
-                {
-                    drawPostInfo[post] = 0;
                 }
                 
                 if(countSecWait[post])
@@ -679,10 +667,10 @@ void UserStartupFunc(void)
       OSTaskCreate(UserAppTask, (void *)0, (OS_STK *)&UserTaskStk[USER_TASK_STK_SIZE-1], USER_TASK_PRIO);
     }
 
-  InitConsole();
+  //InitConsole();
   
 #ifdef BOARD_CENTRAL_CFG
-  InitHostApp();
+  //InitHostApp();
 #endif
       
   SystemTime = GetTimeSec();
@@ -723,6 +711,14 @@ void UserPrintMoneyMenu(int post)
     strcpy(buf, " ");
     PrintUserMenuStr(buf, 0);
 
+    accmoney = GetAcceptedMoney(post) + GetAcceptedBankMoney(post);
+
+    if((wash_State[post] == waitMoney) && (accmoney > 0))
+    {
+        // если была перезагрузка и есть деньги - сразу переходим на ожидание денег
+        wash_State[post] = insertMoney;
+    }
+
     if(wash_State[post] == waitMoney)
     {
       sprintf(buf, " Внесите деньги");
@@ -733,8 +729,6 @@ void UserPrintMoneyMenu(int post)
     }
     else if(wash_State[post] == insertMoney)
     {
-      accmoney = GetAcceptedMoney(post) + GetAcceptedBankMoney(post);
-
       sprintf(buf, " Внесите деньги");
       PrintUserMenuStr(buf, 1);
 
@@ -757,7 +751,7 @@ void UserPrintMoneyMenu(int post)
       sprintf(buf, " ");
       PrintUserMenuStr(buf, 2);
     }
-      
+
     if(post < COUNT_POST)
       sprintf(buf, " Пост %d", post + 1);
     else if(post < COUNT_POST + COUNT_VACUUM)

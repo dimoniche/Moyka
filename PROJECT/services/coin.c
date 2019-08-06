@@ -11,9 +11,9 @@ OS_STK  CoinTaskStk[COIN_TASK_STK_SIZE];
 
 void  InitImpInput(void);
 
-CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U  BankImpCounter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U  CoinImpCounter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U  CashImpCounter[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U  BankImpCounter[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U coin_pulse[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U coin_pause[COUNT_POST + COUNT_VACUUM];
@@ -35,12 +35,12 @@ static char pend_upsignal_counter[COUNT_POST + COUNT_VACUUM];
 static char pend_downsignal_counter[COUNT_POST + COUNT_VACUUM];
 static CPU_INT32U pend_signal_timestamp[COUNT_POST + COUNT_VACUUM];
 
-CPU_INT32U cashLevel[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U coinLevel[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U SignalLevel[COUNT_POST + COUNT_VACUUM];
-CPU_INT32U bankLevel[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U cashLevel[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U coinLevel[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U SignalLevel[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U bankLevel[COUNT_POST + COUNT_VACUUM];
 
-void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
+void SetCoinPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
@@ -51,7 +51,7 @@ void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
   OS_EXIT_CRITICAL();
 }
 
-void SetCoinPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
+void SetCashPulseParam(CPU_INT32U pulse, CPU_INT32U pause, CPU_INT32U post)
 {
   #if OS_CRITICAL_METHOD == 3
   OS_CPU_SR  cpu_sr = 0;
@@ -101,22 +101,22 @@ void SetLevelParam(CPU_INT32U level1, CPU_INT32U level2, CPU_INT32U level3, CPU_
   OS_EXIT_CRITICAL();
 }
 
+static CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U cash_enable[COUNT_POST];
+static CPU_INT32U enable_signal[COUNT_POST];
+static CPU_INT32U bank_enable[COUNT_POST];
+
+static CPU_INT32U last_coin_count[COUNT_POST];
+static CPU_INT32U last_coin_time[COUNT_POST];
+
+static CPU_INT32U last_cash_count[COUNT_POST];
+static CPU_INT32U last_cash_time[COUNT_POST];
+
+static CPU_INT32U last_bank_count[COUNT_POST];
+static CPU_INT32U last_bank_time[COUNT_POST];
+
 void CoinTask(void *p_arg)
 {
-  CPU_INT32U enable_coin[COUNT_POST + COUNT_VACUUM];
-  CPU_INT32U cash_enable[COUNT_POST];
-  CPU_INT32U enable_signal[COUNT_POST];
-  CPU_INT32U bank_enable[COUNT_POST];
-
-  CPU_INT32U last_coin_count[COUNT_POST];
-  CPU_INT32U last_coin_time[COUNT_POST];
-
-  CPU_INT32U last_cash_count[COUNT_POST];
-  CPU_INT32U last_cash_time[COUNT_POST];
-
-  CPU_INT32U last_bank_count[COUNT_POST];
-  CPU_INT32U last_bank_time[COUNT_POST];
-
   CPU_INT32U last_settings_time = 0;
 
   while(1)
@@ -532,9 +532,9 @@ CPU_INT32U input_register()
   return input;
 }
 
-CPU_INT32U input_event = 0;
-CPU_INT32U prev_input = 0;
-CPU_INT32U curr_input = 0;
+static CPU_INT32U input_event = 0;
+static CPU_INT32U prev_input = 0;
+static CPU_INT32U curr_input = 0;
 
 void InputCapture_ISR(void)
 {
@@ -1262,6 +1262,8 @@ void InitInputPorts()
     else PINMODE0_bit.P0_1 = 0;
     FIO0DIR_bit.P0_1  = 0;
     FIO0MASK_bit.P0_1 = 0;
+    
+    prev_input = curr_input = input_register();
 }
 
 // инициализация импульсных входов
@@ -1311,8 +1313,6 @@ void  InitImpInput (void)
     VICINTENABLE      =  (1 << VIC_TIMER3);       
 
     T3IR = 0xFF;
-    
-    prev_input = curr_input = input_register();
 
     OS_EXIT_CRITICAL();
 }

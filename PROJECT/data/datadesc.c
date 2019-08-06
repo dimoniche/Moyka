@@ -30,7 +30,7 @@ CPU_INT08U const CoinPulseLenName[] = "Длина имп.,мс";
 void OnChangeCoinPulseLen()
 {
     CPU_INT32U pulse, pause;
-    for(int post = 0; post < COUNT_POST; post++)
+    for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
     {
       GetData(&CoinPulseLenDesc, &pulse, post, DATA_FLAG_DIRECT_INDEX);
       GetData(&CoinPauseLenDesc, &pause, post, DATA_FLAG_DIRECT_INDEX);
@@ -43,7 +43,7 @@ TDataDescStruct const CoinPulseLenDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,             // размер массива
+  COUNT_POST + COUNT_VACUUM,             // размер массива
   &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, coin_pulse_len),            // указатель на переменную или адрес FRAM
   (void*)&CoinPulseLenRange,     // указатель на границы параметра
@@ -137,7 +137,7 @@ TDataDescStruct const CoinPauseLenDesc = {
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,             // размер массива
+  COUNT_POST + COUNT_VACUUM,             // размер массива
   &CoinIndexDesc,        // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, coin_pause_len),            // указатель на переменную или адрес FRAM
   (void*)&CoinPauseLenRange,     // указатель на границы параметра
@@ -250,7 +250,7 @@ TDataDescStruct const EnableValidatorDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   EnableValidatorList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           // значение по умолчанию
+  0                           // значение по умолчанию
 };
 
 /*************************************
@@ -274,7 +274,7 @@ TDataDescStruct const EnableBankDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   EnableValidatorList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           // значение по умолчанию
+  0                           // значение по умолчанию
 };
 
 /*************************************
@@ -503,7 +503,7 @@ TDataDescStruct const EnableSignalDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   EnableSignalList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           
+  0                           
 };
 
 /*************************************
@@ -627,7 +627,7 @@ TDataDescStruct const CoinPerPulseDesc = {
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           // значение по умолчанию
+  10                           // значение по умолчанию
 };
 
 /*************************************
@@ -817,7 +817,7 @@ TDataDescStruct const PrintTimeoutAfterDesc = {
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  60                           // значение по умолчанию
+  0                           // значение по умолчанию
 };
 
 /*************************************
@@ -935,7 +935,7 @@ TDataDescStruct const CashLevelDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   LevelList,                  // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                          // значение по умолчанию
+  0                          // значение по умолчанию
 };
 
 /*************************************
@@ -956,7 +956,7 @@ TDataDescStruct const BankLevelDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   LevelList,                  // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                          // значение по умолчанию
+  0                          // значение по умолчанию
 };
 
 /*************************************
@@ -977,7 +977,7 @@ TDataDescStruct const CoinLevelDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   LevelList,                  // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                          // значение по умолчанию
+  0                          // значение по умолчанию
 };
 
 /*************************************
@@ -1049,7 +1049,7 @@ TDataDescStruct const EnableFiscalDesc = {
   DATA_IS_INDEX,            // признак индексного параметра (список строк)
   EnableFiscalList,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
-  1                           
+  0                           
 };
 
 /*************************************
