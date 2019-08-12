@@ -523,7 +523,7 @@ void UserAppTask(void *p_arg)
                   {
                     if (PrintFiscalBill(accmoney, number_post, 0) == 0) // здесь добавить с какого поста чек
                     {
-                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, GetTimeSec());
+                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, accmoney);
                     }
                   }
 
@@ -555,7 +555,7 @@ void UserAppTask(void *p_arg)
                   {
                     if (PrintFiscalBill(accmoney,number_post, 1) == 0) // здесь добавить с какого поста чек
                     {
-                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1 + number_post, GetTimeSec());
+                        SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1 + number_post, accmoney);
                     }
                   }
 

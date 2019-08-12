@@ -411,11 +411,11 @@ void PrintEventJournalRecordEng(char* str, TEventRecord *record)
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
         {
-          sprintf(&str[strlen(str)], " ");
+          sprintf(&str[strlen(str)], "%d rub.", record->data);
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1))
         {
-          sprintf(&str[strlen(str)], " ");
+          sprintf(&str[strlen(str)], "%d rub.", record->data);
         }
       else if (record->event == JOURNAL_EVENT_PRINT_Z)
         {

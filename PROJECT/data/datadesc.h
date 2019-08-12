@@ -99,6 +99,7 @@ extern const TDataDescArrayStruct AllDataArray[];
 
 extern CPU_INT32U ErrorJournalIndex;
 extern CPU_INT32U EventJournalIndex;
+extern CPU_INT32U last_Index;
 
 extern TDataDescStruct const CounterRunDesc;
 extern TDataDescStruct const CounterMoneyDesc;

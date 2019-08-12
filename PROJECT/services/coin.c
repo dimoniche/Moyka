@@ -106,8 +106,8 @@ static CPU_INT32U cash_enable[COUNT_POST];
 static CPU_INT32U enable_signal[COUNT_POST];
 static CPU_INT32U bank_enable[COUNT_POST];
 
-static CPU_INT32U last_coin_count[COUNT_POST];
-static CPU_INT32U last_coin_time[COUNT_POST];
+static CPU_INT32U last_coin_count[COUNT_POST + COUNT_VACUUM];
+static CPU_INT32U last_coin_time[COUNT_POST + COUNT_VACUUM];
 
 static CPU_INT32U last_cash_count[COUNT_POST];
 static CPU_INT32U last_cash_time[COUNT_POST];

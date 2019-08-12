@@ -1402,11 +1402,11 @@ void PrintEventJournalRecord(TEventRecord *record)
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_VACUUM2))
         {
-          sprintf(str_EventData, "");
+          sprintf(str_EventData, "%d руб.", record->data);
         }
       else if ((record->event >= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST1) && (record->event <= JOURNAL_EVENT_PRINT_BILL_ONLINE_POST6))
         {
-          sprintf(str_EventData, "");
+          sprintf(str_EventData, "%d руб.", record->data);
         }
       else if (record->event == JOURNAL_EVENT_PRINT_Z)
         {
@@ -1459,6 +1459,7 @@ void OnEnterEventJournal(void)
         {
           last = record.time;
           EventJournalIndex = i;
+          last_Index = EventJournalIndex;
         }
     }
   if (!last) {SetMenu(JournalEmptyMenuPanel); return;}
