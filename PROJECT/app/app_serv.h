@@ -116,4 +116,7 @@ extern void save_config_params(void);
 extern void init_config_params(void);
 extern void AddOutPulses(int count, int len_ms);
 
+extern void ClearAcceptedMoney(int post);
+extern void ClearAcceptedBankMoney(int post);
+
 #endif //#ifndef _APP_SERV_H_

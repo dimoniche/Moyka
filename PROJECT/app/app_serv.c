@@ -105,6 +105,8 @@ static CPU_INT32U fiscal_enable;
 
 void DrawMenu(void)
 {
+  if (GetMode() != MODE_WORK) return;
+    
   if((SystemTime%2))
   {
     if(currentPosition >= COUNT_POST + COUNT_VACUUM)
@@ -204,10 +206,10 @@ void UserAppTask(void *p_arg)
               ErrorServer();
                 
               // дальше только в рабочем режиме
-              if (GetMode() != MODE_WORK)
-              {
-                  break;
-              }
+//              if (GetMode() != MODE_WORK)
+//              {
+//                  break;
+//              }
 
               for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
               {
@@ -315,6 +317,9 @@ void UserAppTask(void *p_arg)
                 CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_COIN_INSERTED_POST1;
                 
+                if(wash_State[number_post] != waitMoney && wash_State[number_post] != insertMoney) break;
+                if(!enable_coin[number_post]) break;
+
                 GetData(&CoinPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
                 money = cpp * GetResetCoinCount(number_post) + testMoney;
@@ -342,6 +347,9 @@ void UserAppTask(void *p_arg)
                 CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_CASH_INSERTED_POST1;
                 
+                if(wash_State[number_post] != waitMoney && wash_State[number_post] != insertMoney) break;
+                if(!cash_enable[number_post]) break;
+
                 GetData(&CashPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
                 money = cpp * GetResetCashCount(number_post) + testMoney;
@@ -354,6 +362,7 @@ void UserAppTask(void *p_arg)
                 if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_NOTE_POST1 + number_post, money);
                 
                 wash_State[number_post] = insertMoney;
+                testMoney = 0;
               }
               break;
              
@@ -368,6 +377,9 @@ void UserAppTask(void *p_arg)
                 CPU_INT32U money, accmoney = 0;
                 int number_post = event - EVENT_BANK_INSERTED_POST1;
                 
+                if(wash_State[number_post] != waitMoney && wash_State[number_post] != insertMoney) break;
+                if(!bank_enable[number_post]) break;
+
                 GetData(&BankPerPulseDesc, &cpp, number_post, DATA_FLAG_DIRECT_INDEX);
                 
                 money = cpp * GetResetbankCount(number_post) + testMoney;
@@ -380,6 +392,7 @@ void UserAppTask(void *p_arg)
                 if (money) SaveEventRecord(number_post, JOURNAL_EVENT_MONEY_BANK_POST1 + number_post, money);
                 
                 wash_State[number_post] = insertMoney;
+                testMoney = 0;
               }
               break;
 
@@ -449,7 +462,7 @@ void UserAppTask(void *p_arg)
             case EVENT_STOP_MONEY_POST4:
             case EVENT_STOP_MONEY_POST5:
             case EVENT_STOP_MONEY_POST6:
-            if (GetMode() == MODE_WORK) //
+            //if (GetMode() == MODE_WORK) //
             {
                 int number_post = event - EVENT_STOP_MONEY_POST1;
                 CPU_INT32U accmoney = 0;
@@ -471,7 +484,7 @@ void UserAppTask(void *p_arg)
             case EVENT_WAIT_CASH_PRINT_CHECK_POST4:
             case EVENT_WAIT_CASH_PRINT_CHECK_POST5:
             case EVENT_WAIT_CASH_PRINT_CHECK_POST6:
-              if (GetMode() == MODE_WORK) //
+              //if (GetMode() == MODE_WORK) //
               {
                   int number_post = event - EVENT_WAIT_CASH_PRINT_CHECK_POST1;
                   int count_delay = 0;
@@ -480,7 +493,7 @@ void UserAppTask(void *p_arg)
                   accmoney = GetAcceptedMoney(number_post);
                   accmoney += GetAcceptedBankMoney(number_post);
 
-                  if (accmoney > 0)
+                  if ((accmoney > 0) && (wash_State[number_post] != printCheck))
                   {
                     // запустим задержку печати чека
                     GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
@@ -505,7 +518,7 @@ void UserAppTask(void *p_arg)
 
             if (was_critical_error) break;
 
-            if (GetMode() == MODE_WORK) // печатаем только в рабочем режиме
+            //if (GetMode() == MODE_WORK) // прием денег идет всегда
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
               CPU_INT32U accmoney = 0;
@@ -529,7 +542,7 @@ void UserAppTask(void *p_arg)
 
                   IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
                   SetAcceptedMoney(0, number_post);
-                  OSTimeDly(1000);
+                  if (GetMode() == MODE_WORK) OSTimeDly(1000);
                  
                   // повесим меню "—ѕј—»Ѕќ"                      
                   if (IsFiscalConnected())
@@ -538,7 +551,7 @@ void UserAppTask(void *p_arg)
                       RefreshMenu();
                   }
                   
-                  OSTimeDly(1000);
+                  if (GetMode() == MODE_WORK) OSTimeDly(1000);
                   wash_State[number_post] = waitMoney;
               }
               
@@ -561,7 +574,7 @@ void UserAppTask(void *p_arg)
 
                   IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
                   SetAcceptedBankMoney(0, number_post);
-                  OSTimeDly(1000);
+                  if (GetMode() == MODE_WORK) OSTimeDly(1000);
                  
                   // повесим меню "—ѕј—»Ѕќ"                      
                   if (IsFiscalConnected())
@@ -570,7 +583,7 @@ void UserAppTask(void *p_arg)
                       RefreshMenu();
                   }
                   
-                  OSTimeDly(1000);
+                  if (GetMode() == MODE_WORK) OSTimeDly(1000);
                   wash_State[number_post] = waitMoney;
               }
             }
@@ -578,7 +591,7 @@ void UserAppTask(void *p_arg)
 
             case EVENT_KEY_F1:
                 //testMoney = 100;
-                //PostUserEvent(EVENT_BANK_INSERTED_POST2);
+                //PostUserEvent(EVENT_COIN_INSERTED_POST2);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -631,7 +644,7 @@ void UserStartupFunc(void)
   // инициализаци€ данных
   CheckAllData();
     
-  OnChangeInitByDefault();
+  //OnChangeInitByDefault();
       
   // проверим длинные счетчики
   CheckLongCounters();
@@ -708,6 +721,8 @@ void UserPrintMoneyMenu(int post)
     char buf[32];
     CPU_INT32U accmoney;
 
+    if (GetMode() != MODE_WORK) return;
+      
     strcpy(buf, " ");
     PrintUserMenuStr(buf, 0);
 
@@ -767,6 +782,8 @@ void UserPrintErrorMenu(void)
 {
   char buf[32];
   
+  if (GetMode() != MODE_WORK) return;
+    
   if (TstErrorFlag(ERROR_FR_CONN))
     {
       sprintf(buf, "ќЎ»Ѕ ј");
@@ -800,6 +817,9 @@ void WorkServer(void)
 void UserPrintPrintBillMenu(int post)
 {
   char buf[32];
+  
+  if (GetMode() != MODE_WORK) return;
+    
   sprintf(buf, " ");
   PrintUserMenuStr(buf, 0);
   sprintf(buf, "»дeт печать");
@@ -818,6 +838,9 @@ void UserPrintPrintBillMenu(int post)
 void UserPrintThanksMenu(int post)
 {
   char buf[32];
+  
+  if (GetMode() != MODE_WORK) return;
+    
   sprintf(buf, " ");
   PrintUserMenuStr(buf, 0);
   sprintf(buf, "   —ѕј—»Ѕќ");
@@ -842,6 +865,9 @@ int ChannelBusy(CPU_INT08U ch)
 void UserPrintFirstMenu(void)
 {
     char buf[32];
+    
+    if (GetMode() != MODE_WORK) return;
+
     sprintf(buf, " ");
     PrintUserMenuStr(buf, 0);
     sprintf(buf, "    ¬Ќ≈—»“≈");

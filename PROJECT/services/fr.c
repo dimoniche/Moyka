@@ -710,7 +710,11 @@ repeat_sell1:
             {
                 if (service_name[i] == 0) ok = 1;
             }
-            sprintf(service_name, "%s пост %d", service_name, post + 1);
+            
+            if(post < COUNT_POST)
+              sprintf(service_name, "%s пост %d", service_name, post + 1);
+            else
+              sprintf(service_name, "%s пылесос %d", service_name, post + 1 - COUNT_POST);
             
             if (!ok)
             {
@@ -804,7 +808,11 @@ repeat_sell2:
             {
                 if (service_name[i] == 0) ok = 1;
             }
-            sprintf(service_name, "%s пост %d", service_name, post + 1);
+
+            if(post < COUNT_POST)
+              sprintf(service_name, "%s пост %d", service_name, post + 1);
+            else
+              sprintf(service_name, "%s пылесос %d", service_name, post + 1 - COUNT_POST);
 
             if (!ok)
             {

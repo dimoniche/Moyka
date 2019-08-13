@@ -184,6 +184,11 @@ void CoinTask(void *p_arg)
             {
 				CoinDisable();
 				GetResetCoinCount(i);
+                
+                OS_ENTER_CRITICAL();
+                pend_coin_counter[i] = 0;
+                pend_coin_timestamp[i] = 0;
+                OS_EXIT_CRITICAL();
             }
 
             if(i >= COUNT_POST) continue;
@@ -250,9 +255,24 @@ void CoinTask(void *p_arg)
             else
             {
               GetResetbankCount(i);
+              
+              OS_ENTER_CRITICAL();
+              pend_bank_counter[i] = 0;
+              pend_bank_timestamp[i] = 0;
+              OS_EXIT_CRITICAL();
             }
 
-			if (!cash_enable[i]) {GetResetCashCount(i); continue;}
+			if (!cash_enable[i])
+            {
+              GetResetCashCount(i); 
+              
+              OS_ENTER_CRITICAL();
+              pend_cash_counter[i] = 0;
+              pend_cash_timestamp[i] = 0;
+              OS_EXIT_CRITICAL();
+
+              continue;
+            }
 
 			OS_ENTER_CRITICAL();
 			if (pend_cash_counter[i])

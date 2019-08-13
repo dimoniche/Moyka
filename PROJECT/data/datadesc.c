@@ -13,6 +13,7 @@
 #include "time.h"
 #include "CRC16.h"
 #include "coin.h"
+#include "app_serv.h"
 
 extern CPU_INT32U modem_status;
 
@@ -1131,6 +1132,17 @@ void OnChangeInitByDefault(void)
   char name[32] = "Услуги автомойки\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
   WriteArrayFram(offsetof(TFramMap, manual_service_flag), 4, (unsigned char*)&flag);
   WriteArrayFram(offsetof(TFramMap, manual_service_name), 32, (unsigned char*)&name);
+  
+  // очистим принятые деньги
+  for(int i = 0; i < COUNT_POST; i++)
+  {
+    ClearAcceptedBankMoney(i);
+  }
+  
+  for(int i = 0; i < COUNT_POST + COUNT_VACUUM; i++)
+  {
+    ClearAcceptedMoney(i);
+  }
 }
 
 
