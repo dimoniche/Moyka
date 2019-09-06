@@ -516,16 +516,12 @@ void UserAppTask(void *p_arg)
             case EVENT_CASH_PRINT_CHECK_VACUUM1:
             case EVENT_CASH_PRINT_CHECK_VACUUM2:
 
+            if (was_critical_error) break;
+
             //if (GetMode() == MODE_WORK) // прием денег идет всегда
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
               CPU_INT32U accmoney = 0;
-
-              if (was_critical_error)
-              {
-                wash_State[number_post] = waitMoney;
-                break;
-              }
               
               // здесь событие старта печати чека - включили насос или пылесос
               accmoney = GetAcceptedMoney(number_post);
@@ -534,9 +530,6 @@ void UserAppTask(void *p_arg)
               { 
                   UserPrintPrintBillMenu(number_post);
                   RefreshMenu();
-                  
-                  // проверим заранее состояние принтера
-                  CheckFiscalStatus();
                   
                   // напечатаем наличный чек
                   if (IsFiscalConnected())
@@ -559,6 +552,7 @@ void UserAppTask(void *p_arg)
                   }
                   
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
+                  wash_State[number_post] = waitMoney;
               }
               
               // здесь событие старта печати чека - включили насос или пылесос
@@ -569,9 +563,6 @@ void UserAppTask(void *p_arg)
                   UserPrintPrintBillMenu(number_post);
                   RefreshMenu();
                   
-                  // проверим заранее состояние принтера
-                  CheckFiscalStatus();
-
                   // напечатаем безналичный чек
                   if (IsFiscalConnected())
                   {
@@ -593,9 +584,8 @@ void UserAppTask(void *p_arg)
                   }
                   
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
+                  wash_State[number_post] = waitMoney;
               }
-              
-              wash_State[number_post] = waitMoney;
             }
             break;
 
