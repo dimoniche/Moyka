@@ -193,13 +193,10 @@ void UserAppTask(void *p_arg)
               // проверим фискальник, если он отвалился или отключался
               if ((++fr_conn_ctr % 5) == 0)
               {
-                 if ((FiscalConnState == FISCAL_NOCONN) || (TstCriticalFiscalError()))
-                 {
-                    if (ConnectFiscalFast() == 0)
-                    {
-                        CheckFiscalStatus();
-                    }
-                 }
+                  if (ConnectFiscalFast() == 0)
+                  {
+                      CheckFiscalStatus();
+                  }
               }
 
               // сервер ошибок
@@ -257,6 +254,7 @@ void UserAppTask(void *p_arg)
                 }
               }
 
+              // монетоприемники для пылесосов без сигнала окончания приема денег - только по тайм ауту
               for(int post = COUNT_POST; post < COUNT_POST + COUNT_VACUUM; post++)
               {
                   accmoney = GetAcceptedMoney(post);
@@ -282,7 +280,7 @@ void UserAppTask(void *p_arg)
                 UserPrintErrorMenu(); 
                 RefreshMenu();
 
-                // выключим прием денег
+                // выключим прием денег, деньги принимаются - но чеки не печатаем - копим
                 if (was_critical_error == 0)
                 {
                     was_critical_error = 1;
@@ -294,6 +292,19 @@ void UserAppTask(void *p_arg)
               if (was_critical_error)
               {
                   was_critical_error = 0;
+                  
+                  // ошибки кончились - напечатаем чек с суммой, которая накопилась за время отсутсвия бумаги, 
+                  // если конечно надо
+                  for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+                  {
+                      accmoney = GetAcceptedMoney(post);
+                      
+                      if (accmoney > 0)
+                      {
+                         PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                      }
+                  }
+                  
                   break;
               }
             }
@@ -516,13 +527,17 @@ void UserAppTask(void *p_arg)
             case EVENT_CASH_PRINT_CHECK_VACUUM1:
             case EVENT_CASH_PRINT_CHECK_VACUUM2:
 
-            if (was_critical_error) break;
-
             //if (GetMode() == MODE_WORK) // прием денег идет всегда
             {
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
               CPU_INT32U accmoney = 0;
-              
+
+              if (was_critical_error)
+              {
+                wash_State[number_post] = waitMoney;
+                break;
+              }
+
               // здесь событие старта печати чека - включили насос или пылесос
               accmoney = GetAcceptedMoney(number_post);
               
@@ -538,6 +553,16 @@ void UserAppTask(void *p_arg)
                     {
                         SaveEventRecord(number_post, JOURNAL_EVENT_PRINT_BILL_POST1 + number_post, accmoney);
                     }
+                  }
+
+                  // если есть ошибки, не работаем - полученные деньги не обнуляем
+                  if (TstCriticalErrors())
+                  {
+                    // выключим прием денег
+                    if (was_critical_error == 0) {was_critical_error = 1;} 
+                    wash_State[number_post] = waitMoney;
+
+                    break;
                   }
 
                   IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
@@ -572,6 +597,16 @@ void UserAppTask(void *p_arg)
                     }
                   }
 
+                  // если есть ошибки, не работаем - полученные деньги не обнуляем
+                  if (TstCriticalErrors()) 
+                  {    
+                    // выключим прием денег
+                    if (was_critical_error == 0) {was_critical_error = 1;}
+                    wash_State[number_post] = waitMoney;
+
+                    break;
+                  }
+
                   IncCounter(number_post, ChannelsPayedTime[number_post], accmoney);
                   SetAcceptedBankMoney(0, number_post);
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
@@ -590,8 +625,8 @@ void UserAppTask(void *p_arg)
             break;
 
             case EVENT_KEY_F1:
-                //testMoney = 100;
-                //PostUserEvent(EVENT_COIN_INSERTED_POST2);
+//                testMoney = 100;
+//                PostUserEvent(EVENT_COIN_INSERTED_POST2);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -614,11 +649,11 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
-                //PostUserEvent(EVENT_STOP_MONEY_POST2);
+//                PostUserEvent(EVENT_STOP_MONEY_POST2);
             break;
             case EVENT_KEY_F3:
                 //testMoney = 100;
-                //PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST2);
+//                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST2);
             break;
 #endif
             default:
