@@ -29,7 +29,7 @@ CPU_INT32U money_timestamp[COUNT_POST + COUNT_VACUUM];
 //CPU_INT32U ChannelsCounters[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U ChannelsPayedTime[COUNT_POST + COUNT_VACUUM];
 
-#define USER_QUERY_LEN  64
+#define USER_QUERY_LEN  128
 
 OS_STK    UserTaskStk[USER_TASK_STK_SIZE];
 OS_EVENT *UserQuery = NULL;
@@ -190,7 +190,7 @@ void UserAppTask(void *p_arg)
                   FiscalConnState = FISCAL_NOCONN;
               }
 
-              // проверим фискальник, если он отвалился или отключался
+              // проверим фискальник, всегда его проверяем
               if ((++fr_conn_ctr % 5) == 0)
               {
                   if (ConnectFiscalFast() == 0)
@@ -222,8 +222,9 @@ void UserAppTask(void *p_arg)
                 accmoney = GetAcceptedMoney(post);
                 accmoney += GetAcceptedBankMoney(post);
 
-                if (accmoney > 0)
+                if (accmoney > 0 && !was_critical_error)
                 {
+                    // есть деньги и нет ошибок
                     if(wash_State[post] != washing)
                     {
                       // печать по внешнему сигналу, ждем таймаут отмены, но не в режиме мойки
@@ -249,8 +250,10 @@ void UserAppTask(void *p_arg)
                 {
                   countSecWait[post]--;
 
-                  // пришло время печати чека
-                  if(!countSecWait[post]) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                  // пришло время печати чека, но не должно быть ошибок - печатаем чек
+                  if(!countSecWait[post] && !was_critical_error) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                  // пришло время печати чека - ждем деньги
+                  else if(!countSecWait[post]) wash_State[post] = waitMoney;
                 }
               }
 
@@ -259,8 +262,8 @@ void UserAppTask(void *p_arg)
               {
                   accmoney = GetAcceptedMoney(post);
                   
-                  if (accmoney > 0)
-                  {
+                  if (accmoney > 0 && !was_critical_error)
+                  {   // есть деньги и нет ошибок
                       // для монетоприемников пылесосов - печать чека по таймауту
                       GetData(&CoinTimeOutDesc, &print_timeout, post, DATA_FLAG_DIRECT_INDEX);
                    
@@ -301,8 +304,14 @@ void UserAppTask(void *p_arg)
                       
                       if (accmoney > 0)
                       {
-                         PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                         // перезапустим тайм ауты - что бы по тайм ауту не вовремя не сбросить накопленное
+                         money_timestamp[post] = OSTimeGet();
+                         // после сброса ошибки чеки печатаем не сразу - а через тайм аут печати, вдруг не все исправилось?
+                         PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1 + post);
                       }
+
+                      // заодно на всякий случай сбросим сообщение о печати чека
+                      if(wash_State[post] == printCheck) wash_State[post] = waitMoney;
                   }
                   
                   break;
@@ -504,9 +513,9 @@ void UserAppTask(void *p_arg)
                   accmoney = GetAcceptedMoney(number_post);
                   accmoney += GetAcceptedBankMoney(number_post);
 
-                  if ((accmoney > 0) && (wash_State[number_post] != printCheck))
+                  if ((accmoney > 0) && (wash_State[number_post] != printCheck) && !was_critical_error)
                   {
-                    // запустим задержку печати чека
+                    // запустим задержку печати чека, если нет ошибок
                     GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
                     countSecWait[number_post] = count_delay;
   
@@ -514,6 +523,11 @@ void UserAppTask(void *p_arg)
                     if(countSecWait[number_post] == 0) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + number_post);
                     
                     wash_State[number_post] = printCheck;
+                  }
+                  else if (was_critical_error)
+                  {
+                    // если есть ошибки - просто продолжаем ожидать прием денег
+                    wash_State[number_post] = waitMoney;
                   }
               }
             break;
@@ -537,7 +551,7 @@ void UserAppTask(void *p_arg)
                 wash_State[number_post] = waitMoney;
                 break;
               }
-
+              
               // здесь событие старта печати чека - включили насос или пылесос
               accmoney = GetAcceptedMoney(number_post);
               
@@ -626,7 +640,14 @@ void UserAppTask(void *p_arg)
 
             case EVENT_KEY_F1:
 //                testMoney = 100;
+//                PostUserEvent(EVENT_COIN_INSERTED_POST1);
 //                PostUserEvent(EVENT_COIN_INSERTED_POST2);
+//                PostUserEvent(EVENT_COIN_INSERTED_POST3);
+//                PostUserEvent(EVENT_COIN_INSERTED_POST4);
+//                PostUserEvent(EVENT_COIN_INSERTED_POST5);
+//                PostUserEvent(EVENT_COIN_INSERTED_POST6);
+//                PostUserEvent(EVENT_COIN_INSERTED_VACUUM1);
+//                PostUserEvent(EVENT_COIN_INSERTED_VACUUM2);
 
                 /*FIO4SET_bit.P4_28 = 1;
                 OSTimeDly(50);
@@ -649,11 +670,22 @@ void UserAppTask(void *p_arg)
                 FIO4CLR_bit.P4_28 = 1;*/
             break;
             case EVENT_KEY_F2:
+                testMoney = 0;
+//                PostUserEvent(EVENT_STOP_MONEY_POST1);
 //                PostUserEvent(EVENT_STOP_MONEY_POST2);
+//                PostUserEvent(EVENT_STOP_MONEY_POST3);
+//                PostUserEvent(EVENT_STOP_MONEY_POST4);
+//                PostUserEvent(EVENT_STOP_MONEY_POST5);
+//                PostUserEvent(EVENT_STOP_MONEY_POST6);
             break;
             case EVENT_KEY_F3:
                 //testMoney = 100;
-//                PostUserEvent(EVENT_CASH_PRINT_CHECK_POST2);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST2);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST3);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST4);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST5);
+//                PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST6);
             break;
 #endif
             default:
