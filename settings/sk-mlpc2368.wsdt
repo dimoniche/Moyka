@@ -18,13 +18,13 @@
           
           
           
-        <Column0>160</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+        <Column0>197</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
     <Find-in-Files><ColumnWidth0>440</ColumnWidth0><ColumnWidth1>62</ColumnWidth1><ColumnWidth2>754</ColumnWidth2></Find-in-Files><TerminalIO/><Debug-Log><ColumnWidth0>22</ColumnWidth0><ColumnWidth1>1219</ColumnWidth1></Debug-Log></Static>
     <Windows>
       
       
-    <Wnd2>
+    <Wnd0>
         <Tabs>
           <Tab>
             <Identity>TabID-23142-24246</Identity>
@@ -34,7 +34,7 @@
           </Tab>
         <Tab><Identity>TabID-28963-15244</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab><Tab><Identity>TabID-3677-8150</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab></Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
+      <SelectedTab>1</SelectedTab></Wnd0><Wnd1>
         <Tabs>
           <Tab>
             <Identity>TabID-1122-24249</Identity>
@@ -46,20 +46,20 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd3></Windows>
+      <SelectedTab>0</SelectedTab></Wnd1></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\app\app_cfg.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>58</SelStart><SelEnd>58</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\8\positive_6_24\OS\app\app.c</Filename><XPos>0</XPos><YPos>26</YPos><SelStart>1431</SelStart><SelEnd>1431</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\uc\lib\lib_def.h</Filename><XPos>0</XPos><YPos>111</YPos><SelStart>5973</SelStart><SelEnd>5981</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\mode.c</Filename><XPos>0</XPos><YPos>28</YPos><SelStart>763</SelStart><SelEnd>763</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\fr.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>348</SelStart><SelEnd>348</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\coin.h</Filename><XPos>0</XPos><YPos>3</YPos><SelStart>390</SelStart><SelEnd>390</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\menu\menudesc.h</Filename><XPos>0</XPos><YPos>26</YPos><SelStart>1390</SelStart><SelEnd>1532</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\data.c</Filename><XPos>0</XPos><YPos>115</YPos><SelStart>3540</SelStart><SelEnd>3540</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\menu\menu.c</Filename><XPos>0</XPos><YPos>663</YPos><SelStart>21796</SelStart><SelEnd>21796</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\datadesc.c</Filename><XPos>0</XPos><YPos>762</YPos><SelStart>34079</SelStart><SelEnd>34093</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\coin.c</Filename><XPos>0</XPos><YPos>185</YPos><SelStart>6131</SelStart><SelEnd>6131</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\keyboard\keyboard.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>420</SelStart><SelEnd>429</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\journal.c</Filename><XPos>0</XPos><YPos>32</YPos><SelStart>978</SelStart><SelEnd>978</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\fram_map.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>179</SelStart><SelEnd>179</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\app_serv.h</Filename><XPos>0</XPos><YPos>23</YPos><SelStart>1204</SelStart><SelEnd>1231</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\journal.h</Filename><XPos>0</XPos><YPos>84</YPos><SelStart>70</SelStart><SelEnd>70</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\datadesc.h</Filename><XPos>0</XPos><YPos>129</YPos><SelStart>4906</SelStart><SelEnd>4906</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\app\app.c</Filename><XPos>0</XPos><YPos>114</YPos><SelStart>1131</SelStart><SelEnd>1131</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\app_serv.c</Filename><XPos>0</XPos><YPos>211</YPos><SelStart>5979</SelStart><SelEnd>5979</SelEnd></Tab><ActiveTab>18</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\fram\fram.c</Filename><XPos>0</XPos><YPos>96</YPos><SelStart>2256</SelStart><SelEnd>2256</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\menu\menudesc.c</Filename><XPos>0</XPos><YPos>637</YPos><SelStart>26818</SelStart><SelEnd>26818</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\time.c</Filename><XPos>0</XPos><YPos>240</YPos><SelStart>6982</SelStart><SelEnd>6982</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\fiscal\fiscal.h</Filename><XPos>0</XPos><YPos>271</YPos><SelStart>13623</SelStart><SelEnd>13623</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\drivers\fiscal\fiscal.c</Filename><XPos>0</XPos><YPos>910</YPos><SelStart>24201</SelStart><SelEnd>24201</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\fr.c</Filename><XPos>0</XPos><YPos>45</YPos><SelStart>484</SelStart><SelEnd>484</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\uc\os_ii\source\os_q.c</Filename><XPos>0</XPos><YPos>368</YPos><SelStart>19317</SelStart><SelEnd>19317</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\OS\uc\os_ii\source\os_core.c</Filename><XPos>0</XPos><YPos>1361</YPos><SelStart>56947</SelStart><SelEnd>56947</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\data\datadesc.c</Filename><XPos>0</XPos><YPos>762</YPos><SelStart>34079</SelStart><SelEnd>34093</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\coin.c</Filename><XPos>0</XPos><YPos>1041</YPos><SelStart>26119</SelStart><SelEnd>26119</SelEnd></Tab><ActiveTab>1</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\app\app_serv.c</Filename><XPos>0</XPos><YPos>354</YPos><SelStart>10810</SelStart><SelEnd>10810</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\menu\menudesc.c</Filename><XPos>0</XPos><YPos>80</YPos><SelStart>3719</SelStart><SelEnd>3719</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\PROJECT\services\time.c</Filename><XPos>0</XPos><YPos>240</YPos><SelStart>6982</SelStart><SelEnd>6982</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-02a83140><key>iaridepm.enu1</key></Toolbar-02a83140></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>722</Bottom><Right>251</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>107</yscreen><sizeHorzCX>156250</sizeHorzCX><sizeHorzCY>112513</sizeHorzCY><sizeVertCX>197656</sizeVertCX><sizeVertCY>761304</sizeVertCY></Rect></Wnd3></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>184</Bottom><Right>1282</Right><x>-2</x><y>-2</y><xscreen>1284</xscreen><yscreen>186</yscreen><sizeHorzCX>1003125</sizeHorzCX><sizeHorzCY>195584</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>112513</sizeVertCY></Rect></Wnd2></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-03722c00><key>iaridepm.enu1</key></Toolbar-03722c00></Sizes></Row0></Top><Left><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>633</Bottom><Right>288</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>110</yscreen><sizeHorzCX>156250</sizeHorzCX><sizeHorzCY>112130</sizeHorzCY><sizeVertCX>226563</sizeVertCX><sizeVertCY>647299</sizeVertCY></Rect></Wnd1></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>303</Bottom><Right>1282</Right><x>-2</x><y>-2</y><xscreen>1284</xscreen><yscreen>305</yscreen><sizeHorzCX>1003125</sizeHorzCX><sizeHorzCY>310907</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>112130</sizeVertCY></Rect></Wnd0></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 
