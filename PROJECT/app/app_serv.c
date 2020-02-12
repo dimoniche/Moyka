@@ -103,6 +103,9 @@ static CPU_INT32U bank_enable[COUNT_POST];
 static CPU_INT32U enable_signal[COUNT_POST];
 static CPU_INT32U fiscal_enable;
 
+// тайм аут меню печать чека после снятия ошибки фискальника
+static CPU_INT16U time_out_print_check[COUNT_POST + COUNT_VACUUM] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 void DrawMenu(void)
 {
   if (GetMode() != MODE_WORK) return;
@@ -286,6 +289,19 @@ void UserAppTask(void *p_arg)
                 // выключим прием денег, деньги принимаются - но чеки не печатаем - копим
                 if (was_critical_error == 0)
                 {
+                    for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+                    {
+                          // обнулим переменные, если находились в режиме печати чека или его ожидания
+                          // или даже сразу после снятия ошибки фискальника
+                          if(wash_State[post] == printCheck)
+                          { 
+                              wash_State[post] = waitMoney;
+                              countSecWait[post] = 0;
+                          }
+                          
+                          time_out_print_check[post] = 0;
+                    }
+
                     was_critical_error = 1;
                 }
                 break;
@@ -301,6 +317,7 @@ void UserAppTask(void *p_arg)
                   for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
                   {
                       accmoney = GetAcceptedMoney(post);
+                      accmoney += GetAcceptedBankMoney(post);
                       
                       if (accmoney > 0)
                       {
@@ -308,13 +325,35 @@ void UserAppTask(void *p_arg)
                          money_timestamp[post] = OSTimeGet();
                          // после сброса ошибки чеки печатаем не сразу - а через тайм аут печати, вдруг не все исправилось?
                          PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1 + post);
+                         
+                         // взведем таймаут печати чека - послали же запрос
+                         time_out_print_check[post] = 35;
                       }
 
-                      // заодно на всякий случай сбросим сообщение о печати чека
-                      if(wash_State[post] == printCheck) wash_State[post] = waitMoney;
+                      // заодно на всякий случай сбросим сообщение о печати чека  и тайм аут его ожидания
+                      if(wash_State[post] == printCheck) 
+                      { 
+                          wash_State[post] = waitMoney;
+                          countSecWait[post] = 0;
+                      }
                   }
                   
                   break;
+              }
+              
+              // тайм аут ожидания печати после ошибки фискальника - 35 секунд
+              for(int post = 0; post < COUNT_POST + COUNT_VACUUM; post++)
+              {
+                  if(time_out_print_check[post])
+                  {
+                      time_out_print_check[post]--;
+
+                      if(!time_out_print_check[post] && wash_State[post] == printCheck)
+                      {
+                          wash_State[post] = waitMoney;
+                          countSecWait[post] = 0;
+                      }
+                  }
               }
             }
             break;
@@ -1020,6 +1059,9 @@ CPU_INT32U GetAcceptedMoney(int post)
 void SetAcceptedBankMoney(CPU_INT32U money, int post)
 {
   CPU_INT32U m,crc;
+  
+  if(post >= COUNT_POST) return;
+
   m=money;
   crc = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
   SetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
@@ -1030,6 +1072,9 @@ void SetAcceptedBankMoney(CPU_INT32U money, int post)
 void ClearAcceptedBankMoney(int post)
 {
   CPU_INT32U m,crc;
+  
+  if(post >= COUNT_POST) return;
+
   m=0;
   crc = crc16((unsigned char*)&m, sizeof(CPU_INT32U));
   SetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
@@ -1040,6 +1085,9 @@ void ClearAcceptedBankMoney(int post)
 CPU_INT32U GetAcceptedBankMoney(int post)
 {
   CPU_INT32U m;
+
+  if(post >= COUNT_POST) return 0;
+
   GetData(&AcceptedBankMoneyDesc, &m, post, DATA_FLAG_DIRECT_INDEX);
   return m;
 }

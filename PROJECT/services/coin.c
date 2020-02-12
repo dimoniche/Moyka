@@ -524,14 +524,16 @@ CPU_INT32U input_register()
   {
      SETBIT(input, 19);
   }
-  if (FIO0PIN_bit.P0_28)
+  
+  if (FIO2PIN_bit.P2_10)
   {
      SETBIT(input, 20);
   }
-  if (FIO0PIN_bit.P0_27)
+  if (FIO1PIN_bit.P1_31)
   {
      SETBIT(input, 21);
   }
+  
   if (FIO1PIN_bit.P1_24)
   {
      SETBIT(input, 22);
@@ -972,7 +974,7 @@ void InputCapture_ISR(void)
   // банк 1
   if(TSTBIT(input_event, 20))
   {
-    if ((!FIO0PIN_bit.P0_28 && bankLevel[0]) || (FIO0PIN_bit.P0_28 && !bankLevel[0]))
+    if ((!FIO2PIN_bit.P2_10 && bankLevel[0]) || (FIO2PIN_bit.P2_10 && !bankLevel[0]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_bank[0];
@@ -993,7 +995,7 @@ void InputCapture_ISR(void)
   // банк 2
   if(TSTBIT(input_event, 21))
   {
-    if ((!FIO0PIN_bit.P0_27 && bankLevel[1]) || (FIO0PIN_bit.P0_27 && !bankLevel[1]))
+    if ((!FIO1PIN_bit.P1_31 && bankLevel[1]) || (FIO1PIN_bit.P1_31 && !bankLevel[1]))
       { // пришел задний фронт
         CPU_INT32U cr=T3CR;
         cr -= period_bank[1];
@@ -1242,18 +1244,18 @@ void InitInputPorts()
     FIO1MASK_bit.P1_25 = 0;
   
     // банк 1
-    PINSEL1_bit.P0_28 = 0;
-    if(bankLevel[0])PINMODE1_bit.P0_28 = 3;
-    else PINMODE1_bit.P0_28 = 0;
-    FIO0DIR_bit.P0_28  = 0;
-    FIO0MASK_bit.P0_28 = 0;
+    PINSEL4_bit.P2_10 = 0;
+    if(bankLevel[0])PINMODE4_bit.P2_10 = 3;
+    else PINMODE4_bit.P2_10 = 0;
+    FIO2DIR_bit.P2_10  = 0;
+    FIO2MASK_bit.P2_10 = 0;
 
     // банк 2
-    PINSEL1_bit.P0_27 = 0;
-    if(bankLevel[1])PINMODE1_bit.P0_27 = 3;
-    else PINMODE1_bit.P0_27 = 0;
-    FIO0DIR_bit.P0_27  = 0;
-    FIO0MASK_bit.P0_27 = 0;
+    PINSEL3_bit.P1_31 = 0;
+    if(bankLevel[1])PINMODE3_bit.P1_31 = 3;
+    else PINMODE3_bit.P1_31 = 0;
+    FIO1DIR_bit.P1_31  = 0;
+    FIO1MASK_bit.P1_31 = 0;
 
     // банк 3
     PINSEL3_bit.P1_24 = 0;
