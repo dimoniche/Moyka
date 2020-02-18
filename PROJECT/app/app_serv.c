@@ -674,6 +674,9 @@ void UserAppTask(void *p_arg)
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
                   wash_State[number_post] = waitMoney;
               }
+              
+              // сбросим таймаут ожидания печати чека после снятия ошибки
+              time_out_print_check[number_post] = 0;
             }
             break;
 
