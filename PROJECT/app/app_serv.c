@@ -319,22 +319,23 @@ void UserAppTask(void *p_arg)
                       accmoney = GetAcceptedMoney(post);
                       accmoney += GetAcceptedBankMoney(post);
                       
-                      if (accmoney > 0)
-                      {
-                         // перезапустим тайм ауты - что бы по тайм ауту не вовремя не сбросить накопленное
-                         money_timestamp[post] = OSTimeGet();
-                         // после сброса ошибки чеки печатаем не сразу - а через тайм аут печати, вдруг не все исправилось?
-                         PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1 + post);
-                         
-                         // взведем таймаут печати чека - послали же запрос
-                         time_out_print_check[post] = 35;
-                      }
-
                       // заодно на всякий случай сбросим сообщение о печати чека  и тайм аут его ожидания
                       if(wash_State[post] == printCheck) 
                       { 
                           wash_State[post] = waitMoney;
                           countSecWait[post] = 0;
+                      }
+
+                      if (accmoney > 0)
+                      {
+                         // перезапустим тайм ауты - что бы по тайм ауту не вовремя не сбросить накопленное
+                         money_timestamp[post] = OSTimeGet();
+                         
+                         // взведем таймаут печати чека - послали же запрос
+                         time_out_print_check[post] = 35;
+
+                         // после сброса ошибки чеки печатаем не сразу - а через тайм аут печати, вдруг не все исправилось?
+                         PostUserEvent(EVENT_WAIT_CASH_PRINT_CHECK_POST1 + post);
                       }
                   }
                   
@@ -558,10 +559,10 @@ void UserAppTask(void *p_arg)
                     GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
                     countSecWait[number_post] = count_delay;
   
+                    wash_State[number_post] = printCheck;
+
                     // если задержки нет - сразу печатаем
                     if(countSecWait[number_post] == 0) PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + number_post);
-                    
-                    wash_State[number_post] = printCheck;
                   }
                   else if (was_critical_error)
                   {
@@ -585,10 +586,14 @@ void UserAppTask(void *p_arg)
               int number_post = event - EVENT_CASH_PRINT_CHECK_POST1;
               CPU_INT32U accmoney = 0;
 
+              // переходим в ожидание приема денег
+              wash_State[number_post] = waitMoney;
+              // сбросим таймаут ожидания печати чека после снятия ошибки
+              time_out_print_check[number_post] = 0;
+
               if (was_critical_error)
               {
-                wash_State[number_post] = waitMoney;
-                break;
+                  break;
               }
               
               // здесь событие старта печати чека - включили насос или пылесос
@@ -612,9 +617,7 @@ void UserAppTask(void *p_arg)
                   if (TstCriticalErrors())
                   {
                     // выключим прием денег
-                    if (was_critical_error == 0) {was_critical_error = 1;} 
-                    wash_State[number_post] = waitMoney;
-
+                    if (was_critical_error == 0) {was_critical_error = 1;}
                     break;
                   }
 
@@ -630,7 +633,6 @@ void UserAppTask(void *p_arg)
                   }
                   
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
-                  wash_State[number_post] = waitMoney;
               }
               
               // здесь событие старта печати чека - включили насос или пылесос
@@ -655,8 +657,6 @@ void UserAppTask(void *p_arg)
                   {    
                     // выключим прием денег
                     if (was_critical_error == 0) {was_critical_error = 1;}
-                    wash_State[number_post] = waitMoney;
-
                     break;
                   }
 
@@ -672,11 +672,7 @@ void UserAppTask(void *p_arg)
                   }
                   
                   if (GetMode() == MODE_WORK) OSTimeDly(1000);
-                  wash_State[number_post] = waitMoney;
               }
-              
-              // сбросим таймаут ожидания печати чека после снятия ошибки
-              time_out_print_check[number_post] = 0;
             }
             break;
 
