@@ -29,7 +29,7 @@ CPU_INT32U money_timestamp[COUNT_POST + COUNT_VACUUM];
 //CPU_INT32U ChannelsCounters[COUNT_POST + COUNT_VACUUM];
 CPU_INT32U ChannelsPayedTime[COUNT_POST + COUNT_VACUUM];
 
-#define USER_QUERY_LEN  128
+#define USER_QUERY_LEN  512
 
 OS_STK    UserTaskStk[USER_TASK_STK_SIZE];
 OS_EVENT *UserQuery = NULL;
@@ -239,6 +239,10 @@ void UserAppTask(void *p_arg)
                         {
                             SetAcceptedMoney(0, post);
                             wash_State[post] = waitMoney;
+                            countSecWait[post] = 0;
+                            
+                            // сбросили все - к следующему каналу
+                            continue;
                         }
                       }
                     }
@@ -276,7 +280,7 @@ void UserAppTask(void *p_arg)
                       }
                   }
               }
-                
+
               // принимаем деньги
               DrawMenu();
 
@@ -556,7 +560,7 @@ void UserAppTask(void *p_arg)
                   if ((accmoney > 0) && (wash_State[number_post] != printCheck) && !was_critical_error)
                   {
                     // запустим задержку печати чека, если нет ошибок
-                    GetData(&PrintTimeoutDesc, &count_delay, number_post, DATA_FLAG_DIRECT_INDEX);
+                    GetData(&PrintTimeoutDesc, &count_delay, 0, DATA_FLAG_DIRECT_INDEX);
                     countSecWait[number_post] = count_delay;
   
                     wash_State[number_post] = printCheck;
