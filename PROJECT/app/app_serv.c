@@ -234,14 +234,13 @@ void UserAppTask(void *p_arg)
                       GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
                       if(print_timeout)
                       {
-                        // если указан таймаут обнулени€ денег - просто их обнул€ем
+                        // если указан таймаут обнулени€ денег - вместо пр€мого обнулени€ запускаем печать чека, там все сброс€т после печати
                         if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
                         {
-                            SetAcceptedMoney(0, post);
-                            wash_State[post] = waitMoney;
                             countSecWait[post] = 0;
-                            
-                            // сбросили все - к следующему каналу
+                            PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                              
+                            // событие послали - к следующему каналу
                             continue;
                         }
                       }
