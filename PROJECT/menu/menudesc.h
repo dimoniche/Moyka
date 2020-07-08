@@ -49,6 +49,7 @@ extern const TMenuPanel CommonCountersPanel[];
 extern const TMenuPanel bufReportMenuPanel[];
 extern const TMenuPanel ValidatorSetupPanel[];
 extern const TMenuPanel BankSetupPanel[];
+extern const TMenuPanel WashStatMenuPanel[];
 
 extern void PrintUserMenuStr(char* str, CPU_INT08U n);
 extern void PrintEventJournalRecord(TEventRecord *record);

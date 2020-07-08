@@ -136,8 +136,8 @@ const TMenuLine line_ServiceMenu_4 = {
   (void*)&ReportMenuPanel                           // панель для перехода
 };
 
-const TMenuLineArray arr_ServiceMenuArray[] = {&line_ServiceMenu_0, &line_ServiceMenu_1, /*&line_ServiceMenu_2,*/ &line_ServiceMenu_3, &line_ServiceMenu_4, NULL};
-const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 4, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_ServiceMenuArray[] = {&line_ServiceMenu_0, &line_ServiceMenu_1, &line_ServiceMenu_2, &line_ServiceMenu_3, &line_ServiceMenu_4, NULL};
+const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 5, MENU_PANEL_STANDARD};
 
 
 /***********************************
@@ -145,6 +145,7 @@ const TMenuPanel ServiceMenuPanel[] = {arr_ServiceMenuArray, NULL, 4, MENU_PANEL
 ***********************************/
 
 const CPU_INT08U str_StatisticsMenu_0[] = "    СТАТИСТИКА";
+const CPU_INT08U str_StatisticsMenu_1[] = "Суммы по мойкам";
 const CPU_INT08U str_StatisticsMenu_2[] = "Общая";
 const CPU_INT08U str_StatisticsMenu_4[] = "Очистка статистики";
 
@@ -153,6 +154,13 @@ const TMenuLine line_StatisticsMenu_0 = {
   MENU_FIXED_LINE,                // доп. флаги  
   (void*)str_StatisticsMenu_0,       // указатель на текстовую строку или дескриптор
   NULL                            // панель для перехода
+};
+
+const TMenuLine line_StatisticsMenu_1 = {
+  MENU_LINE_GOTO_MENU,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)str_StatisticsMenu_1,        // указатель на текстовую строку или дескриптор
+  (void*)WashStatMenuPanel                           // панель для перехода
 };
 
 const TMenuLine line_StatisticsMenu_2 = {
@@ -169,8 +177,36 @@ const TMenuLine line_StatisticsMenu_4 = {
   (void*)ClearStatMenu                           // панель для перехода
 };
 
-const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_2, &line_StatisticsMenu_4, NULL};
-const TMenuPanel StatisticsMenuPanel[] = {arr_StatisticsMenuArray, NULL, 3, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_StatisticsMenuArray[] = {&line_StatisticsMenu_0, &line_StatisticsMenu_1, /*&line_StatisticsMenu_2, &line_StatisticsMenu_4,*/ NULL};
+const TMenuPanel StatisticsMenuPanel[] = {arr_StatisticsMenuArray, NULL, 2, MENU_PANEL_STANDARD};
+
+/***********************************
+  МЕНЮ Статистика по мойкам
+***********************************/
+
+const TMenuLine line_WashStatMenu_0 = {
+  MENU_LINE_SHOW_DESC,                // тип пункта меню
+  MENU_FIXED_LINE|MENU_INDEX_LINE,    // доп. флаги  
+  (void*)&StatMoneyIndexDesc,         // указатель на текстовую строку или дескриптор
+  NULL                                // панель для перехода
+};
+
+const TMenuLine line_WashStatMenu_1 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                                 // доп. флаги  
+  (void*)&AcceptedMoneyDesc1,         // указатель на текстовую строку или дескриптор
+  NULL                               // панель для перехода
+};
+
+const TMenuLine line_WashStatMenu_2 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                                 // доп. флаги  
+  (void*)&AcceptedMoneyDesc1,         // указатель на текстовую строку или дескриптор
+  NULL                               // панель для перехода
+};
+
+const TMenuLineArray arr_WashStatMenuArray[] = {&line_WashStatMenu_0, &line_WashStatMenu_1, &line_WashStatMenu_2, NULL};
+const TMenuPanel WashStatMenuPanel[] = {arr_WashStatMenuArray, NULL, 3, MENU_PANEL_STANDARD};
 
 
 /***********************************
@@ -612,13 +648,20 @@ const TMenuLine line_SignalMenu_4 = {
   NULL                            // панель для перехода
 };
 
+const TMenuLine line_SignalMenu_5 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                                 // доп. флаги  
+  (void*)&CashPerMinuteDesc,         // указатель на текстовую строку или дескриптор
+  NULL                               // панель для перехода
+};
+
 void OnEnterSignalMenu(void)
 {
     CoinIndex = 0;
 }
 
-const TMenuLineArray arr_SignalMenuArray[] = {&line_SignalMenu_0, &line_SignalMenu_1, &line_SignalMenu_2, &line_SignalMenu_3, &line_SignalMenu_4, NULL};
-const TMenuPanel SignalSetupPanel[] = {arr_SignalMenuArray, OnEnterSignalMenu, 5, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_SignalMenuArray[] = {&line_SignalMenu_0, &line_SignalMenu_1, &line_SignalMenu_2, &line_SignalMenu_3, &line_SignalMenu_4, &line_SignalMenu_5, NULL};
+const TMenuPanel SignalSetupPanel[] = {arr_SignalMenuArray, OnEnterSignalMenu, 6, MENU_PANEL_STANDARD};
 
 
 /***********************************

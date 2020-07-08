@@ -57,6 +57,8 @@ typedef struct{
 
   CPU_INT32U  DeviceId;
 
+  CPU_INT32U  CashPerMinute;  // стоимость 1 минуты мойки
+  
 }TDeviceConfig;
 
 
@@ -111,8 +113,10 @@ extern TDataDescStruct const ClearStatCmdDesc;
 extern TDataDescStruct const BillFormatDesc;
 
 extern TDataDescStruct const AcceptedMoneyDesc;
+extern TDataDescStruct const AcceptedMoneyDesc1;
 extern TDataDescStruct const AcceptedMoneyCRC16Desc;
 extern TDataDescStruct const AcceptedBankMoneyDesc;
+extern TDataDescStruct const AcceptedBankMoneyDesc1;
 extern TDataDescStruct const AcceptedBankMoneyCRC16Desc;
 
 extern TDataDescStruct const DisableFiscalErrorsDesc;
@@ -162,6 +166,7 @@ extern void OnChangeCoinPulseLen();
 
 extern TDataDescStruct const PrintModeDesc;
 extern TDataDescStruct const PrintTimeoutAfterDesc;
+extern TDataDescStruct const CashPerMinuteDesc;
 extern TDataDescStruct const TaxFormatDesc;
 extern TDataDescStruct const SubjSellDesc;
 extern TDataDescStruct const CommandV2Desc;
@@ -188,6 +193,7 @@ extern TDataDescStruct const BankPauseLenDesc;
 extern TDataDescStruct const BankLevelDesc;
 
 extern TDataDescStruct const CoinTimeOutDesc;
+extern TDataDescStruct const StatMoneyIndexDesc;
 
 extern void OnChangeBankPulseLen();
 

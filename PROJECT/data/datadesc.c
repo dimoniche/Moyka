@@ -822,6 +822,30 @@ TDataDescStruct const PrintTimeoutAfterDesc = {
 };
 
 /*************************************
+  Стоимость минуты мойки для тайм аута
+*************************************/
+TRangeValueULONG const CashPerMinuteRange = {0, 600};
+CPU_INT08U const CashPerMinuteName[] = "Руб./мин.";
+
+TDataDescStruct const CashPerMinuteDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,             // размер массива
+  0,        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, DeviceConfig.CashPerMinute),            // указатель на переменную или адрес FRAM
+  (void*)&CashPerMinuteRange,     // указатель на границы параметра
+  NULL,                     // функция по изменению
+  0,       // смещение между элементами в массиве
+  CashPerMinuteName,       // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  10                          // значение по умолчанию
+};
+
+/*************************************
   Цена импульса купюрника в импульсном режиме
 *************************************/
 TRangeValueULONG const CashPerPulseRange = {1, 9999};
@@ -2201,6 +2225,7 @@ TDataDescStruct const ServiceNameDesc = {
 /*************************************
   Дескриптор для энергонезависимого сохранения текущих денег
 *************************************/
+
 TDataDescStruct const AcceptedMoneyDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
@@ -2212,7 +2237,27 @@ TDataDescStruct const AcceptedMoneyDesc = {
   NULL,                     // указатель на границы параметра
   NULL,                     // функция по изменению
   sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  NULL,           // указатель на строку названия параметра
+  NULL,                     // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  0                           
+};
+
+CPU_INT08U const AcceptedMoneyName[] = "Куп/Мон.руб.";
+
+TDataDescStruct const AcceptedMoneyDesc1 = {
+  DATA_DESC_VIEW,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST + COUNT_VACUUM,// размер массива
+  &StatMoneyIndexDesc,      // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, FRAM_AcceptedMoney),            // указатель на переменную или адрес FRAM
+  NULL,                     // указатель на границы параметра
+  NULL,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  (void*)&AcceptedMoneyName,       // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
@@ -2243,18 +2288,39 @@ TDataDescStruct const AcceptedMoneyCRC16Desc = {
 /*************************************
   Дескриптор для энергонезависимого сохранения текущих денег
 *************************************/
+
 TDataDescStruct const AcceptedBankMoneyDesc = {
   DATA_DESC_EDIT,           // тип дескриптора
   DATA_TYPE_ULONG,          // тип параметра
   DATA_LOC_FRAM,            // расположение параметра
   DATA_IS_ARRAY,            // признак массива
-  COUNT_POST,// размер массива
+  COUNT_POST,               // размер массива
   NULL,                     // указатель на десриптор индекса массива
   (void*)offsetof(TFramMap, FRAM_AcceptedBankMoney),            // указатель на переменную или адрес FRAM
   NULL,                     // указатель на границы параметра
   NULL,                     // функция по изменению
   sizeof(CPU_INT32U),       // смещение между элементами в массиве
-  NULL,           // указатель на строку названия параметра
+  NULL,                     // указатель на строку названия параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк для индексного параметра
+  DATA_INIT_DISABLE,
+  0                           
+};
+
+CPU_INT08U const AcceptedBankMoneyName[] = "Банк руб.";
+
+TDataDescStruct const AcceptedBankMoneyDesc1 = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_IS_ARRAY,            // признак массива
+  COUNT_POST,               // размер массива
+  &StatMoneyIndexDesc,      // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, FRAM_AcceptedBankMoney),            // указатель на переменную или адрес FRAM
+  NULL,                     // указатель на границы параметра
+  NULL,                     // функция по изменению
+  sizeof(CPU_INT32U),       // смещение между элементами в массиве
+  (void*)&AcceptedBankMoneyName,   // указатель на строку названия параметра
   DATA_NO_INDEX,            // признак индексного параметра (список строк)
   NULL,                     // указатель на список строк для индексного параметра
   DATA_INIT_DISABLE,
@@ -2629,6 +2695,29 @@ TDataDescStruct const GatewayDesc = {
   0xC0A80001
 };
 
+/*************************************
+  Индекс при просмотре текущего количества денег
+*************************************/
+CPU_INT08U const StatIndexName[] = "СУММЫ ПО ПОСТУ";
+
+TDataDescStruct const StatMoneyIndexDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_RAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,             // размер массива
+  NULL,        // указатель на десриптор индекса массива
+  (void*)&CoinIndex,            // указатель на переменную или адрес FRAM
+  (void*)&BankIndexRange,     // указатель на границы параметра
+  OnChangeBankIndex,                     // функция по изменению
+  0,       // смещение между элементами в массиве
+  StatIndexName,       // указатель на строку названия параметра
+  DATA_IS_INDEX,            // признак индексного параметра (список строк)
+  CoinIndexList,                     // указатель на список строк для индексного параметра
+  DATA_INIT_ENABLE,
+  0                           
+};
+
 //**************************************************
 const TDataDescArrayStruct AllDataArray[] = 
 {
@@ -2687,6 +2776,7 @@ const TDataDescArrayStruct AllDataArray[] =
     {&DisableFiscalErrorsDesc, "DisableFiscalErrorsDesc"},
     {&EnableSignalDesc, "EnableSignalDesc"},
     {&SignalPulseDesc, "SignalPulseDesc"},
+    {&CashPerMinuteDesc, "CashPerMinuteDesc"},
     
     {&CashLevelDesc, "CashLevelDesc"},
     {&CoinLevelDesc, "CoinLevelDesc"},

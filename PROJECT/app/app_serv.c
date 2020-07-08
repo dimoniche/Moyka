@@ -154,7 +154,9 @@ void UserAppTask(void *p_arg)
   incassation = 0;
   was_critical_error = 0;
 #endif
-      
+
+  UserPrintFirstMenu();
+
   int testMoney = 0;
 
   while (1)
@@ -227,15 +229,29 @@ void UserAppTask(void *p_arg)
 
                 if (accmoney > 0 && !was_critical_error)
                 {
+                    CPU_INT32U tick = labs(OSTimeGet() - money_timestamp[post]);
+
                     // есть деньги и нет ошибок
                     if(wash_State[post] != washing)
-                    {
+                    { 
                       // печать по внешнему сигналу, ждем таймаут отмены, но не в режиме мойки
                       GetData(&PrintTimeoutAfterDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
                       if(print_timeout)
                       {
                         // если указан таймаут обнуления денег - вместо прямого обнуления запускаем печать чека, там все сбросят после печати
-                        if (labs(OSTimeGet() - money_timestamp[post]) > 1000UL * print_timeout)
+                        if (tick > 1000UL * print_timeout)
+                        {
+                            countSecWait[post] = 0;
+                            PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                              
+                            // событие послали - к следующему каналу
+                            continue;
+                        }
+                      }
+                      else
+                      {
+                        // аварийный тайм аут ожидания начала мойки
+                        if (tick > 300000UL)
                         {
                             countSecWait[post] = 0;
                             PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
@@ -247,8 +263,25 @@ void UserAppTask(void *p_arg)
                     }
                     else
                     {
-                      // в режиме мойки продлеваем ожидание
-                      money_timestamp[post] = OSTimeGet();
+                      // в режиме мойки свой тайм аут в зависимости от суммы и цены минуты мойки
+                      GetData(&CashPerMinuteDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
+                      if(print_timeout)
+                      {
+                        // если указана стоимость минуты - по исчерпанию времени мойки принудительно запускаем печать чека
+                        if (tick > 1000UL * accmoney / print_timeout)
+                        {
+                            countSecWait[post] = 0;
+                            PostUserEvent(EVENT_CASH_PRINT_CHECK_POST1 + post);
+                              
+                            // событие послали - к следующему каналу
+                            continue;
+                        }
+                      }
+                      else
+                      {
+                          // если нет цены минуты - нет и тайм аута мойки
+                          money_timestamp[post] = OSTimeGet();
+                      }
                     }
                 }
                 
@@ -978,9 +1011,9 @@ void UserPrintFirstMenu(void)
 
     sprintf(buf, " ");
     PrintUserMenuStr(buf, 0);
-    sprintf(buf, "    ВНЕСИТЕ");
+    sprintf(buf, "    Все посты");
     PrintUserMenuStr(buf, 1);
-    sprintf(buf, "    ДЕНЬГИ");
+    sprintf(buf, "    выключены");
     PrintUserMenuStr(buf, 2);
     sprintf(buf, " ");
     PrintUserMenuStr(buf, 3);
