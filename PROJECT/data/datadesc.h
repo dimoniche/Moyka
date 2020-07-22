@@ -165,7 +165,6 @@ extern TDataDescStruct const CoinPauseLenDesc;
 extern void OnChangeCoinPulseLen();
 
 extern TDataDescStruct const PrintModeDesc;
-extern TDataDescStruct const PrintTimeoutAfterDesc;
 extern TDataDescStruct const CashPerMinuteDesc;
 extern TDataDescStruct const TaxFormatDesc;
 extern TDataDescStruct const SubjSellDesc;

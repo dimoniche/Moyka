@@ -1512,7 +1512,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>version2_07.hex</state>
+          <state>version2_08.hex</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1566,7 +1566,7 @@
         </option>
         <option>
           <name>IlinkOutputFile</name>
-          <state>version2_07.out</state>
+          <state>version2_08.out</state>
         </option>
         <option>
           <name>IlinkDebugInfoEnable</name>

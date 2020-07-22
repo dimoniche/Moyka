@@ -798,30 +798,6 @@ TDataDescStruct const PrintTimeoutDesc = {
 };
 
 /*************************************
-  “аймаут отмены печати чека
-*************************************/
-TRangeValueULONG const PrintTimeoutAfterRange = {0, 60};
-CPU_INT08U const PrintTimeoutAfterName[] = "“аймаут обнул.";
-
-TDataDescStruct const PrintTimeoutAfterDesc = {
-  DATA_DESC_EDIT,           // тип дескриптора
-  DATA_TYPE_ULONG,          // тип параметра
-  DATA_LOC_FRAM,            // расположение параметра
-  DATA_NO_ARRAY,            // признак массива
-  0,             // размер массива
-  0,        // указатель на десриптор индекса массива
-  (void*)offsetof(TFramMap, DeviceConfig.PrintTimeoutAfter),            // указатель на переменную или адрес FRAM
-  (void*)&PrintTimeoutAfterRange,     // указатель на границы параметра
-  NULL,                     // функци€ по изменению
-  0,       // смещение между элементами в массиве
-  PrintTimeoutAfterName,       // указатель на строку названи€ параметра
-  DATA_NO_INDEX,            // признак индексного параметра (список строк)
-  NULL,                     // указатель на список строк дл€ индексного параметра
-  DATA_INIT_DISABLE,
-  0                           // значение по умолчанию
-};
-
-/*************************************
   —тоимость минуты мойки дл€ тайм аута
 *************************************/
 TRangeValueULONG const CashPerMinuteRange = {0, 600};
@@ -2772,7 +2748,6 @@ const TDataDescArrayStruct AllDataArray[] =
     {&ServiceNameDesc, "ServiceNameDesc"},
 
     {&PrintModeDesc, "PrintModeDesc"},
-    {&PrintTimeoutAfterDesc, "PrintTimeoutAfterDesc"},
     {&DisableFiscalErrorsDesc, "DisableFiscalErrorsDesc"},
     {&EnableSignalDesc, "EnableSignalDesc"},
     {&SignalPulseDesc, "SignalPulseDesc"},
