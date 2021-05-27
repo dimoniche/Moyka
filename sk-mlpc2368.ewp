@@ -1512,7 +1512,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>version2_08.hex</state>
+          <state>version2_09.hex</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>

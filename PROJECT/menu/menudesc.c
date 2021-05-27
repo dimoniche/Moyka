@@ -1171,6 +1171,7 @@ const CPU_INT08U str_ReportMenu_0[] = "      ОТЧЕТЫ";
 const CPU_INT08U str_ReportMenu_1[] = "X-отчет";
 const CPU_INT08U str_ReportMenu_2[] = "Отчет о закр.смены";
 const CPU_INT08U str_ReportMenu_3[] = "Z-отчет из буфера";
+const CPU_INT08U str_ReportMenu_4[] = "Аннулирование чека";
 
 const TMenuLine line_ReportMenu_0 = {
   MENU_LINE_STRING,               // тип пункта меню
@@ -1201,6 +1202,13 @@ const TMenuLine line_ReportMenu_3 = {
 };
 */
 
+const TMenuLine line_ReportMenu_4 = {
+  MENU_LINE_GOTO_MENU,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)str_ReportMenu_4,        // указатель на текстовую строку или дескриптор
+  (void*)&CanselCheckMenuPanel                            // панель для перехода
+};
+
 void OnEnterReportsPanel(void)
 {
   CPU_INT32U enable;
@@ -1213,8 +1221,8 @@ void OnEnterReportsPanel(void)
   FlagForPrintReport = 0;
 }
 
-const TMenuLineArray arr_ReportMenuArray[] = {&line_ReportMenu_0, &line_ReportMenu_1, &line_ReportMenu_2, /*&line_ReportMenu_3,*/ NULL};
-const TMenuPanel ReportMenuPanel[] = {arr_ReportMenuArray, OnEnterReportsPanel, 3, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_ReportMenuArray[] = {&line_ReportMenu_0, &line_ReportMenu_1, &line_ReportMenu_2, /*&line_ReportMenu_3,*/ &line_ReportMenu_4, NULL};
+const TMenuPanel ReportMenuPanel[] = {arr_ReportMenuArray, OnEnterReportsPanel, 4, MENU_PANEL_STANDARD};
 
 /***********************************
   МЕНЮ ПЕЧАТЬ X-ОТЧЕТА
@@ -1338,6 +1346,44 @@ const TMenuLine line_bufReportMenu_3 = {
 
 const TMenuLineArray arr_bufReportMenuArray[] = {&line_bufReportMenu_0, &line_bufReportMenu_1, &line_bufReportMenu_2, &line_xReportMenu_3, NULL};
 const TMenuPanel bufReportMenuPanel[] = {arr_bufReportMenuArray, OnEnterZXReportPanel, 4, MENU_PANEL_STATIC};
+
+/***********************************
+  МЕНЮ АННУЛИРОВАНИЕ ЧЕКА
+***********************************/
+const CPU_INT08U str_CanselCheckMenu_0[] = " ";
+const CPU_INT08U str_CanselCheckMenu_1[] = "  Аннулировaть чек?";
+const CPU_INT08U str_CanselCheckMenu_2[] = " ";
+
+const TMenuLine line_CanselCheckMenu_0 = {
+  MENU_LINE_STRING,               // тип пункта меню
+  MENU_FIXED_LINE,                // доп. флаги  
+  (void*)str_CanselCheckMenu_0,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_CanselCheckMenu_1 = {
+  MENU_LINE_STRING,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)str_CanselCheckMenu_1,       // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_CanselCheckMenu_2 = {
+  MENU_LINE_STRING,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)str_CanselCheckMenu_2,        // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLine line_CanselCheckMenu_3 = {
+  MENU_LINE_STRING,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)str_xReportMenu_3,        // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
+const TMenuLineArray arr_CanselCheckMenuArray[] = {&line_CanselCheckMenu_0, &line_CanselCheckMenu_1, &line_CanselCheckMenu_2, &line_CanselCheckMenu_3, NULL};
+const TMenuPanel CanselCheckMenuPanel[] = {arr_CanselCheckMenuArray, OnEnterZXReportPanel, 4, MENU_PANEL_STATIC};
 
 /***********************************
   МЕНЮ ФР ОТКЛЮЧЕН

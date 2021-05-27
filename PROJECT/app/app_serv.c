@@ -524,6 +524,13 @@ void UserAppTask(void *p_arg)
                         GoToPreviousMenu();
                       }
                    }
+                  else if (GetCurrentMenu() == CanselCheckMenuPanel)
+                    {
+                      int res = CanselFiscalBill();
+                      SaveEventRecord(0, JOURNAL_EVENT_PRINT_X, res);
+                      CheckFiscalStatus();
+                      GoToPreviousMenu();
+                    }
                   break;
                 }
             
