@@ -718,13 +718,13 @@ repeat_sell1:
             
             if (!ok)
             {
-                CPU_INT32U serv_index;
-                GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
-                if (serv_index == 1)
-                {
-                    sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
-                }
-                else
+//                CPU_INT32U serv_index;
+//                GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
+//                if (serv_index == 1)
+//                {
+//                    sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
+//                }
+//                else
                 {
                     GetDataStr(&ServiceNameDesc, (CPU_INT08U*)service_name, 0, DATA_FLAG_SYSTEM_INDEX);
                 }
@@ -816,13 +816,13 @@ repeat_sell2:
 
             if (!ok)
             {
-                CPU_INT32U serv_index;
-                GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
-                if (serv_index == 1)
-                {
-                  sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
-                }
-                else
+//                CPU_INT32U serv_index;
+//                GetData(&ServiceNameDesc, &serv_index, 0, DATA_FLAG_SYSTEM_INDEX);
+//                if (serv_index == 1)
+//                {
+//                  sprintf(service_name, "Услуги мойки самообслуживания пост %d", post + 1);
+//                }
+//                else
                 {
                     GetDataStr(&ServiceNameDesc, (CPU_INT08U*)service_name, 0, DATA_FLAG_SYSTEM_INDEX);
                 }
