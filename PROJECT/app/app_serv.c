@@ -230,10 +230,20 @@ void UserAppTask(void *p_arg)
                 if (accmoney > 0 && !was_critical_error)
                 {
                     CPU_INT32U tick = labs(OSTimeGet() - money_timestamp[post]);
-
+                    
                     // есть деньги и нет ошибок
                     if(wash_State[post] != washing)
-                    { 
+                    {
+                      // если задан тайм аут начала мойки и он прошел - запускаем мойку - только для постов мойки
+                      GetData(&SignalTimeOutDesc, &print_timeout, 0, DATA_FLAG_SYSTEM_INDEX);
+                      if((print_timeout > 0) && (tick > print_timeout * 1000L) && (post < COUNT_POST))
+                      {
+                          PostUserEvent(EVENT_STOP_MONEY_POST1 + post); // начинаем мойку
+
+                          // событие послали - к следующему каналу
+                          continue;
+                      }
+
                       // аварийный тайм аут ожидания начала мойки
                       if (tick > 300000UL)
                       {

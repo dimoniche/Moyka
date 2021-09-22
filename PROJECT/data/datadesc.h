@@ -180,6 +180,7 @@ extern CPU_INT32U CoinIndex;
 extern TDataDescStruct const SignalIndexDesc;
 extern TDataDescStruct const EnableSignalDesc;
 extern TDataDescStruct const SignalPulseDesc;
+extern TDataDescStruct const SignalTimeOutDesc;
 
 extern TDataDescStruct const CashLevelDesc;
 extern TDataDescStruct const CoinLevelDesc;

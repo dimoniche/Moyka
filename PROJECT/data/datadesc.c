@@ -542,6 +542,30 @@ TDataDescStruct const SignalPulseDesc = {
 };
 
 /*************************************
+  “аймаут сигнала начала мойки
+*************************************/
+TRangeValueULONG const SignalTimeOutRange = {1, 300};
+CPU_INT08U const SignalTimeOutName[] = "“аймаут,сек.";
+
+TDataDescStruct const SignalTimeOutDesc = {
+  DATA_DESC_EDIT,           // тип дескриптора
+  DATA_TYPE_ULONG,          // тип параметра
+  DATA_LOC_FRAM,            // расположение параметра
+  DATA_NO_ARRAY,            // признак массива
+  0,                        // размер массива
+  0,                        // указатель на десриптор индекса массива
+  (void*)offsetof(TFramMap, signal_print_timeout_len),        // указатель на переменную или адрес FRAM
+  (void*)&SignalTimeOutRange,     // указатель на границы параметра
+  NULL,                     // функци€ по изменению
+  0,                        // смещение между элементами в массиве
+  SignalTimeOutName,        // указатель на строку названи€ параметра
+  DATA_NO_INDEX,            // признак индексного параметра (список строк)
+  NULL,                     // указатель на список строк дл€ индексного параметра
+  DATA_INIT_DISABLE,
+  0                         // значение по умолчанию
+};
+
+/*************************************
   »ндекс при настройке монетоприемников
 *************************************/
 TRangeValueULONG const CoinIndexRange = {0, 7};
@@ -2751,6 +2775,7 @@ const TDataDescArrayStruct AllDataArray[] =
     {&DisableFiscalErrorsDesc, "DisableFiscalErrorsDesc"},
     {&EnableSignalDesc, "EnableSignalDesc"},
     {&SignalPulseDesc, "SignalPulseDesc"},
+    {&SignalTimeOutDesc, "SignalTimeOutDesc"},
     {&CashPerMinuteDesc, "CashPerMinuteDesc"},
     
     {&CashLevelDesc, "CashLevelDesc"},

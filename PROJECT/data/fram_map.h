@@ -52,6 +52,9 @@ typedef struct
   TCountersLong CountersLong;
 
   CPU_INT32U StartButtonName;
+  
+  // таймаут начала мойки без внешнего сигнала - общий на все каналы
+  CPU_INT32U  signal_print_timeout_len;
 #endif
   
   CPU_INT08U  mac_addr[6];

@@ -627,6 +627,13 @@ const TMenuLine line_SignalMenu_1 = {
   NULL                            // панель для перехода
 };
 
+const TMenuLine line_SignalMenu_6 = {
+  MENU_LINE_SHOW_DESC,               // тип пункта меню
+  0,                              // доп. флаги  
+  (void*)&SignalTimeOutDesc,      // указатель на текстовую строку или дескриптор
+  NULL                            // панель для перехода
+};
+
 const TMenuLine line_SignalMenu_2 = {
   MENU_LINE_SHOW_DESC,               // тип пункта меню
   0,                              // доп. флаги  
@@ -660,8 +667,8 @@ void OnEnterSignalMenu(void)
     CoinIndex = 0;
 }
 
-const TMenuLineArray arr_SignalMenuArray[] = {&line_SignalMenu_0, &line_SignalMenu_1, &line_SignalMenu_2, &line_SignalMenu_3, &line_SignalMenu_4, &line_SignalMenu_5, NULL};
-const TMenuPanel SignalSetupPanel[] = {arr_SignalMenuArray, OnEnterSignalMenu, 6, MENU_PANEL_STANDARD};
+const TMenuLineArray arr_SignalMenuArray[] = {&line_SignalMenu_0, &line_SignalMenu_1, &line_SignalMenu_6, &line_SignalMenu_2, &line_SignalMenu_3, &line_SignalMenu_4, &line_SignalMenu_5, NULL};
+const TMenuPanel SignalSetupPanel[] = {arr_SignalMenuArray, OnEnterSignalMenu, 7, MENU_PANEL_STANDARD};
 
 
 /***********************************
