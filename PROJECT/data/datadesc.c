@@ -544,7 +544,7 @@ TDataDescStruct const SignalPulseDesc = {
 /*************************************
   Таймаут сигнала начала мойки
 *************************************/
-TRangeValueULONG const SignalTimeOutRange = {1, 300};
+TRangeValueULONG const SignalTimeOutRange = {0, 300};
 CPU_INT08U const SignalTimeOutName[] = "Таймаут,сек.";
 
 TDataDescStruct const SignalTimeOutDesc = {
